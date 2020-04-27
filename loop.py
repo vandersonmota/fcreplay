@@ -5,6 +5,7 @@ import shutil
 import os
 import logging
 import json
+import sys
 from internetarchive import get_item
 
 with open("config.json") as json_data_file:
@@ -38,7 +39,10 @@ while True:
         logging.info(f"Running capture with {str(row[0])} and {str(row[7])}")
         time_min = int(row[7]/60)
         logging.info(f"Capture will take {str(time_min)} minutes")
-        capture_rc = subprocess.call([f"{config['fcreplay_dir']}/capture.sh", str(row[0]), str(row[7])])
+        capture_rc = subprocess.run([
+            f"{config['fcreplay_dir']}/capture.sh",
+            str(row[0]),
+            str(row[7])])
         # Check if failed
         status = open(f"{config['fcreplay_dir']}/tmp/status", 'r')
         if "failed" in status.readline():
@@ -59,23 +63,42 @@ Fightcade replay id: {row[0]}"""
 
         # Fix broken videos:
         logging.info("Running ffmpeg to fix dirty video")
-        dirty_rc = subprocess.call(["ffmpeg", "-err_detect", "ignore_err",
-                                    "-i", f"{config['fcreplay_dir']}/finished/dirty_{filename}",
-                                    "-c", "copy",
-                                    f"{config['fcreplay_dir']}/finished/{filename}"])
+        dirty_rc = subprocess.run([
+            "ffmpeg", "-err_detect", "ignore_err",
+            "-i", f"{config['fcreplay_dir']}/finished/dirty_{filename}",
+            "-c", "copy",
+            f"{config['fcreplay_dir']}/finished/{filename}"])
         logging.info("Removing dirty file")
         os.remove(f"{config['fcreplay_dir']}/finished/dirty_{filename}")
         logging.info("Removed dirty file")
         logging.info("Fixed file")
 
+        # Use ffmpeg to check for black frames to see if something is broken
+        logging.info("Checking for black frames")
+        black_rc = subprocess.run([
+            "ffmpeg",
+            "-i",
+            f"{config['[fcreplay_dir']}/finished/{filename}",
+            "-vf", "blackdetect=d=10",
+            "-an", "-f", "null", "-"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        if "blackdetect" in str(black_rc):
+            logging.error("10 seconds or more of black frames detected")
+            # Doing a hard exit here until there is a better way to find out
+            # what might be broken
+            sys.exit(1)
+        logging.info("Finished checking black frames")
+
         # Create thumbnail
         logging.info("Making thumbnail")
-        thumbnail_rc = subprocess.call(["ffmpeg",
-                                        "-ss", "20",
-                                        "-i", f"{config['fcreplay_dir']}/finished/{filename}",
-                                        "-vframes:v", "1",
-                                        f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
-        logging.info("Made thumbnail")
+        thumbnail_rc = subprocess.run([
+            "ffmpeg",
+            "-ss", "20",
+            "-i", f"{config['fcreplay_dir']}/finished/{filename}",
+            "-vframes:v", "1",
+            f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
+        logging.info("Finished making thumbnail")
 
         if config['upload_to_ia']:
             # Do Upload
@@ -99,16 +122,17 @@ Fightcade replay id: {row[0]}"""
                   'language': config['ia_settings']['language'],
                   'licenseurl': config['ia_settings']['license_url']}
 
-            logging.info("Uploading to archive.org")
-            fc_video.upload(f"{config['fcreplay_dir']}/finished/{filename}", metadata=md, verbose=True)
-            logging.info("Uploaded to archive.org")
+            logging.info("Starting upload to archive.org")
+            fc_video.upload(f"{config['fcreplay_dir']}/finished/{filename}",
+                            metadata=md, verbose=True)
+            logging.info("Finished upload to archive.org")
 
         if config['remove_generated_files']:
             # Remove dirty file, description and thumbnail
             logging.info("Removing old files")
             os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
             os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
-            logging.info("Removed files")
+            logging.info("Finished removing files")
 
         # Update to processed
         logging.info(f"sqlite updating id {str(row[0])} created to yes")
