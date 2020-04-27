@@ -83,7 +83,7 @@ def black_check(config, filename):
         "-an", "-f", "null", "-"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    if "blackdetect" in str(black_rc.stderr) or "blackdetect" in black_rc.stdout:
+    if "blackdetect" in str(black_rc.stderr) or "blackdetect" in str(black_rc.stdout):
         logging.error("Black frames detected, exiting")
         # If there are too many black frames, then we need to debug processing
         sys.exit(1)
