@@ -15,10 +15,7 @@ sql_conn = sqlite3.connect(config['sqlite_db'])
 c = sql_conn.cursor()
 
 # Setup Log
-logging.basicConfig(filename=config['logfile'])
-loglevel = logging.getLogger('logging')
-level = logging.getLevelName(config['loglevel'])
-loglevel.setLevel(level)
+logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
 
 # Create directories if they don't exist
 if not os.path.exists(f"{config['fcreplay_dir']}/tmp"):

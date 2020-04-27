@@ -218,7 +218,7 @@ obs
 ```
 
 Configure OBS for your systems performance. You want to change the video output directory to `~/fcreplay/videos` with
-a static filename (set in the advanced setion) as `video`. Make sure to disable recording of the mouse cursor as well
+a static filename (set in the advanced setion) as `replay`. Make sure to disable recording of the mouse cursor as well
 
 Now you need to configure the scene. I found the best way to do this was to have ggpofba running, then switch OBS to a
 i3 floating window (win+shift+space).
