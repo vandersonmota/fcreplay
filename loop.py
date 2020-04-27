@@ -36,9 +36,9 @@ while True:
 
     if row is not None:
         # Do record here
-        logging.info(f"Running capture with {str(row[0])} and {str(row[7])}")
+        logging.info(f"Running capture with {row[0]} and {row[7]}")
         time_min = int(row[7]/60)
-        logging.info(f"Capture will take {str(time_min)} minutes")
+        logging.info(f"Capture will take {time_min} minutes")
         capture_rc = subprocess.run([
             f"{config['fcreplay_dir']}/capture.sh",
             str(row[0]),
@@ -46,12 +46,12 @@ while True:
         # Check if failed
         status = open(f"{config['fcreplay_dir']}/tmp/status", 'r')
         if "failed" in status.readline():
-            logging.error(f"Status file is failed. Unable to record {str(row[0])}")
+            logging.error(f"Status file is failed. Unable to record {row[0]}")
             continue
         logging.info("Capture finished")
 
         # Do move
-        filename = f"{str(row[0])}.mkv"
+        filename = f"{row[0]}.mkv"
         shutil.move(f"{config['fcreplay_dir']}/videos/{config['obs_video_filename']}",
                     f"{config['fcreplay_dir']}/finished/dirty_{filename}")
 
@@ -135,12 +135,12 @@ Fightcade replay id: {row[0]}"""
             logging.info("Finished removing files")
 
         # Update to processed
-        logging.info(f"sqlite updating id {str(row[0])} created to yes")
+        logging.info(f"sqlite updating id {row[0]} created to yes")
         c2 = sql_conn.cursor()
         c2.execute("UPDATE replays SET created = 'yes' WHERE ID = ?", (row[0],))
         sql_conn.commit()
         logging.info("Updated sqlite")
-        logging.info(f"Finished processing {str(row[0])}")
+        logging.info(f"Finished processing {row[0]}")
     else:
         break
 
