@@ -35,16 +35,16 @@ while True:
 
     if row is not None:
         # Do record here
-        logging.info(f"INFO: Running capture with {str(row[0])} and {str(row[7])}")
+        logging.info(f"Running capture with {str(row[0])} and {str(row[7])}")
         time_min = int(row[7]/60)
-        logging.info(f"INFO: Capture will take {str(time_min)} minutes")
+        logging.info(f"Capture will take {str(time_min)} minutes")
         capture_rc = subprocess.call([f"{config['fcreplay_dir']}/capture.sh", str(row[0]), str(row[7])])
         # Check if failed
         status = open(f"{config['fcreplay_dir']}/tmp/status", 'r')
         if "failed" in status.readline():
-            logging.error(f"ERROR: Status file is failed. Unable to record {str(row[0])}")
+            logging.error(f"Status file is failed. Unable to record {str(row[0])}")
             continue
-        logging.info("INFO: Capture finished")
+        logging.info("Capture finished")
 
         # Do move
         filename = f"{str(row[0])}.mkv"
@@ -52,30 +52,30 @@ while True:
                     f"{config['fcreplay_dir']}/finished/dirty_{filename}")
 
         # Create description
-        logging.info("INFO: Creating description")
+        logging.info("Creating description")
         description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
 Fightcade replay id: {row[0]}"""
-        logging.info("INFO: Finished creating description")
+        logging.info("Finished creating description")
 
         # Fix broken videos:
-        logging.info("INFO: Running ffmpeg to fix dirty video")
+        logging.info("Running ffmpeg to fix dirty video")
         dirty_rc = subprocess.call(["ffmpeg", "-err_detect", "ignore_err",
                                     "-i", f"{config['fcreplay_dir']}/finished/dirty_{filename}",
                                     "-c", "copy",
                                     f"{config['fcreplay_dir']}/finished/{filename}"])
-        logging.info("INFO: Removing dirty file")
+        logging.info("Removing dirty file")
         os.remove(f"{config['fcreplay_dir']}/finished/dirty_{filename}")
-        logging.info("INFO: Removed dirty file")
-        logging.info("INFO: Fixed file")
+        logging.info("Removed dirty file")
+        logging.info("Fixed file")
 
         # Create thumbnail
-        logging.info("INFO: Making thumbnail")
+        logging.info("Making thumbnail")
         thumbnail_rc = subprocess.call(["ffmpeg",
                                         "-ss", "20",
                                         "-i", f"{config['fcreplay_dir']}/finished/{filename}",
                                         "-vframes:v", "1",
                                         f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
-        logging.info("INFO: Made thumbnail")
+        logging.info("Made thumbnail")
 
         if config['upload_to_ia']:
             # Do Upload
@@ -99,25 +99,25 @@ Fightcade replay id: {row[0]}"""
                   'language': config['ia_settings']['language'],
                   'licenseurl': config['ia_settings']['license_url']}
 
-            logging.info("INFO: Uploading to archive.org")
+            logging.info("Uploading to archive.org")
             fc_video.upload(f"{config['fcreplay_dir']}/finished/{filename}", metadata=md, verbose=True)
-            logging.info("INFO: Uploaded to archive.org")
+            logging.info("Uploaded to archive.org")
 
         if config['remove_generated_files']:
             # Remove dirty file, description and thumbnail
-            logging.info("INFO: Removing old files")
+            logging.info("Removing old files")
             os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
             os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
-            logging.info("INFO: Removed files")
+            logging.info("Removed files")
 
         # Update to processed
-        logging.info(f"INFO: sqlite updating id {str(row[0])} created to yes")
+        logging.info(f"sqlite updating id {str(row[0])} created to yes")
         c2 = sql_conn.cursor()
         c2.execute("UPDATE replays SET created = 'yes' WHERE ID = ?", (row[0],))
         sql_conn.commit()
-        logging.info("INFO: Updated sqlite")
-        logging.info(f"INFO: Finished processing {str(row[0])}")
+        logging.info("Updated sqlite")
+        logging.info(f"Finished processing {str(row[0])}")
     else:
         break
 
-logging.info("INFO: Finished processing queue")
+logging.info("Finished processing queue")
