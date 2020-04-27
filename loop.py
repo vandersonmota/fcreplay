@@ -37,8 +37,8 @@ def record(config, row):
     # Check if failed
     status = open(f"{config['fcreplay_dir']}/tmp/status", 'r')
     if "failed" in status.readline():
-        logging.error(f"Status file is failed. Unable to record {row[0]}")
-        continue
+        logging.error(f"Status file is failed. Unable to record {row[0]}, exiting.")
+        sys.exit(1)
     logging.info("Capture finished")
 
 
