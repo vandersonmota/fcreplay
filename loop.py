@@ -78,7 +78,7 @@ Fightcade replay id: {row[0]}"""
         black_rc = subprocess.run([
             "ffmpeg",
             "-i",
-            f"{config['[fcreplay_dir']}/finished/{filename}",
+            f"{config[fcreplay_dir']}/finished/{filename}",
             "-vf", "blackdetect=d=10",
             "-an", "-f", "null", "-"],
             stdout=subprocess.PIPE,
