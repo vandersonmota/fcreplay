@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import requests
 import datetime
+import json
 import sys
 import sqlite3
 from retrying import retry
