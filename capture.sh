@@ -4,6 +4,14 @@ FCREPLAY_DIR=`cat config.json|jq .fcreplay_dir -M -r`
 GGPO_DIR=`cat config.json|jq .pyqtggpo_dir -M -r`
 LOGFILE=`cat config.json|jq .logfile -M -r`
 
+# Pulseaudio seems to crash? Stop lets just manage it ourselves
+pulseaudio --start
+if ! pulseaudio --check; then
+  # Pulse audio didn't start. This is bad
+  echo failed > ${FCREPLAY_DIR}/tmp/status
+  exit 1
+fi
+
 let TIME=${2}-3
 cd $GGPO_DIR
 ./ggpofba.sh "$1" &
@@ -20,7 +28,7 @@ pkill -9 soundmeter
 # Check if ggpo is actually running or crashed. If it isn't running, update script and exit
 if ! pgrep ggpo > /dev/null; then
   echo "ERROR: GGPO isn't running! Crashed?" >> ${LOGFILE}
-  echo fail > ${FCREPLAY_DIR}/tmp/status
+  echo failed > ${FCREPLAY_DIR}/tmp/status
 fi
 
 # Start pre-configured OBS
@@ -28,3 +36,6 @@ timeout $TIME obs --minimize-to-tray --startrecording || pkill -9 ggpofba
 
 # Set fcreplay to pass
 echo pass > ${FCREPLAY_DIR}/tmp/status
+
+# And kill pulse audio
+pulseaudio --kill

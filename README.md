@@ -89,7 +89,8 @@ apt-get install \
         python3-venv \
         sqlite3 \
         ffmpeg \
-        pavucontrol
+        pavucontrol \
+        jq
 ```
 
 Install wine:
