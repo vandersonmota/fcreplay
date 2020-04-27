@@ -21,11 +21,11 @@ level = logging.getLevelName(config['loglevel'])
 loglevel.setLevel(level)
 
 # Create directories if they don't exist
-if not os.path.exits(f"{config['fcreplay_dir']}/tmp"):
+if not os.path.exists(f"{config['fcreplay_dir']}/tmp"):
     os.mkdir(f"{config['fcreplay_dir']}/tmp")
-if not os.path.exits(f"{config['fcreplay_dir']}/videos"):
+if not os.path.exists(f"{config['fcreplay_dir']}/videos"):
     os.mkdir(f"{config['fcreplay_dir']}/videos")
-if not os.path.exits(f"{config['fcreplay_dir']}/finished"):
+if not os.path.exists(f"{config['fcreplay_dir']}/finished"):
     os.mkdir(f"{config['fcreplay_dir']}/finished")
 
 # Loop and choose a random replay every time
