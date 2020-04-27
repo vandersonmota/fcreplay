@@ -1,0 +1,20 @@
+{
+  "fcreplay_dir": "/home/fbarecorder/fcreplay",
+  "pyqtggpo_dir": "/home/fbarecorder/fcreplay/pyqtggpo-master",
+  "logfile": "/home/fbarecorder/fcreplay/fcreplay.log",
+  "replay_pages": "20",
+  "loglevel": "DEBUG",
+  "sqlite_db": "replays.db",
+  "obs_video_filename": "replay.mkv",
+  "remove_generated_files": true,
+  "upload_to_ia": true,
+  "random_replay": true,
+  "ia_settings": {
+    "mediatype": "video",
+    "collection": "opensource_movies",
+    "language": "English",
+    "creator": "Your Name",
+    "subject": ["3rds strike", "street fighter", "video", "fightcade"],
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0'"
+  }
+}
