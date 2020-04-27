@@ -162,7 +162,7 @@ def main():
             description_text = description(config, row)
             broken_fix(config, filename)
             black_check(config, filename)
-            create_thumbnail(config)
+            create_thumbnail(config, filename)
 
             if config['upload_to_ia']:
                 upload_to_ia(config, row, filename, description_text)
