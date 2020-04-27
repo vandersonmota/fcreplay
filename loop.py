@@ -17,7 +17,7 @@ c = sql_conn.cursor()
 # Setup Log
 logging.basicConfig(filename=config['logfile'])
 loglevel = logging.getLogger('logging')
-level = logging.getLevelName(config.['loglevel'])
+level = logging.getLevelName(config['loglevel'])
 loglevel.setLevel(level)
 
 # Create directories if they don't exist
