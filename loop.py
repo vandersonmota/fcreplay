@@ -7,6 +7,7 @@ import logging
 import json
 import sys
 from internetarchive import get_item
+from retrying import retry
 
 with open("config.json") as json_data_file:
     config = json.load(json_data_file)
@@ -101,9 +102,11 @@ def create_thumbnail(config, filename):
         f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
     logging.info("Finished making thumbnail")
 
-
+@retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
 def upload_to_ia(config, row, filename, description_text):
-    # Do Upload
+    # Do Upload to internet archive. Sometimes it will return a 403, even
+    # though the file doesn't already exist. So we decorate the function with
+    # the @retry decorator to try again in a little bit. Max of 3 tries.
     title = f"Street Fighter III: 3rd Strike: ({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}"
     tags = "StreetFighter3rd, fightcade"
     date_mut = str(row[6])
