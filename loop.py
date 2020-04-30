@@ -80,7 +80,7 @@ def black_check(config, filename):
         "ffmpeg",
         "-i",
         f"{config['fcreplay_dir']}/finished/{filename}",
-        "-vf", "blackdetect=d=10",
+        "-vf", "blackdetect=d=20",
         "-an", "-f", "null", "-"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
