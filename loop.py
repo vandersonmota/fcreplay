@@ -151,12 +151,19 @@ def update_db(row):
     logging.info(f"Finished processing {row[0]}")
 
 
+def set_failed(row):
+    logging.info(f"Setting {row[0]} to failed")
+    c3 = sql_conn.cursor()
+    c3.execute("UPDATE replays SET failed = 'yes' WHERE ID = ?", (row[0],))
+    sql_conn.commit()
+    logging.info("Finished updating sqlite")
+
 def main():
     while True:
         if config['random_replay']:
-            c.execute("SELECT * FROM replays WHERE created = 'no' ORDER BY RANDOM() LIMIT 1")
+            c.execute("SELECT * FROM replays WHERE created = 'no' AND failed = 'no' ORDER BY RANDOM() LIMIT 1")
         else:
-            c.execute("SELECT * FROM replays WHERE created = 'no' LIMIT 1")
+            c.execute("SELECT * FROM replays WHERE created = 'no' AND failed != 'yes' LIMIT 1")
         row = c.fetchone()
 
         if row is not None:
@@ -168,7 +175,10 @@ def main():
             create_thumbnail(config, filename)
 
             if config['upload_to_ia']:
-                upload_to_ia(config, row, filename, description_text)
+                try:
+                    upload_to_ia(config, row, filename, description_text)
+                except:
+                    set_failed(row)
 
             if config['remove_generated_files']:
                 remove_generated_files(config, filename)

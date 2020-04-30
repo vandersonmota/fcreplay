@@ -60,7 +60,9 @@ if c.fetchone()[0] == 0:
     p2 TEXT NOT NULL, \
     date_formatted TEXT NOT NULL, \
     date_org TEXT NOT NULL, \
-    length INT, created TEXT NOT NULL);")
+    length INT, \
+    created TEXT NOT NULL, \
+    failed TEXT NOT NULL);")
     sql_conn.commit()
 
 for replay in replays:
@@ -75,7 +77,7 @@ for replay in replays:
             p1 = replay[4]
             p2_loc = replay[5]
             p2 = replay[6]
-            fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no')
+            fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no')
 
             # Insert into sqlite
             c.execute('SELECT id FROM replays WHERE id=?', (fc_data[0],))
@@ -83,7 +85,7 @@ for replay in replays:
             if data is None:
                 # Don't bother with videos shorter than 60 seconds
                 if time > 60:
-                    c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?)', fc_data)
+                    c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?)', fc_data)
                     sql_conn.commit()
 
 sql_conn.close()
