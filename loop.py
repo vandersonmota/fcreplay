@@ -27,7 +27,8 @@ if not os.path.exists(f"{config['fcreplay_dir']}/videos"):
 if not os.path.exists(f"{config['fcreplay_dir']}/finished"):
     os.mkdir(f"{config['fcreplay_dir']}/finished")
 
-def record(config, row):
+
+def record(row):
     logging.info(f"Running capture with {row[0]} and {row[7]}")
     time_min = int(row[7]/60)
     logging.info(f"Capture will take {time_min} minutes")
@@ -43,14 +44,13 @@ def record(config, row):
     logging.info("Capture finished")
 
 
-def move(config, row):
+def move(row):
     filename = f"{row[0]}.mkv"
     shutil.move(f"{config['fcreplay_dir']}/videos/{config['obs_video_filename']}",
                 f"{config['fcreplay_dir']}/finished/dirty_{filename}")
-    return filename
 
 
-def description(config, row):
+def description(row):
     # Create description
     logging.info("Creating description")
     description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
@@ -59,8 +59,9 @@ Fightcade replay id: {row[0]}"""
     return description_text
 
 
-def broken_fix(config, filename):
+def broken_fix(row):
     # Fix broken videos:
+    filename = f"{row[0]}.mkv"
     logging.info("Running ffmpeg to fix dirty video")
     dirty_rc = subprocess.run([
         "ffmpeg", "-err_detect", "ignore_err",
@@ -73,9 +74,10 @@ def broken_fix(config, filename):
     logging.info("Fixed file")
 
 
-def black_check(config, filename):
+def black_check(row):
     # Use ffmpeg to check for black frames to see if something is broken
     logging.info("Checking for black frames")
+    filename = f"{row[0]}.mkv"
     black_rc = subprocess.run([
         "ffmpeg",
         "-i",
@@ -91,9 +93,10 @@ def black_check(config, filename):
     logging.info("Finished checking black frames")
 
 
-def create_thumbnail(config, filename):
+def create_thumbnail(row):
     # Create thumbnail
     logging.info("Making thumbnail")
+    filename = f"{row[0]}.mkv"
     thumbnail_rc = subprocess.run([
         "ffmpeg",
         "-ss", "20",
@@ -102,16 +105,15 @@ def create_thumbnail(config, filename):
         f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
     logging.info("Finished making thumbnail")
 
+
 @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
-def upload_to_ia(config, row, filename, description_text):
+def upload_to_ia(row, description_text):
     # Do Upload to internet archive. Sometimes it will return a 403, even
     # though the file doesn't already exist. So we decorate the function with
     # the @retry decorator to try again in a little bit. Max of 3 tries.
     title = f"Street Fighter III: 3rd Strike: ({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}"
-    tags = "StreetFighter3rd, fightcade"
-    date_mut = str(row[6])
+    filename = f"{row[0]}.mkv"
     date_short = str(row[6])[10]
-    date = date_mut.replace(" ","T") + ".0Z"
 
     # Make identifier for Archive.org
     ident = str(row[0]).replace("@", "-")
@@ -133,9 +135,10 @@ def upload_to_ia(config, row, filename, description_text):
     logging.info("Finished upload to archive.org")
 
 
-def remove_generated_files(config, filename):
+def remove_generated_files(row):
     # Remove dirty file, description and thumbnail
     logging.info("Removing old files")
+    filename = f"{row[0]}.mkv"
     os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
     os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
     logging.info("Finished removing files")
@@ -158,6 +161,7 @@ def set_failed(row):
     sql_conn.commit()
     logging.info("Finished updating sqlite")
 
+
 def main():
     while True:
         if config['random_replay']:
@@ -167,21 +171,56 @@ def main():
         row = c.fetchone()
 
         if row is not None:
-            record(config, row)
-            filename = move(config, row)
-            description_text = description(config, row)
-            broken_fix(config, filename)
-            black_check(config, filename)
-            create_thumbnail(config, filename)
+            try:
+                record(row)
+            except FileNotFoundError as e:
+                logging.error(e)
+                logging.error("Exiting due to error in capture")
+                sys.exit(1)
+
+            try:
+                move(row)
+            except FileNotFoundError as e:
+                logging.error(e)
+                logging.error("Exiting due to error in move")
+                sys.exit(1)
+
+            description_text = description(row)
+
+            try:
+                broken_fix(row)
+            except FileNotFoundError as e:
+                logging.error(e)
+                logging.error("Exiting due to error in brokenfix")
+                sys.exit(1)
+
+            try:
+                black_check(row)
+            except FileNotFoundError as e:
+                logging.error(e)
+                logging.error("Exiting due to error in black_check")
+                sys.exit(1)
+
+            try:
+                create_thumbnail(row)
+            except FileNotFoundError as e:
+                logging.error(e)
+                logging.error("Exiting due to error in create_thumbnail")
+                sys.exit(1)
 
             if config['upload_to_ia']:
                 try:
-                    upload_to_ia(config, row, filename, description_text)
+                    upload_to_ia(row, description_text)
                 except:
                     set_failed(row)
 
             if config['remove_generated_files']:
-                remove_generated_files(config, filename)
+                try:
+                    remove_generated_files(row)
+                except FileNotFoundError as e:
+                    logging.error(e)
+                    logging.error("Exiting due to error in remove_generated_files")
+                    sys.exit(1)
 
             update_db(row)
         else:
