@@ -194,12 +194,13 @@ def main():
                 logging.error("Exiting due to error in brokenfix")
                 sys.exit(1)
 
-            try:
-                black_check(row)
-            except FileNotFoundError as e:
-                logging.error(e)
-                logging.error("Exiting due to error in black_check")
-                sys.exit(1)
+            if config['blackdetect']:
+                try:
+                    black_check(row)
+                except FileNotFoundError as e:
+                    logging.error(e)
+                    logging.error("Exiting due to error in black_check")
+                    sys.exit(1)
 
             try:
                 create_thumbnail(row)
