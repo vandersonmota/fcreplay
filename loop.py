@@ -65,6 +65,8 @@ Fightcade replay id: {row[0]}"""
         description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
 Fightcade replay id: {row[0]}"""
     logging.info("Finished creating description")
+    if '--debug' in sys.argv[1]:
+        print(description_text)
     return description_text
 
 
@@ -173,7 +175,7 @@ def set_failed(row):
 
 def main():
     if '--debug' in sys.argv[1]:
-        print("-debug causes the script to end after one run")
+        print("--debug causes the script to end after one run and be a little more verbose")
 
     while True:
         if config['random_replay']:
