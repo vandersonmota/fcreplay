@@ -62,14 +62,14 @@ def description(row, detected_chars=None):
 Fightcade replay id: {row[0]}"""
         for match in detected_chars:
             description_text += f"""
-{row[3]}: {match[0]}, {row[4]}: {match[1]}  - {match[3]}
+{row[3]}: {match[0]}, {row[4]}: {match[1]}  - {match[2]}
             """
     else:
         description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
 Fightcade replay id: {row[0]}"""
     logging.info("Finished creating description")
     if DEBUG:
-        print(description_text)
+        print(f'Description Text is: {description_text}')
     return description_text
 
 
@@ -178,7 +178,7 @@ def set_failed(row):
 
 def main(argparser=None):
     if argparser is not None:
-        debug = argparser.parse_args(['--debug'])
+        DEBUG = argparser.parse_args(['--debug'])
 
     while True:
         if config['random_replay']:
@@ -219,14 +219,17 @@ def main(argparser=None):
 
             if config['detect_chars']:
                 try:
+                    logging.info("Detecting characters")
                     detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{row[0]}.mkv")
                     description_text = description(row, detected_chars)
+                    logging.info(f"Description is: {description_text}")
                 except Exception as e:
                     logging.error(e)
                     logging.error("Exiting due to error in character detection")
                     sys.exit(1)
             else:
-                    description_text = description(row)
+                description_text = description(row)
+                logging.info(f"Description is {description_text}")
 
             try:
                 create_thumbnail(row)
