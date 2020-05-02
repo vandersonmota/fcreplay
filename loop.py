@@ -7,6 +7,7 @@ import logging
 import json
 import sys
 import character_detect
+import argparse
 from internetarchive import get_item
 from retrying import retry
 
@@ -19,6 +20,8 @@ c = sql_conn.cursor()
 
 # Setup Log
 logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
+
+DEBUG=False
 
 # Create directories if they don't exist
 if not os.path.exists(f"{config['fcreplay_dir']}/tmp"):
@@ -65,7 +68,7 @@ Fightcade replay id: {row[0]}"""
         description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
 Fightcade replay id: {row[0]}"""
     logging.info("Finished creating description")
-    if '--debug' in sys.argv[1]:
+    if DEBUG:
         print(description_text)
     return description_text
 
@@ -173,9 +176,9 @@ def set_failed(row):
     logging.info("Finished updating sqlite")
 
 
-def main():
-    if '--debug' in sys.argv[1]:
-        print("--debug causes the script to end after one run and be a little more verbose")
+def main(argparser=None):
+    if argparser is not None:
+        debug = argparser.parse_args(['--debug'])
 
     while True:
         if config['random_replay']:
@@ -213,9 +216,10 @@ def main():
                     logging.error(e)
                     logging.error("Exiting due to error in black_check")
                     sys.exit(1)
+
             if config['detect_chars']:
                 try:
-                    detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{row[0]}")
+                    detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{row[0]}.mkv")
                     description_text = description(row, detected_chars)
                 except Exception as e:
                     logging.error(e)
@@ -250,12 +254,14 @@ def main():
         else:
             break
 
-        if '--debug' in sys.argv[1]:
+        if DEBUG:
             sys.exit(0)
 
 
 # Loop and choose a random replay every time
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
+    parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
+    main(parser)
 
 logging.info("Finished processing queue")
