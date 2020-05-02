@@ -6,6 +6,7 @@ import os
 import logging
 import json
 import sys
+import character_detect
 from internetarchive import get_item
 from retrying import retry
 
@@ -50,10 +51,18 @@ def move(row):
                 f"{config['fcreplay_dir']}/finished/dirty_{filename}")
 
 
-def description(row):
+def description(row, detected_chars=None):
     # Create description
     logging.info("Creating description")
-    description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
+    if detected_chars is not None:
+        description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
+Fightcade replay id: {row[0]}"""
+        for match in detected_chars:
+            description_text += f"""
+{row[3]}: {match[0]}, {row[4]}: {match[1]}  - {match[3]}
+            """
+    else:
+        description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
 Fightcade replay id: {row[0]}"""
     logging.info("Finished creating description")
     return description_text
@@ -163,6 +172,9 @@ def set_failed(row):
 
 
 def main():
+    if '--debug' in sys.argv[1]:
+        print("-debug causes the script to end after one run")
+
     while True:
         if config['random_replay']:
             c.execute("SELECT * FROM replays WHERE created = 'no' AND failed = 'no' ORDER BY RANDOM() LIMIT 1")
@@ -185,8 +197,6 @@ def main():
                 logging.error("Exiting due to error in move")
                 sys.exit(1)
 
-            description_text = description(row)
-
             try:
                 broken_fix(row)
             except FileNotFoundError as e:
@@ -201,9 +211,20 @@ def main():
                     logging.error(e)
                     logging.error("Exiting due to error in black_check")
                     sys.exit(1)
+            if config['detect_chars']:
+                try:
+                    detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{row[0]}")
+                    description_text = description(row, detected_chars)
+                except Exception as e:
+                    logging.error(e)
+                    logging.error("Exiting due to error in character detection")
+                    sys.exit(1)
+            else:
+                    description_text = description(row)
 
             try:
                 create_thumbnail(row)
+
             except FileNotFoundError as e:
                 logging.error(e)
                 logging.error("Exiting due to error in create_thumbnail")
@@ -226,6 +247,9 @@ def main():
             update_db(row)
         else:
             break
+
+        if '--debug' in sys.argv[1]:
+            sys.exit(0)
 
 
 # Loop and choose a random replay every time
