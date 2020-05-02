@@ -20,7 +20,7 @@ The script then takes over and:
 
 ## Character Detection
 OpenCV is used to analise the video and match character names from the health bars. It does this by template matching
-the included character name images against the video ever 60 frames. Depending on your OBS recording settings you might
+the included character name images against the video every 60 frames. Depending on your OBS recording settings you might
 need to regenerate the images.
 
 ### A few more notes: 
