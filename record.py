@@ -47,7 +47,7 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     print("Started ggpofba")
     
     # Check for sound
-    while not True:
+    while True:
         time.sleep(1)
         running_time = (datetime.datetime.now() - begin_time).seconds
         print(f'{running_time} of {fc_time}')
