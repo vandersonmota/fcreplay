@@ -67,8 +67,8 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
                 return False
         if running_time > kill_time:
             # Check if OBS is running, if it isn't then we are broken :(
-            if check_rc.returncode == 0:
-                print("Timeout reached killing processes")
+            if check_rc.returncode > 0:
+                print("Kill timeout reached killing processes")
                 cleanup_tasks()
                 timeout = True
                 return False
