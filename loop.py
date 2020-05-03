@@ -260,7 +260,7 @@ def main(DEBUG):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
     parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
-    DEBUG = argparser.parse_args(['--debug'])
+    DEBUG = parser.parse_args(['--debug'])
     main(parser)
 
 logging.info("Finished processing queue")
