@@ -39,8 +39,8 @@ def record(row):
     time_min = int(row[7]/60)
     logging.info(f"Capture will take {time_min} minutes")
     
-    record_failed = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
-    if record_failed:
+    record_pass = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
+    if not record_pass:
         logging.error(f"Recording failed on {row[0]}, exiting.")
         sys.exit(1)
     logging.info("Capture finished")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import daemon
+import argparse
 import datetime
 import threading
 import subprocess
@@ -39,7 +39,6 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     
     # Get start time
     begin_time = datetime.datetime.now()
-    timeout = False
     
     # Start ggpofba
     print("Starting ggpofba")
@@ -48,34 +47,42 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     print("Started ggpofba")
     
     # Check for sound
-    while not timeout:
+    while not True:
         time.sleep(1)
         running_time = (datetime.datetime.now() - begin_time).seconds
         print(f'{running_time} of {fc_time}')
-        check_rc = subprocess.run(['pgrep', '-a', '-f', 'obs'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        obs_running = '/usr/bin/obs' in str(subprocess.run(['ps', '-ef'], stdout=subprocess.PIPE, stderr=subprocess.PIPE))
 
         if  obs_sm_thread.is_alive():
             print('Soundmeter Running')
         if running_time > fc_time:
             # We have reached the end of the video. Killing processes
-            if check_rc.returncode == 0:
+            if obs_running:
                 cleanup_tasks()
-                timeout=True
                 return True
             else:
                 print("Timeout reached but obs isn't running. Something was broken")
+                cleanup_tasks()
                 return False
         if running_time > kill_time:
             # Check if OBS is running, if it isn't then we are broken :(
-            if check_rc.returncode > 0:
+            if not obs_running:
                 print("Kill timeout reached killing processes")
                 cleanup_tasks()
-                timeout = True
-                return False
-            else:
-                print("Timeout reached buy obs isn't running. Something is broken")
                 return False
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Record fightcade replays")
+    parser.add_argument('challenge_id', help="Fightcade challenge id")
+    parser.add_argument('fc_time', help="Length of time in seconds to record")
+    parser.add_argument('kill_timeout', help="How long to wait before killing processing")
+    parser.add_argument('ggpo_path', help='Path to ggpo')
+    parser.add_argument('fcreplay_path', help='Path to fcreplay')
+    args = parser.parse_args()
+    main(
+        fc_challange=args.challenge_id,
+        fc_time=int(args.fc_time),
+        kill_time=int(args.kill_timeout),
+        ggpo_path=args.ggpo_path,
+        fcreplay_path=args.fcreplay_path)
