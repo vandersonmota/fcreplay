@@ -52,7 +52,7 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
         time.sleep(1)
         running_time = (datetime.datetime.now() - begin_time).seconds
         print(f'{running_time} of {fc_time}')
-        check_rc = subprocess.run(['pgrep', 'obs'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        check_rc = subprocess.run(['pgrep', '-a', '-f', 'obs'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if  obs_sm_thread.is_alive():
             print('Soundmeter Running')
