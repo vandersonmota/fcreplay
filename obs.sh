@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/bin/obs --minimize-at-start --startrecording
+/usr/bin/obs --minimize-to-tray --startrecording
