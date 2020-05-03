@@ -7,7 +7,9 @@ import logging
 import json
 import sys
 import character_detect
+import record as fc_record
 import argparse
+from soundmeter import meter as sm
 from internetarchive import get_item
 from retrying import retry
 
@@ -36,14 +38,10 @@ def record(row):
     logging.info(f"Running capture with {row[0]} and {row[7]}")
     time_min = int(row[7]/60)
     logging.info(f"Capture will take {time_min} minutes")
-    capture_rc = subprocess.run([
-        f"{config['fcreplay_dir']}/capture.sh",
-        str(row[0]),
-        str(row[7])])
-    # Check if failed
-    status = open(f"{config['fcreplay_dir']}/tmp/status", 'r')
-    if "failed" in status.readline():
-        logging.error(f"Status file is failed. Unable to record {row[0]}, exiting.")
+    
+    record_failed = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
+    if record_failed:
+        logging.error(f"Recording failed on {row[0]}, exiting.")
         sys.exit(1)
     logging.info("Capture finished")
 
