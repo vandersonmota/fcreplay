@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/bin/osb --minimize-at-start --startrecording
+/usr/bin/obs --minimize-at-start --startrecording
