@@ -174,10 +174,7 @@ def set_failed(row):
     logging.info("Finished updating sqlite")
 
 
-def main(argparser=None):
-    if argparser is not None:
-        DEBUG = argparser.parse_args(['--debug'])
-
+def main(DEBUG):
     while True:
         if config['random_replay']:
             c.execute("SELECT * FROM replays WHERE created = 'no' AND failed = 'no' ORDER BY RANDOM() LIMIT 1")
@@ -263,6 +260,7 @@ def main(argparser=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
     parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
+    DEBUG = argparser.parse_args(['--debug'])
     main(parser)
 
 logging.info("Finished processing queue")
