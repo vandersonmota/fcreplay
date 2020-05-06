@@ -35,12 +35,13 @@ def cleanup_tasks():
 
 
 def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcreplay_path=None):
-    # Start pulseaudio
+    logging.info('Starting pulseaudio')
     subprocess.run(['pulseaudio', '--daemon'])
-    # Create soundmeter
-    sm = soundmeter.Meter(threshold='+1000', num=1, action="exec-stop", script=f"{fcreplay_path}/obs.sh")
+    
 
     # Create thread for sound meter
+    logging.info('Starting soundmeter to trigger obs')
+    sm = soundmeter.Meter(threshold='+1000', num=1, action="exec-stop", script=f"{fcreplay_path}/obs.sh")
     obs_sm_thread = threading.Thread(target=sm.start)
     obs_sm_thread.start()
     
