@@ -5,7 +5,14 @@ import threading
 import subprocess
 import sys
 import time
+import logging
+import json
 from soundmeter import meter as soundmeter
+
+with open("config.json") as json_data_file:
+    config = json.load(json_data_file)
+
+logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
 
 def start_ggpo(ggpo_path=None, fc_challenge=None):
     challenge_id, game_name = fc_challenge.split('@')
@@ -41,33 +48,33 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     begin_time = datetime.datetime.now()
     
     # Start ggpofba
-    print("Starting ggpofba")
+    logging.info("Starting ggpofba")
     ggpo_thread = threading.Thread(target=start_ggpo, args=[ggpo_path, fc_challange])
     ggpo_thread.start()
-    print("Started ggpofba")
+    logging.info("Started ggpofba")
     
     # Check for sound
     while True:
         time.sleep(1)
         running_time = (datetime.datetime.now() - begin_time).seconds
-        print(f'{running_time} of {fc_time}')
+        logging.info(f'{running_time} of {fc_time}')
         obs_running = '/usr/bin/obs' in str(subprocess.run(['ps', '-ef'], stdout=subprocess.PIPE, stderr=subprocess.PIPE))
 
         if  obs_sm_thread.is_alive():
-            print('Soundmeter Running')
+            logging.info('Soundmeter Running')
         if running_time > fc_time:
             # We have reached the end of the video. Killing processes
             if obs_running:
                 cleanup_tasks()
                 return True
             else:
-                print("Timeout reached but obs isn't running. Something was broken")
+                logging.error("Timeout reached but obs isn't running. Something was broken")
                 cleanup_tasks()
                 return False
         if running_time > kill_time:
             # Check if OBS is running, if it isn't then we are broken :(
             if not obs_running:
-                print("Kill timeout reached killing processes")
+                logging.error("Kill timeout reached killing processes")
                 cleanup_tasks()
                 return False
 
