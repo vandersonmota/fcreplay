@@ -41,15 +41,17 @@ def record(row):
     
     record_status = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
     if not record_status == "Pass":
-        logging.error(f"Recording failed on {row[0]}, Status: {record_status}, exiting.")
+        logging.error(f"Recording failed on {row[0]}, Status: \"{record_status}\", exiting.")
         # Depending on the exit status, do different things:
-        if record_status == "Timeout":
+        if record_status == "FailTimeout":
             # Just do a new recording and mark the current one as failed
             logging.error(f"Setting {row[0]} to failed and continuing")
             set_failed(row)
             return False
         else:
+            logging.error("Exiting")
             sys.exit(1)
+            return False
     logging.info("Capture finished")
     return True
 
