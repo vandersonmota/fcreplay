@@ -39,11 +39,19 @@ def record(row):
     time_min = int(row[7]/60)
     logging.info(f"Capture will take {time_min} minutes")
     
-    record_pass = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
-    if not record_pass:
-        logging.error(f"Recording failed on {row[0]}, exiting.")
-        sys.exit(1)
+    record_status = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
+    if not record_status == "Pass":
+        logging.error(f"Recording failed on {row[0]}, Status: {record_status}, exiting.")
+        # Depending on the exit status, do different things:
+        if record_status == "Timeout":
+            # Just do a new recording and mark the current one as failed
+            logging.error(f"Setting {row[0]} to failed and continuing")
+            set_failed(row)
+            return False
+        else:
+            sys.exit(1)
     logging.info("Capture finished")
+    return True
 
 
 def move(row):
@@ -151,8 +159,15 @@ def remove_generated_files(row):
     # Remove dirty file, description and thumbnail
     logging.info("Removing old files")
     filename = f"{row[0]}.mkv"
-    os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
-    os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
+    try:
+        os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
+    except:
+        pass
+    
+    try:
+        os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
+    except:
+        pass
     logging.info("Finished removing files")
 
 
@@ -184,7 +199,9 @@ def main(DEBUG):
 
         if row is not None:
             try:
-                record(row)
+                status = record(row)
+                if status is False:
+                    continue
             except FileNotFoundError as e:
                 logging.error(e)
                 logging.error("Exiting due to error in capture")

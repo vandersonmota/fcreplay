@@ -67,17 +67,17 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
             # We have reached the end of the video. Killing processes
             if obs_running:
                 cleanup_tasks()
-                return True
+                return "Pass"
             else:
                 logging.error("Timeout reached but obs isn't running. Something was broken")
                 cleanup_tasks()
-                return False
+                return "FailNoOBS"
         if running_time > kill_time:
             # Check if OBS is running, if it isn't then we are broken :(
             if not obs_running:
                 logging.error("Kill timeout reached killing processes")
                 cleanup_tasks()
-                return False
+                return "FailTimeout"
 
 
 if __name__ == "__main__":
