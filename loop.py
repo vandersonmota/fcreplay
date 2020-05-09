@@ -71,6 +71,7 @@ Fightcade replay id: {row[0]}"""
         for match in detected_chars:
             description_text += f"""
 {row[3]}: {match[0]}, {row[4]}: {match[1]}  - {match[2]}
+{match[0]} vs {match[1]}
             """
     else:
         description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
