@@ -58,7 +58,8 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     while True:
         time.sleep(1)
         running_time = (datetime.datetime.now() - begin_time).seconds
-        logging.info(f'{running_time} of {fc_time}')
+        if (running_time % 60) == 0:
+            logging.info(f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
         obs_running = '/usr/bin/obs' in str(subprocess.run(['ps', '-ef'], stdout=subprocess.PIPE, stderr=subprocess.PIPE))
 
         if  obs_sm_thread.is_alive():
