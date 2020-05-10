@@ -10,7 +10,11 @@
   "remove_generated_files": true,
   "blackdetect": true,
   "detect_chars": true,
-  "upload_to_ia": true,
+  "upload_to_yt": false,
+  "youtube_credentials": "/home/fcreplay/.youtube-upload-credentials.json",
+  "youtube_secrets": "/home/fcreplay/.client_secrets.json",
+  "youtube_max_daily_uploads": "5",
+  "upload_to_ia": false,
   "ia_settings": {
     "mediatype": "video",
     "collection": "opensource_movies",

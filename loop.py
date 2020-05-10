@@ -9,11 +9,12 @@ import sys
 import character_detect
 import record as fc_record
 import argparse
+import datetime
 from soundmeter import meter as sm
 from internetarchive import get_item
 from retrying import retry
 
-with open("config.json") as json_data_file:
+with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
 
 # Setup Sql
@@ -158,6 +159,59 @@ def upload_to_ia(row, description_text):
     logging.info("Finished upload to archive.org")
 
 
+def upload_to_yt(row, description_text):
+    title = f"Street Fighter III: 3rd Strike: ({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}"
+    filename = f"{row[0]}.mkv"
+    import_format = '%Y-%m-%d %H:%M:%S'
+    date_raw = datetime.datetime.strptime(str(row[6]), import_format)
+
+    # YYYY-MM-DDThh:mm:ss.sZ
+    youtube_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S:0Z')
+
+    
+    # Check if youtube-upload is installed
+    if shutil.which('youtube-upload') is not None:
+        # Check if credentials file exists
+        if not os.path.exists(config['youtube_credentials']):
+            logging.error("Youtube credentials don't exist exist")
+            return False
+
+        if not os.path.exists(config['youtube_secrets']):
+            logging.error("Youtube secrets don't exist")
+            return False
+
+        # Create description file
+        with open(f"{config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
+            description_file.write(description_text)
+
+        # Chech max daily uploads
+        ##TODO
+
+        # Do upload
+        logging.info("Uploading to youtube")
+        yt_rc = subprocess.run(
+            [
+                'youtube-upload',
+                '--credentials-file', config['youtube_credentials'],
+                '--client-secrets', config['youtube_secrets'],
+                '-t', title,
+                '-c', 'Gaming',
+                '--description-file', f"{config['fcreplay_dir']}/tmp/description.txt",
+                '--recording-date', youtube_date,
+                '--default-language', 'en',
+                '--thumbnail', f"{config['fcreplay_dir']}/tmp/thumbnail.jpg",
+                f"{config['fcreplay_dir']}/finished/{filename}",
+                ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+
+        print(str(yt_rc))
+
+        # Remove description file
+        os.remove(f"{config['fcreplay_dir']}/tmp/description.txt")
+        logging.info('Finished uploading to Youtube')
+    else:
+        logging.error("youtube-upload is not installed")
+
+
 def remove_generated_files(row):
     # Remove dirty file, description and thumbnail
     logging.info("Removing old files")
@@ -257,6 +311,12 @@ def main(DEBUG):
             if config['upload_to_ia']:
                 try:
                     upload_to_ia(row, description_text)
+                except:
+                    set_failed(row)
+
+            if config['upload_to_yt']:
+                try:
+                    upload_to_yt(row, description_text)
                 except:
                     set_failed(row)
 
