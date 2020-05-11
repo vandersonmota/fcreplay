@@ -73,11 +73,23 @@ Fightcade replay id: {row[0]}"""
             description_text += f"""
 {row[3]}: {match[0]}, {row[4]}: {match[1]}  - {match[2]}
 {match[0]} vs {match[1]}
-            """
+"""
     else:
         description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
 Fightcade replay id: {row[0]}"""
+
+    # Read the append file:
+    if config['description_append_file'][0] is True:
+        # Check if file exists:
+        if not os.path.exists(config['description_append_file'][1]):
+            logging.error(f"Description append file {config['description_append_file'][0]} doesn't exist")
+            return False
+        else:
+            with open(config['description_append_file'][1]) as description_append:
+                description_text += description_append.read()
+
     logging.info("Finished creating description")
+
     if DEBUG:
         print(f'Description Text is: {description_text}')
     return description_text
@@ -166,9 +178,8 @@ def upload_to_yt(row, description_text):
     date_raw = datetime.datetime.strptime(str(row[6]), import_format)
 
     # YYYY-MM-DDThh:mm:ss.sZ
-    youtube_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S:0Z')
+    youtube_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S.0Z')
 
-    
     # Check if youtube-upload is installed
     if shutil.which('youtube-upload') is not None:
         # Check if credentials file exists
@@ -180,12 +191,36 @@ def upload_to_yt(row, description_text):
             logging.error("Youtube secrets don't exist")
             return False
 
+        # Check min and max length:
+        if (int(row[7])/60) < int(config['yt_min_length']):
+            logging.info("Replay is too short. Not uploading to youtube")
+            return False
+        if (int(row[7])/60) > int(config['yt_max_length']):
+            logging.info("Replay is too long. Not uploading to youtube")
+            return False
+
+        # Chech max daily uploads
+        # Create table if it doesn't exist
+        c.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='day_log'")
+        if c.fetchone()[0] == 0:
+            logging.info("Creating table day_log")
+            c.execute("CREATE TABLE day_log (ID TEXT PRIMARY KEY, date TEXT NOT NULL)")
+            sql_conn.commit()
+
+        # Find number of uploads today
+        c.execute("SELECT count(date) FROM day_log WHERE ID = '*' AND date = date('now')")
+        num_uploads = c.fetchone()[0]
+        if num_uploads >= 5:
+            logging.info("Maximum uploads reached for today")
+            return False
+        elif num_uploads == 0:
+            logging.info("Clearing table day_log as no entries found for today")
+            c.execute('DELETE FROM day_log')
+            sql_conn.commit()
+
         # Create description file
         with open(f"{config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
             description_file.write(description_text)
-
-        # Chech max daily uploads
-        ##TODO
 
         # Do upload
         logging.info("Uploading to youtube")
@@ -204,6 +239,9 @@ def upload_to_yt(row, description_text):
                 ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
         print(str(yt_rc))
+
+        # Add upload to day_log dable
+        c.execute("INSERT INTO day_log VALUES (?, date('now'))", row[0])
 
         # Remove description file
         os.remove(f"{config['fcreplay_dir']}/tmp/description.txt")
@@ -317,7 +355,8 @@ def main(DEBUG):
             if config['upload_to_yt']:
                 try:
                     upload_to_yt(row, description_text)
-                except:
+                except Exception as e:
+                    logging.error(e)
                     set_failed(row)
 
             if config['remove_generated_files']:

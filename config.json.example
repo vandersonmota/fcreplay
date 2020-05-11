@@ -11,9 +11,12 @@
   "blackdetect": true,
   "detect_chars": true,
   "upload_to_yt": false,
+  "yt_min_length": 0,
+  "yt_max_length": 120,
   "youtube_credentials": "/home/fcreplay/.youtube-upload-credentials.json",
   "youtube_secrets": "/home/fcreplay/.client_secrets.json",
   "youtube_max_daily_uploads": "5",
+  "description_append_file": [false, "/path/to/file.txt"],
   "upload_to_ia": false,
   "ia_settings": {
     "mediatype": "video",
