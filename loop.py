@@ -242,6 +242,7 @@ def upload_to_yt(row, description_text):
 
         # Add upload to day_log dable
         c.execute("INSERT INTO day_log VALUES (?, date('now'))", row[0])
+        sql_conn.commit()
 
         # Remove description file
         os.remove(f"{config['fcreplay_dir']}/tmp/description.txt")
