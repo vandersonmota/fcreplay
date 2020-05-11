@@ -238,9 +238,11 @@ def upload_to_yt(row, description_text):
                 f"{config['fcreplay_dir']}/finished/{filename}",
                 ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
-        print(str(yt_rc))
+        logging.info(yt.stdout.decode())
+        logging.info(yt.stderr.decode())
 
         # Add upload to day_log dable
+        logging.info('Updating day_log')
         c.execute("INSERT INTO day_log VALUES (?, date('now'))", row[0])
         sql_conn.commit()
 
