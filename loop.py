@@ -208,7 +208,7 @@ def upload_to_yt(row, description_text):
             sql_conn.commit()
 
         # Find number of uploads today
-        c.execute("SELECT count(date) FROM day_log WHERE ID = '*' AND date = date('now')")
+        c.execute("SELECT count(date) FROM day_log WHERE date = date('now')")
         num_uploads = c.fetchone()[0]
         if num_uploads >= int(config['youtube_max_daily_uploads']):
             logging.info("Maximum uploads reached for today")
