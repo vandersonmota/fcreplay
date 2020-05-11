@@ -210,7 +210,7 @@ def upload_to_yt(row, description_text):
         # Find number of uploads today
         c.execute("SELECT count(date) FROM day_log WHERE ID = '*' AND date = date('now')")
         num_uploads = c.fetchone()[0]
-        if num_uploads >= 5:
+        if num_uploads >= int(config['youtube_max_daily_uploads']):
             logging.info("Maximum uploads reached for today")
             return False
         elif num_uploads == 0:
