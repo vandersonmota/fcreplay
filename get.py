@@ -7,9 +7,10 @@ import sqlite3
 from retrying import retry
 import logging
 
-logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
 with open("config.json") as json_data_file:
     config = json.load(json_data_file)
+
+logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
 
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
 def get_data(url):
