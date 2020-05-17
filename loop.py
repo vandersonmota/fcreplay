@@ -375,7 +375,7 @@ def main(DEBUG):
         else:
             if config['auto_add_more']:
                 logging.info('Auto adding more replays')
-                fc_get(config['auto_add_string'])                
+                fc_get(config['auto_add_search_string'])                
             else:
                 break
 
