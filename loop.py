@@ -8,6 +8,7 @@ import json
 import sys
 import character_detect
 import record as fc_record
+import get as fc_get
 import argparse
 import datetime
 from soundmeter import meter as sm
@@ -372,7 +373,11 @@ def main(DEBUG):
 
             update_db(row)
         else:
-            break
+            if config['auto_add_more']:
+                logging.info('Auto adding more replays')
+                fc_get(config['auto_add_string'])                
+            else:
+                break
 
         if DEBUG:
             sys.exit(0)

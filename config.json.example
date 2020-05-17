@@ -3,6 +3,8 @@
   "pyqtggpo_dir": "/home/fbarecorder/fcreplay/pyqtggpo-master",
   "logfile": "/home/fbarecorder/fcreplay/fcreplay.log",
   "replay_pages": "20",
+  "auto_add_more": true,
+  "auto_add_search_string": "sfiii3n",
   "loglevel": "DEBUG",
   "sqlite_db": "replays.db",
   "random_replay": true,
