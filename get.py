@@ -84,6 +84,7 @@ def get_replays(fc_profile):
                 fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no')
 
                 # Insert into sqlite
+                logging.info(f"Looking for {fc_data[0]}")
                 c.execute('SELECT id FROM replays WHERE id=?', (fc_data[0],))
                 data = c.fetchone()
                 if data is None:
@@ -91,6 +92,10 @@ def get_replays(fc_profile):
                     if time > 60:
                         c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?)', fc_data)
                         sql_conn.commit()
+                    else:
+                        logging.info(f"{fc_data[0]} is only {time} not adding")
+                else:
+                    logging.info(f"{fc_data[0]} already exists")
 
     sql_conn.close()
 
