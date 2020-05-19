@@ -90,6 +90,7 @@ def get_replays(fc_profile):
                 if data is None:
                     # Don't bother with videos shorter than 60 seconds
                     if time > 60:
+                        logging.info(f"Adding {fc_data[0]} to queue")
                         c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?)', fc_data)
                         sql_conn.commit()
                     else:
