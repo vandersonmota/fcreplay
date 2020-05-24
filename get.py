@@ -6,6 +6,7 @@ import sys
 import sqlite3
 from retrying import retry
 import logging
+import time
 
 with open("config.json") as json_data_file:
     config = json.load(json_data_file)
@@ -69,6 +70,11 @@ def get_replays(fc_profile):
         failed TEXT NOT NULL);")
         sql_conn.commit()
 
+    if len(replays) == 0:
+        logging.error('No replays returned')
+        sys.exit(1)
+
+    replay_added = False
     for replay in replays:
         # Only sfiii3n
         if 'sfiii3n' in replay[1]:
@@ -92,12 +98,18 @@ def get_replays(fc_profile):
                     if time > 60:
                         c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?)', fc_data)
                         sql_conn.commit()
+                        replay_added = True
                     else:
                         logging.info(f"{fc_data[0]} is only {time} not adding")
                 else:
                     logging.info(f"{fc_data[0]} already exists")
 
     sql_conn.close()
+
+    if replay_added == False:
+        logging.info('No replays added, but I did find some, sleeping for 1 minute')
+        time.sleep(60)
+
 
 if __name__ == "__main__":
     get_replays(sys.argv[1])
