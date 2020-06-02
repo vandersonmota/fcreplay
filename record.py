@@ -12,7 +12,7 @@ from soundmeter import meter as soundmeter
 with open("config.json") as json_data_file:
     config = json.load(json_data_file)
 
-logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
+logging.basicConfig(                                                                                                                format='%(asctime)s %(levelname)s: %(message)s',                                                                            filename=config['logfile'],                                                                                                 level=config['loglevel'],                                                                                                   datefmt='%Y-%m-%d %H:%M:%S'                                                                                         )
 
 def start_ggpo(ggpo_path=None, fc_challenge=None):
     challenge_id, game_name = fc_challenge.split('@')

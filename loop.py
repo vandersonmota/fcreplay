@@ -23,7 +23,12 @@ sql_conn = sqlite3.connect(config['sqlite_db'])
 c = sql_conn.cursor()
 
 # Setup Log
-logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
+logging.basicConfig(
+        format='%(asctime)s %(levelname)s: %(message)s',
+        filename=config['logfile'],
+        level=config['loglevel'],
+        datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 DEBUG=False
 

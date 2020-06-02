@@ -11,7 +11,7 @@ import time
 with open("config.json") as json_data_file:
     config = json.load(json_data_file)
 
-logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
+logging.basicConfig(                                                                                                                format='%(asctime)s %(levelname)s: %(message)s',                                                                            filename=config['logfile'],                                                                                                 level=config['loglevel'],                                                                                                   datefmt='%Y-%m-%d %H:%M:%S'                                                                                         )
 
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
 def get_data(url):
