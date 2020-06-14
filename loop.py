@@ -23,7 +23,12 @@ sql_conn = sqlite3.connect(config['sqlite_db'])
 c = sql_conn.cursor()
 
 # Setup Log
-logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
+logging.basicConfig(
+        format='%(asctime)s %(levelname)s: %(message)s',
+        filename=config['logfile'],
+        level=config['loglevel'],
+        datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 DEBUG=False
 
@@ -40,6 +45,11 @@ def record(row):
     logging.info(f"Running capture with {row[0]} and {row[7]}")
     time_min = int(row[7]/60)
     logging.info(f"Capture will take {time_min} minutes")
+
+    c2 = sql_conn.cursor()
+    c2.execute("UPDATE replays SET status = 'recording' WHERE ID = ?", (row[0],))
+    sql_conn.commit()
+    logging.info(f"Set status to recording")
     
     record_status = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
     if not record_status == "Pass":
@@ -275,6 +285,8 @@ def update_db(row):
     logging.info(f"sqlite updating id {row[0]} created to yes")
     c2 = sql_conn.cursor()
     c2.execute("UPDATE replays SET created = 'yes' WHERE ID = ?", (row[0],))
+    sql_conn.commit()
+    c2.execute("UPDATE replays SET status = 'finished' WHERE ID = ?", (row[0],))
     sql_conn.commit()
     logging.info("Updated sqlite")
     logging.info(f"Finished processing {row[0]}")

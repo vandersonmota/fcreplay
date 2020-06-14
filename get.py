@@ -11,7 +11,13 @@ import time
 with open("config.json") as json_data_file:
     config = json.load(json_data_file)
 
-logging.basicConfig(filename=config['logfile'], level=config['loglevel'])
+# Setup Log
+logging.basicConfig(
+        format='%(asctime)s %(levelname)s: %(message)s',
+        filename=config['logfile'],
+        level=config['loglevel'],
+        datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
 def get_data(url):
@@ -22,17 +28,69 @@ def get_data(url):
     else:
         return r
 
+
+def addreplay(row, player_replay=False):
+    # Connect to sqlite3
+    sql_conn = sqlite3.connect(f"{config['fcreplay_dir']}/{config['sqlite_db']}")
+    c = sql_conn.cursor()
+
+    ftr = [3600, 60, 1]
+    time = sum([a*b for a,b in zip(ftr, map(int,row[7].split(':')))])
+    date_old = datetime.datetime.strptime(row[0], "%d %b %Y %H:%M:%S")
+    date_formated = date_old.strftime("%Y_%m_%d-%H-%M-%S")
+    date_now = str(datetime.datetime.today())
+    fightcade_id = row[2]
+    p1_loc = row[3]
+    p1 = row[4]
+    p2_loc = row[5]
+    p2 = row[6]
+    if player_replay:
+        fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no', 'added', date_now, 'yes')
+    else:
+        fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no', 'added', date_now, 'no')
+
+    # Insert into sqlite
+    logging.info(f"Looking for {fc_data[0]}")
+    c.execute('SELECT id FROM replays WHERE id=?', (fc_data[0],))
+    data = c.fetchone()
+    if data is None:
+        # Don't bother with videos shorter than 60 seconds
+        if time > 60:
+            logging.info(f"Adding {fc_data[0]} to queue")
+            c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?,?)', fc_data)
+            sql_conn.commit()
+            if player_replay:
+                sql_conn.close()
+                return True
+        else:
+            logging.info(f"{fc_data[0]} is only {time} not adding")
+            if player_replay:
+                sql_conn.close()
+                return(False, 'TOO_SHORT')
+    
+    else:
+        logging.info(f"{fc_data[0]} already exists")
+        if player_replay:
+            sql_conn.close()
+            return(False, 'ALREADY_EXISTS')
+    
+    sql_conn.close()
+
+
+def check_for_profile(profile):
+    r = requests.get(f"https://www.fightcade.com/id/{profile}")
+    if "PROFILE NOT FOUND" in r.text:
+        logging.error(f"Unable to find profile: {profile}")
+        raise LookupError
+
 def get_replays(fc_profile):
     replays = []
-    ftr = [3600, 60, 1]
     profile = fc_profile
     epoch = datetime.datetime.utcfromtimestamp(0)
 
     # Check if user exists
     r = requests.get(f"https://www.fightcade.com/id/{profile}")
-    if "PROFILE NOT FOUND" in r.text:
-        logging.error(f"Unable to find profile: {profile}")
-        sys.ext(1)
+    check_for_profile()
 
     # Get replays
     for i in range(0, int(config['replay_pages'])):
@@ -67,45 +125,24 @@ def get_replays(fc_profile):
         date_org TEXT NOT NULL, \
         length INT, \
         created TEXT NOT NULL, \
-        failed TEXT NOT NULL);")
+        failed TEXT NOT NULL, \
+        status TEXT NOT NULL, \
+        date_added TEXT NOT NULL, \
+        player_requested TEXT NOT NULL);")
         sql_conn.commit()
+        sql_conn.close()
 
     if len(replays) == 0:
         logging.error('No replays returned')
-        sys.exit(1)
+        raise LookupError
 
     replay_added = False
-    for replay in replays:
+    for row in replays:
         # Only sfiii3n
-        if 'sfiii3n' in replay[1]:
-            if 'live' not in replay[7]:
-                time = sum([a*b for a,b in zip(ftr, map(int,replay[7].split(':')))])
-                date_old = datetime.datetime.strptime(replay[0], "%d %b %Y %H:%M:%S")
-                date_formated = date_old.strftime("%Y_%m_%d-%H-%M-%S")
-                fightcade_id = replay[2]
-                p1_loc = replay[3]
-                p1 = replay[4]
-                p2_loc = replay[5]
-                p2 = replay[6]
-                fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no')
-
-                # Insert into sqlite
-                logging.info(f"Looking for {fc_data[0]}")
-                c.execute('SELECT id FROM replays WHERE id=?', (fc_data[0],))
-                data = c.fetchone()
-                if data is None:
-                    # Don't bother with videos shorter than 60 seconds
-                    if time > 60:
-                        logging.info(f"Adding {fc_data[0]} to queue")
-                        c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?)', fc_data)
-                        sql_conn.commit()
-                        replay_added = True
-                    else:
-                        logging.info(f"{fc_data[0]} is only {time} not adding")
-                else:
-                    logging.info(f"{fc_data[0]} already exists")
-
-    sql_conn.close()
+        if 'sfiii3n' in row[1]:
+            if 'live' not in row[7]:
+                addreplay(row)
+                replay_added = True
 
     if replay_added == False:
         logging.info('No replays added, but I did find some, sleeping for 1 minute')
