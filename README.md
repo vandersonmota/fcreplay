@@ -23,6 +23,19 @@ OpenCV is used to analise the video and match character names from the health ba
 the included character name images against the video every 60 frames. Depending on your OBS recording settings you might
 need to regenerate the images.
 
+## Soundmeter
+Getting soundmeter to work takes a little bit of work. It's different depending on how sound is configured. On Fedora32
+I found I had to load the `snd-asound` module and edit the soundmeter configuration file to be:
+```
+[soundmeter]
+frames_per_buffer = 2048
+format = 8
+channels = 2
+rate = 44100
+audio_segment_length = 1
+rms_as_trigger_arg = False
+input_device_index = 1
+```
 ### A few more notes: 
 To trigger OBS I am using [Soundmeter](https://github.com/shichao-an/soundmeter) to start OBS once sound playback
 begins.
