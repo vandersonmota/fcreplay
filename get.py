@@ -32,7 +32,7 @@ def get_replays(fc_profile):
     r = requests.get(f"https://www.fightcade.com/id/{profile}")
     if "PROFILE NOT FOUND" in r.text:
         logging.error(f"Unable to find profile: {profile}")
-        sys.ext(1)
+        sys.exit(1)
 
     # Get replays
     for i in range(0, int(config['replay_pages'])):
