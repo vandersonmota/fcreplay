@@ -1,3 +1,24 @@
 .idea
 venv
 .vscode
+
+# Misc files
+.client_secrets.json
+.client_secrets.json.old
+.youtube-upload-credentials.json
+__pycache__/
+config.json
+description_append.txt
+fcreplay.log
+finished/
+manualupload.py
+master.zip
+pyqtggpo-master/
+replays.db
+replays.db.bak
+roms/
+soundmeter/
+start.sh
+test_upload.py
+tmp/
+youtube-upload-master/
