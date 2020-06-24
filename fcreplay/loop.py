@@ -6,9 +6,9 @@ import os
 import logging
 import json
 import sys
-import character_detect
-import record as fc_record
-import get as fc_get
+from fcreplay import character_detect
+from fcreplay import record as fc_record
+from fcreplay import get as fc_get
 import argparse
 import datetime
 from soundmeter import meter as sm
@@ -65,6 +65,8 @@ def record(row):
             sys.exit(1)
             return False
     logging.info("Capture finished")
+    c2.execute("UPDATE replays SET status = 'recorded' WHERE ID = ?", (row[0],))
+    sql_conn.commit()
     return True
 
 
@@ -297,17 +299,33 @@ def set_failed(row):
     c3 = sql_conn.cursor()
     c3.execute("UPDATE replays SET failed = 'yes' WHERE ID = ?", (row[0],))
     sql_conn.commit()
+    c3.execute("UPDATE replays SET status = 'failed' WHERE ID = ?", (row[0],))
     logging.info("Finished updating sqlite")
+
+
+def get_row():
+    logging.info('Getting replay from sqlite database')
+    if config['player_replay']:
+        c.execute("SELECT * FROM replays WHERE player_requested = 'yes' AND created = 'no' AND failed ='no' ORDER BY datetime(date_added) ASC LIMIT 1")
+        row = c.fetchone()
+        if row is not None:
+            logging.info('Found player replay to encode')
+            return row
+        else:
+            logging.info('No more player replays, encoding a random one')
+    if config['random_replay']:
+        logging.info('Getting random replay')
+        c.execute("SELECT * FROM replays WHERE created = 'no' AND failed = 'no' ORDER BY RANDOM() LIMIT 1")
+        return c.fetchone()
+    else:
+        logging.info('Getting any replay')
+        c.execute("SELECT * FROM replays WHERE created = 'no' AND failed != 'yes' LIMIT 1")
+        return c.fetchone()
 
 
 def main(DEBUG):
     while True:
-        if config['random_replay']:
-            c.execute("SELECT * FROM replays WHERE created = 'no' AND failed = 'no' ORDER BY RANDOM() LIMIT 1")
-        else:
-            c.execute("SELECT * FROM replays WHERE created = 'no' AND failed != 'yes' LIMIT 1")
-        row = c.fetchone()
-
+        row = get_row()
         if row is not None:
             try:
                 status = record(row)
@@ -395,11 +413,14 @@ def main(DEBUG):
             sys.exit(0)
 
 
-# Loop and choose a random replay every time
-if __name__ == "__main__":
+def console():
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
     parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
     args = parser.parse_args()
     main(args.debug)
+
+# Loop and choose a random replay every time
+if __name__ == "__main__":
+    console()
 
 logging.info("Finished processing queue")

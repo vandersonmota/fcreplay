@@ -2,7 +2,9 @@ import requests
 import sqlite3
 import logging
 import json
-import get as fcreplayget
+import sys
+import datetime
+from fcreplay import get as fcreplayget
 from bs4 import BeautifulSoup
 
 with open("config.json") as json_data_file:
@@ -41,6 +43,11 @@ def main(profile, challenge):
 
     for row in table:
         if challenge in row:
+            # Dates are different
+            date_old = row[0]
+            date_new = datetime.datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+            row[0] = date_new.strftime('%d %b %Y %H:%M:%S')
+
             # Add to DB
             logging.info('Adding player replay to DB')
             fcreplayget.addreplay(row, player_replay=True)
@@ -49,6 +56,9 @@ def main(profile, challenge):
     logging.error('Unable to find replay in player profile')
     raise LookupError
 
+
+def console():
+    main(sys.argv[1], sys.argv[2])
 
 if __name__ == '__main__':
     main()

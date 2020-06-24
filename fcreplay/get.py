@@ -57,24 +57,37 @@ def addreplay(row, player_replay=False):
         # Don't bother with videos shorter than 60 seconds
         if time > 60:
             logging.info(f"Adding {fc_data[0]} to queue")
-            c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?,?)', fc_data)
+            c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', fc_data)
             sql_conn.commit()
             if player_replay:
                 sql_conn.close()
-                return True
+                return('ADDED')
         else:
             logging.info(f"{fc_data[0]} is only {time} not adding")
             if player_replay:
                 sql_conn.close()
-                return(False, 'TOO_SHORT')
+                return('TOO_SHORT')
     
     else:
         logging.info(f"{fc_data[0]} already exists")
         if player_replay:
             sql_conn.close()
-            return(False, 'ALREADY_EXISTS')
+            return('ALREADY_EXISTS')
     
     sql_conn.close()
+
+
+def check_player_record_status(challenge):
+    sql_conn = sqlite3.connect(f"{config['fcreplay_dir']}/{config['sqlite_db']}")
+    c = sql_conn.cursor()
+    c.execute('SELECT id FROM replays WHERE id=?', (challenge,))
+    data = c.fetchone()
+    i = 0
+    while data is not None:
+        i += i
+        return('added', i)
+        
+
 
 
 def check_for_profile(profile):
@@ -89,8 +102,7 @@ def get_replays(fc_profile):
     epoch = datetime.datetime.utcfromtimestamp(0)
 
     # Check if user exists
-    r = requests.get(f"https://www.fightcade.com/id/{profile}")
-    check_for_profile()
+    check_for_profile(profile)
 
     # Get replays
     for i in range(0, int(config['replay_pages'])):
@@ -149,5 +161,8 @@ def get_replays(fc_profile):
         time.sleep(60)
 
 
-if __name__ == "__main__":
+def console():
     get_replays(sys.argv[1])
+
+if __name__ == "__main__":
+    console()
