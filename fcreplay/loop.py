@@ -250,17 +250,19 @@ def upload_to_yt(row, description_text):
             c.execute("CREATE TABLE day_log (ID TEXT PRIMARY KEY, date TEXT NOT NULL)")
             sql_conn.commit()
 
-        # Find number of uploads today
-        c.execute("SELECT count(date) FROM day_log WHERE date = date('now')")
-        num_uploads = c.fetchone()[0]
-        if num_uploads >= int(config['youtube_max_daily_uploads']):
-            logging.info("Maximum uploads reached for today")
-            return False
-        elif num_uploads == 0:
-            logging.info("Clearing table day_log as no entries found for today")
-            c.execute('DELETE FROM day_log')
-            sql_conn.commit()
-
+        # If this isn't a player replay, then check max uploads
+        if row[12] == 'no':
+            # Find number of uploads today
+            c.execute("SELECT count(date) FROM day_log WHERE date = date('now')")
+            num_uploads = c.fetchone()[0]
+            if num_uploads >= int(config['youtube_max_daily_uploads']):
+                logging.info("Maximum uploads reached for today")
+                return False
+            elif num_uploads == 0:
+                logging.info("Clearing table day_log as no entries found for today")
+                c.execute('DELETE FROM day_log')
+                sql_conn.commit()
+    
         # Create description file
         with open(f"{config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
             description_file.write(description_text)
@@ -284,10 +286,11 @@ def upload_to_yt(row, description_text):
         logging.info(yt_rc.stdout.decode())
         logging.info(yt_rc.stderr.decode())
 
-        # Add upload to day_log dable
-        logging.info('Updating day_log')
-        c.execute("INSERT INTO day_log VALUES (?, date('now'))", (row[0],))
-        sql_conn.commit()
+        if row[12] == 'yes':
+            # Add upload to day_log dable
+            logging.info('Updating day_log')
+            c.execute("INSERT INTO day_log VALUES (?, date('now'))", (row[0],))
+            sql_conn.commit()
 
         # Remove description file
         os.remove(f"{config['fcreplay_dir']}/tmp/description.txt")
