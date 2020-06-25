@@ -7,6 +7,7 @@ import sys
 import time
 import logging
 import json
+import pkg_resources
 from soundmeter import meter as soundmeter
 
 with open("config.json") as json_data_file:
@@ -35,12 +36,13 @@ def cleanup_tasks():
 
 
 def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcreplay_path=None):
+    obs_script = pkg_resources.resource_filename('fcreplay', 'data/obs.sh')
     logging.info('Starting pulseaudio')
     subprocess.run(['pulseaudio', '--daemon'])
 
     # Create thread for sound meter
     logging.info('Starting soundmeter to trigger obs')
-    sm = soundmeter.Meter(threshold='+1000', num=1, action="exec-stop", script=f"{fcreplay_path}/obs.sh")
+    sm = soundmeter.Meter(threshold='+1000', num=1, action="exec-stop", script=obs_script)
     obs_sm_thread = threading.Thread(target=sm.start)
     obs_sm_thread.start()
     

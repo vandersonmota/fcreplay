@@ -7,6 +7,10 @@ setup(name='fcreplay',
       author_email='glisignoli@gmail.com',
       license='GPL3',
       packages=['fcreplay'],
+      package_data={'fcreplay': [
+          'data/*',
+          'data/charnames/*'
+      ]},
       entry_points = {
           'console_scripts': [
               'fcreplayloop=fcreplay.loop:console',

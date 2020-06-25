@@ -5,6 +5,8 @@
   "sqlite_db": "replays.db",
   "loglevel": "DEBUG",
   "replay_pages": "20",
+  "min_replay_length": 60,
+  "max_replay_length": 10800,
   "auto_add_more": true,
   "auto_add_search_string": "sfiii3n",
   "player_replay": true,

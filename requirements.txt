@@ -50,4 +50,4 @@ tqdm==4.46.1
 uritemplate==3.0.1
 urllib3==1.25.9
 urwid==2.1.0
-wcwidth==0.2.4
+wcwidth==0.2.4beautifulsoup4==4.9.1

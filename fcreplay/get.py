@@ -45,17 +45,17 @@ def addreplay(row, player_replay=False):
     p2_loc = row[5]
     p2 = row[6]
     if player_replay:
-        fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no', 'added', date_now, 'yes')
+        fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no', 'ADDED', date_now, 'yes')
     else:
-        fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no', 'added', date_now, 'no')
+        fc_data=(fightcade_id, p1_loc, p2_loc, p1, p2, date_formated, date_old, time, 'no', 'no', 'ADDED', date_now, 'no')
 
     # Insert into sqlite
     logging.info(f"Looking for {fc_data[0]}")
-    c.execute('SELECT id FROM replays WHERE id=?', (fc_data[0],))
+    c.execute('SELECT * FROM replays WHERE id=?', (fc_data[0],))
     data = c.fetchone()
     if data is None:
-        # Don't bother with videos shorter than 60 seconds
-        if time > 60:
+        # Limit the lenfth of videos
+        if time > int(config['min_replay_length']) and time < int(config['max_replay_length']):
             logging.info(f"Adding {fc_data[0]} to queue")
             c.execute('INSERT INTO replays VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', fc_data)
             sql_conn.commit()
@@ -71,30 +71,27 @@ def addreplay(row, player_replay=False):
     else:
         logging.info(f"{fc_data[0]} already exists")
         if player_replay:
-            sql_conn.close()
-            return('ALREADY_EXISTS')
+            # Check if the returned replay is a player replay
+            if data[12] == 'no':
+                # Update DB to mark returned replay as player replay
+                c.execute('UPDATE replays SET player_requested = yes WHERE ID = ?',(row[0]),)
+                sql_conn.commit()
+                sql_conn.close()
+                return('MARKED_PLAYER')
+            else:
+                sql_conn.close()
+                return('ALREADY_EXISTS')
     
     sql_conn.close()
 
 
-def check_player_record_status(challenge):
-    sql_conn = sqlite3.connect(f"{config['fcreplay_dir']}/{config['sqlite_db']}")
-    c = sql_conn.cursor()
-    c.execute('SELECT id FROM replays WHERE id=?', (challenge,))
-    data = c.fetchone()
-    i = 0
-    while data is not None:
-        i += i
-        return('added', i)
-        
-
-
-
+@retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
 def check_for_profile(profile):
     r = requests.get(f"https://www.fightcade.com/id/{profile}")
     if "PROFILE NOT FOUND" in r.text:
         logging.error(f"Unable to find profile: {profile}")
         raise LookupError
+
 
 def get_replays(fc_profile):
     replays = []
@@ -163,6 +160,7 @@ def get_replays(fc_profile):
 
 def console():
     get_replays(sys.argv[1])
+
 
 if __name__ == "__main__":
     console()

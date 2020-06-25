@@ -6,6 +6,7 @@ import os
 import logging
 import json
 import sys
+import time
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
@@ -18,7 +19,6 @@ from retrying import retry
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
 
-# Setup Sql
 sql_conn = sqlite3.connect(config['sqlite_db'])
 c = sql_conn.cursor()
 
@@ -41,15 +41,36 @@ if not os.path.exists(f"{config['fcreplay_dir']}/finished"):
     os.mkdir(f"{config['fcreplay_dir']}/finished")
 
 
+def setupjobssql():
+    # Create jobs table
+    c.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='job'")
+    if c.fetchone()[0] == 0:
+        # Create table, ID auto increments
+        c.execute("CREATE TABLE job (ID INTEGER PRIMARY KEY, \
+            challenge_id TEXT NOT NULL, \
+            start_time INTEGER, \
+            length INTEGER);")
+        sql_conn.commit()
+
+
+def setcurrentjob(row):
+    # Insert current job, with start_time and length
+    current_time = str(time.time())
+    c.execute("INSERT INTO job VALUES (null, ?, ?, ?);",(row[0], current_time, row[7],))
+    sql_conn.commit()
+
+def update_status(row, status):
+    # Update the replay table status of the current job
+    c.execute("UPDATE replays SET status = ? WHERE ID = ?", (status, row[0],))
+    logging.info(f"Set status to {status}")
+    sql_conn.commit()
+
 def record(row):
     logging.info(f"Running capture with {row[0]} and {row[7]}")
     time_min = int(row[7]/60)
     logging.info(f"Capture will take {time_min} minutes")
 
-    c2 = sql_conn.cursor()
-    c2.execute("UPDATE replays SET status = 'recording' WHERE ID = ?", (row[0],))
-    sql_conn.commit()
-    logging.info(f"Set status to recording")
+    update_status(row, 'RECORDING')
     
     record_status = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=30, ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
     if not record_status == "Pass":
@@ -65,8 +86,7 @@ def record(row):
             sys.exit(1)
             return False
     logging.info("Capture finished")
-    c2.execute("UPDATE replays SET status = 'recorded' WHERE ID = ?", (row[0],))
-    sql_conn.commit()
+    update_status(row, 'RECORDED')
     return True
 
 
@@ -74,6 +94,8 @@ def move(row):
     filename = f"{row[0]}.mkv"
     shutil.move(f"{config['fcreplay_dir']}/videos/{config['obs_video_filename']}",
                 f"{config['fcreplay_dir']}/finished/dirty_{filename}")
+
+    update_status(row, 'MOVED')
 
 
 def description(row, detected_chars=None):
@@ -101,6 +123,7 @@ Fightcade replay id: {row[0]}"""
             with open(config['description_append_file'][1]) as description_append:
                 description_text += description_append.read()
 
+    update_status(row, 'DESCRIPTION_CREATED')
     logging.info("Finished creating description")
 
     if DEBUG:
@@ -119,6 +142,7 @@ def broken_fix(row):
         f"{config['fcreplay_dir']}/finished/{filename}"])
     logging.info("Removing dirty file")
     os.remove(f"{config['fcreplay_dir']}/finished/dirty_{filename}")
+    update_status(row,'BROKEN_CHECK')
     logging.info("Removed dirty file")
     logging.info("Fixed file")
 
@@ -139,6 +163,8 @@ def black_check(row):
         logging.error("Black frames detected, exiting")
         # If there are too many black frames, then we need to debug processing
         sys.exit(1)
+    
+    update_status(row, 'EMPTY_CHECK')
     logging.info("Finished checking black frames")
 
 
@@ -152,6 +178,8 @@ def create_thumbnail(row):
         "-i", f"{config['fcreplay_dir']}/finished/{filename}",
         "-vframes:v", "1",
         f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
+
+    update_status(row, 'THUMBNAIL_CREATED')
     logging.info("Finished making thumbnail")
 
 
@@ -181,6 +209,8 @@ def upload_to_ia(row, description_text):
     logging.info("Starting upload to archive.org")
     fc_video.upload(f"{config['fcreplay_dir']}/finished/{filename}",
                     metadata=md, verbose=True)
+
+    update_status(row, 'UPLOADED_TO_IA')
     logging.info("Finished upload to archive.org")
 
 
@@ -261,6 +291,8 @@ def upload_to_yt(row, description_text):
 
         # Remove description file
         os.remove(f"{config['fcreplay_dir']}/tmp/description.txt")
+
+        update_status(row, 'UPLOADED_TO_YOUTUBE')
         logging.info('Finished uploading to Youtube')
     else:
         logging.error("youtube-upload is not installed")
@@ -279,6 +311,8 @@ def remove_generated_files(row):
         os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
     except:
         pass
+
+    update_status(row, "REMOVED_GENERATED_FILES")
     logging.info("Finished removing files")
 
 
@@ -288,9 +322,9 @@ def update_db(row):
     c2 = sql_conn.cursor()
     c2.execute("UPDATE replays SET created = 'yes' WHERE ID = ?", (row[0],))
     sql_conn.commit()
-    c2.execute("UPDATE replays SET status = 'finished' WHERE ID = ?", (row[0],))
-    sql_conn.commit()
     logging.info("Updated sqlite")
+
+    update_status(row, "FINISHED")
     logging.info(f"Finished processing {row[0]}")
 
 
@@ -299,7 +333,8 @@ def set_failed(row):
     c3 = sql_conn.cursor()
     c3.execute("UPDATE replays SET failed = 'yes' WHERE ID = ?", (row[0],))
     sql_conn.commit()
-    c3.execute("UPDATE replays SET status = 'failed' WHERE ID = ?", (row[0],))
+
+    update_status(row, "FAILED")
     logging.info("Finished updating sqlite")
 
 
@@ -324,9 +359,14 @@ def get_row():
 
 
 def main(DEBUG):
+    # Create jobs table if it does't exist
+    setupjobssql()
+
     while True:
         row = get_row()
         if row is not None:
+            # Update the current job
+            setcurrentjob(row)
             try:
                 status = record(row)
                 if status is False:

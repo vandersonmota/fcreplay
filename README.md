@@ -25,7 +25,7 @@ need to regenerate the images.
 
 ## Soundmeter
 Getting soundmeter to work takes a little bit of work. It's different depending on how sound is configured. On Fedora32
-I found I had to load the `snd-asound` module and edit the soundmeter configuration file to be:
+I found I had to load the `snd-aloop` module and edit the soundmeter configuration file to be:
 ```
 [soundmeter]
 frames_per_buffer = 2048
@@ -36,7 +36,10 @@ audio_segment_length = 1
 rms_as_trigger_arg = False
 input_device_index = 1
 ```
-### A few more notes: 
+
+Then using the `pavucontrol` application, set the default input as the monitor of the output
+
+### A few more notes:
 To trigger OBS I am using [Soundmeter](https://github.com/shichao-an/soundmeter) to start OBS once sound playback
 begins.
 
@@ -59,7 +62,7 @@ This is all done in a headless X11 session
  - Find something that might be more lightweight than OBS.
  - Possibly find a way to do multiple recordings at once.
  - Fix archive.org thumbnails
- 
+
 ## Goal
 The goal of this was to make fightcade replays accessible to anyone to watch without the need of using an emulator.
 
@@ -147,10 +150,13 @@ Add user to the pulse, pulse-access and input groups:
 usermod -a -G pulse,pulse-access,input fbarecorder
 ```
 
-Switch to the fbarecorder user and clone the repo:
+Switch to the fbarecorder user and install the package in a virtual env:
 ```commandline
 su fbarecorder -
-git clone https://github.com/glisignoli/fcreplay.git ~/fcreplay
+git clone https://github.com/glisignoli/fcreplay.git ~/fcreplay_install
+cd ~/fcreplay_install
+python3 -m venv ./venv
+python3 setup install
 ```
 
 Edit the config file and replace the defaults `fcreplay.config`
@@ -162,31 +168,14 @@ x11vnc -storepasswd
 
 Download pyqtggpo-0.42 and unzip it as the fbarecorder user:
 ```commandline
+mkdir ~/fcreplay
 cd ~/fcreplay
 wget https://github.com/poliva/pyqtggpo/archive/master.zip
 unzip master.zip
 ```
 
-Setup the python virtual environment as the fbarecorder user:
-```commandline
-cd ~/fcreplay
-python3 -m venv ./venv
-source ./venv/bin/activate
-pip3 install -r requirements.txt
-```
-
-Install the latest soundmeter as the fbarecorder user:
-```commandline
-git clone https://github.com/shichao-an/soundmeter.git ./soundmeter
-cd soundmeter
-python3 setup.py install
-```
-
-Copy the xorg.conf and Xwrapper.conf file to /etc/X11 as the root user:
-```commandline
-cp /home/fbarecorder/fcreplay/xorg.conf /etc/X11/
-cp /home/fbarecorder/fcreplay/Xwrapper.config /etc/X11/
-```
+Copy the xorg.conf and Xwrapper.conf file to /etc/X11 as the root user
+These files are installed in the python package installation directory
 
 Now you need to start the dummy X server, configure fightcade and configure OBS.
 As the fbarecorder user:
@@ -230,8 +219,8 @@ And configure it with:
      1. Pre-scale using SoftFX
      1. RGB effects
      1. Advanced settings: Force 16-bit emulation & Use DirectX texture management
- .1. Stretch: Correct aspect ratio
- 
+ 1. Stretch: Correct aspect ratio
+
 Close ggpofba, and run OBS:
 ```commandline
 obs
@@ -243,6 +232,14 @@ a static filename (set in the advanced section) as `replay`. Make sure to disabl
 Now you need to configure the scene. I found the best way to do this was to have ggpofba running, then switch OBS to a
 i3 floating window (win+shift+space).
 
+ * I'm using a canvas resolution of 512x384 and a output resolutuon of 512.384.
+ * For the screen capture I'm using the following crop/pad filter settings:
+   * Left: 514
+   * Top: 204
+   * Right: 2
+   * Bottom: 184
+
+
 After doing all this you can start recording. Activate the python environment with:
 ```commandline
 cd ~/fcreplay
@@ -251,11 +248,16 @@ source ./venv/bin/activate
 
 Now grab some replays:
 ```commandline
-./get.py fightcade_id
+fcreplayget <fightcade profile>
 ```
 
-This will download quite a few replays, and place them in a sqlite3 database (replays.db)a
-Now you can trigger the recording loop, just run `loop.py` Once a loop has started you can close the vnc session and
+This will download quite a few replays, and place them in a sqlite3 database (replays.db).
+Now you can trigger the recording loop, Run:
+```commandline
+fcreplayloop
+````
+
+Once a loop has started you can close the vnc session and
 leave it running.
 
-You can also run `loop.py --debug` to only run for a single iteration. Useful for testing.
+You can also run `fcreplayloop --debug` to only run for a single iteration. Useful for testing.

@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import datetime
 import sys
+import pkg_resources
 
 
 def process_img(frame_rgb, character_images, count):
@@ -71,11 +72,12 @@ def character_detect(videofile):
 
     # Load all character images
     character_images = {}
+    charnames_dir = pkg_resources.resource_filename('fcreplay', 'data/charnames')
     for character in characters:
         for i in range(1, 10):
             if character not in character_images:
                 character_images[character] = {'images': []}
-            character_images[character]['images'].append(cv2.imread(f'./charnames/{character}{i}.png', 0))
+            character_images[character]['images'].append(cv2.imread(f'{charnames_dir}/{character}{i}.png', 0))
     count = 0
 
     # [ p1, p2, start-time ]

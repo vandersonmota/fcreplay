@@ -4,6 +4,7 @@ import logging
 import json
 import sys
 import datetime
+from retrying import retry
 from fcreplay import get as fcreplayget
 from bs4 import BeautifulSoup
 
@@ -18,12 +19,23 @@ logging.basicConfig(
         datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+@retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
+def get_profile(profile):
+    r = requests.get(f"https://www.fightcade.com/id/{profile}")
+    if r.status_code == 500:
+        logging.error("500 Code, trying up to 3 times")
+        raise IOError("Unable to get data")
+    else:
+        return r
+
+
 def main(profile, challenge):
+    # Check if profile exists, raise exception if it doesn't
     fcreplayget.check_for_profile(profile)
 
     # Get profile page
     logging.info('Getting profile page')
-    r = requests.get(f"https://www.fightcade.com/id/{profile}")
+    r = get_profile(profile)
 
     table = []
 
@@ -50,8 +62,8 @@ def main(profile, challenge):
 
             # Add to DB
             logging.info('Adding player replay to DB')
-            fcreplayget.addreplay(row, player_replay=True)
-            return(True)
+            status = fcreplayget.addreplay(row, player_replay=True)
+            return(status)
 
     logging.error('Unable to find replay in player profile')
     raise LookupError
