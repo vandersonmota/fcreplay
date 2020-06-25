@@ -4,6 +4,7 @@ venv
 
 dist
 *.egg-info
+build
 
 # Misc files
 .client_secrets.json
