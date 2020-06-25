@@ -100,6 +100,8 @@ def check_if_finished(challenge_id):
         row = c.fetchone()
         if row[0] == 'FINISHED':
             return('FINISHED')
+        else:
+            return('NOT_FINISHED')
     else:
         return("NO_DATA")
 
