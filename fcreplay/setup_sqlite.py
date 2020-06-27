@@ -79,10 +79,10 @@ def setup_character_times_sql():
             logging.info("Creating table character_detect")
             c.execute("CREATE TABLE character_detect ( \
                 ID INTEGER PRIMARY KEY, \
-                CHALLENGE TEXT NOT NULL, \
-                P1_CHAR TEXT NOT NULL, \
-                p2_CHAR TEXT NOT NULL, \
-                TIME TEXT NOT NULL)")
+                challenge TEXT NOT NULL, \
+                p1_char TEXT NOT NULL, \
+                p2_char TEXT NOT NULL, \
+                vid_time TEXT NOT NULL)")
             sql_conn.commit()
 
 
