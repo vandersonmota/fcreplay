@@ -3,6 +3,21 @@ import numpy as np
 import datetime
 import sys
 import pkg_resources
+import json
+import logging
+import sqlite3
+from fcreplay import setup_sqlite as fc_setup_sqlite
+
+with open("config.json") as json_data_file:
+    config = json.load(json_data_file)
+
+# Setup Log
+logging.basicConfig(
+        format='%(asctime)s %(levelname)s: %(message)s',
+        filename=config['logfile'],
+        level=config['loglevel'],
+        datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 
 def process_img(frame_rgb, character_images, count):
@@ -98,12 +113,11 @@ def character_detect(videofile):
                 elif p1 not in times[-1][0] or p2 not in times[-1][1]:
                     times.append([p1, p2, str(datetime.timedelta(seconds=int(count/60)))])
 
-    print(f'Video: {videofile}')
+    logging.debug(f'Video: {videofile}')
     video_chars = []
     for i in times:
-        print(f'P1: {i[0]}, P2: {i[1]}, Time: {i[2]}')
+        logging.info(f'P1: {i[0]}, P2: {i[1]}, Time: {i[2]}')
         video_chars.append([i[0], i[1], i[2]])
-    print(datetime.datetime.now() - begin_time)
     return video_chars
 
 

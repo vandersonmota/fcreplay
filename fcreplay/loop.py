@@ -10,6 +10,7 @@ import time
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
+from fcreplay import setup_sqlite as fc_setup_sqlite
 import argparse
 import datetime
 from soundmeter import meter as sm
@@ -41,15 +42,16 @@ if not os.path.exists(f"{config['fcreplay_dir']}/finished"):
     os.mkdir(f"{config['fcreplay_dir']}/finished")
 
 
-def setupjobssql():
-    # Create jobs table
-    c.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='job'")
-    if c.fetchone()[0] == 0:
-        # Create table, ID auto increments
-        c.execute("CREATE TABLE job (ID INTEGER PRIMARY KEY, \
-            challenge_id TEXT NOT NULL, \
-            start_time INTEGER, \
-            length INTEGER);")
+def add_detected_characters(row, detected_chars):
+    logging.info("Adding detected characters to DB")
+    logging.info(f"Data is: {detected_chars}")
+    for i in detected_chars:
+        c.execute(f"INSERT INTO character_detect VALUES (null,?,?,?,?)",(
+            row[0],
+            i[0],
+            i[1],
+            i[2],
+            ))
         sql_conn.commit()
 
 
@@ -125,6 +127,10 @@ Fightcade replay id: {row[0]}"""
 
     update_status(row, 'DESCRIPTION_CREATED')
     logging.info("Finished creating description")
+
+    # Add description to sqlite database
+    logging.info('Adding description to database')
+    c.execute(f'INSERT INTO descriptions VALUES (?,?)',(row[0], description_text,))
 
     if DEBUG:
         print(f'Description Text is: {description_text}')
@@ -242,14 +248,6 @@ def upload_to_yt(row, description_text):
             logging.info("Replay is too long. Not uploading to youtube")
             return False
 
-        # Chech max daily uploads
-        # Create table if it doesn't exist
-        c.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='day_log'")
-        if c.fetchone()[0] == 0:
-            logging.info("Creating table day_log")
-            c.execute("CREATE TABLE day_log (ID TEXT PRIMARY KEY, date TEXT NOT NULL)")
-            sql_conn.commit()
-
         # If this isn't a player replay, then check max uploads
         if row[12] == 'no':
             # Find number of uploads today
@@ -362,8 +360,8 @@ def get_row():
 
 
 def main(DEBUG):
-    # Create jobs table if it does't exist
-    setupjobssql()
+    # Create tables if it does't exist
+    fc_setup_sqlite.main()
 
     while True:
         row = get_row()
@@ -405,6 +403,7 @@ def main(DEBUG):
                 try:
                     logging.info("Detecting characters")
                     detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{row[0]}.mkv")
+                    add_detected_characters(row, detected_chars)
                     description_text = description(row, detected_chars)
                     logging.info(f"Description is: {description_text}")
                 except Exception as e:

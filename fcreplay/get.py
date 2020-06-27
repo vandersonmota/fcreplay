@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import requests
+from fcreplay import setup_sqlite as fc_setup_sqlite
+from retrying import retry
 import datetime
 import json
-import sys
-import sqlite3
-from retrying import retry
 import logging
+import requests
+import sqlite3
+import sys
 import time
 
 with open("config.json") as json_data_file:
@@ -94,6 +95,9 @@ def check_for_profile(profile):
 
 
 def get_replays(fc_profile):
+    # Create tables if they don't exist
+    fc_setup_sqlite.main() 
+
     replays = []
     profile = fc_profile
     epoch = datetime.datetime.utcfromtimestamp(0)
@@ -116,30 +120,6 @@ def get_replays(fc_profile):
             logging.error("Failed after 3 attempts or unknown error, continuing",)
             logging.error(f"{str(e)}")
             continue
-
-    # Connect to sqlite3
-    sql_conn = sqlite3.connect(f"{config['fcreplay_dir']}/{config['sqlite_db']}")
-    c = sql_conn.cursor()
-
-    # Check if table is created
-    c.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='replays'")
-    if c.fetchone()[0] == 0:
-        # Create table
-        c.execute("CREATE TABLE replays (ID TEXT PRIMARY KEY, \
-        p1_loc TEXT NOT NULL, \
-        p2_loc TEXT NOT NULL, \
-        p1 TEXT NOT NULL, \
-        p2 TEXT NOT NULL, \
-        date_formatted TEXT NOT NULL, \
-        date_org TEXT NOT NULL, \
-        length INT, \
-        created TEXT NOT NULL, \
-        failed TEXT NOT NULL, \
-        status TEXT NOT NULL, \
-        date_added TEXT NOT NULL, \
-        player_requested TEXT NOT NULL);")
-        sql_conn.commit()
-        sql_conn.close()
 
     if len(replays) == 0:
         logging.error('No replays returned')
