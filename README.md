@@ -23,25 +23,10 @@ OpenCV is used to analise the video and match character names from the health ba
 the included character name images against the video every 60 frames. Depending on your OBS recording settings you might
 need to regenerate the images.
 
-## Soundmeter
-Getting soundmeter to work takes a little bit of work. It's different depending on how sound is configured. On Fedora32
-I found I had to load the `snd-aloop` module and edit the soundmeter configuration file to be:
-```
-[soundmeter]
-frames_per_buffer = 2048
-format = 8
-channels = 2
-rate = 44100
-audio_segment_length = 1
-rms_as_trigger_arg = False
-input_device_index = 1
-```
-
-Then using the `pavucontrol` application, set the default input as the monitor of the output
-
 ### A few more notes:
-To trigger OBS I am using [Soundmeter](https://github.com/shichao-an/soundmeter) to start OBS once sound playback
-begins.
+To trigger OBS I am capturing the screen, looking for a the split windows, then checking for differences in the screen
+capture. This might seem crude, but without memory inspection it doesn't seem like there is a way to tell when
+the emulator has started playing the replay.
 
 Because fightcade doesn't have the ability to record to a video file you need to use some sort of capture software.
 
