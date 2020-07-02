@@ -158,7 +158,7 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
                 logging.error("Kill timeout reached killing processes")
                 cleanup_tasks()
                 return "FailTimeout"
-        time.sleep(0.5)
+        time.sleep(1)
 
 
 if __name__ == "__main__":
