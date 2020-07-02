@@ -33,6 +33,7 @@ def start_ggpo(ggpo_path=None, fc_challenge=None):
         ]
     )
 
+
 def start_obs():
     obs_rc = subprocess.run(
         [
@@ -41,7 +42,6 @@ def start_obs():
             '--startrecording'
         ]
     )
-
 
 
 def cleanup_tasks():
@@ -76,48 +76,53 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     #   1. Check to see if GGPOFBA is loaded
     #     1. Check to see if there are screen updates
 
-    empty_capture = Image.open(pkg_resources.resource_filename('fcreplay', 'data/empty_capture.png')).convert('RGB')
-    ggpo_capture = Image.open(pkg_resources.resource_filename('fcreplay', 'data/ggpo_capture.png')).convert('RGB')
+    empty_capture = Image.open(pkg_resources.resource_filename(
+        'fcreplay', 'data/empty_capture.png')).convert('RGB')
+    ggpo_capture = Image.open(pkg_resources.resource_filename(
+        'fcreplay', 'data/ggpo_capture.png')).convert('RGB')
 
     empty_capture.save('empty_capture.png')
-    ggpo_capture.save('ggpo_capture.png')    
+    ggpo_capture.save('ggpo_capture.png')
 
     logging.info('Starting image capture loop')
     while True:
         running_time = (datetime.datetime.now() - begin_time).seconds
 
-        screen_ggpo_capture = ImageGrab.grab(bbox=(485,0,514,18)).convert('RGB')
-        screen_capture1 = ImageGrab.grab(bbox=(800,100,950,650)).convert('RGB')
+        screen_ggpo_capture = ImageGrab.grab(
+            bbox=(485, 0, 514, 18)).convert('RGB')
+        screen_capture1 = ImageGrab.grab(
+            bbox=(800, 100, 950, 650)).convert('RGB')
 
         screen_ggpo_capture.save('screen_ggpo_capture.png')
         screen_capture1.save('screen_capture1.png')
 
         time.sleep(0.5)
-        
+
         # Check if ggpo is running:
         diff = ImageChops.difference(screen_ggpo_capture, ggpo_capture)
         if not diff.getbbox():
             logging.info('Detected GGPO')
-            
-            #Check if screen is empty
+
+            # Check if screen is empty
             diff = ImageChops.difference(empty_capture, screen_capture1)
-            
+
             # Something on screen
             if diff.getbbox():
                 logging.info('Detected non-black GGPO screen')
-                #Look for non-static image
-                screen_capture2 = ImageGrab.grab(bbox=(800,100,950,650))
+                # Look for non-static image
+                screen_capture2 = ImageGrab.grab(bbox=(800, 100, 950, 650))
                 screen_capture2.save('screen_capture2.png')
-                screen_capture2 = ImageGrab.grab(bbox=(800,100,950,650)).convert('RGB')
+                screen_capture2 = ImageGrab.grab(
+                    bbox=(800, 100, 950, 650)).convert('RGB')
                 diff = ImageChops.difference(screen_capture1, screen_capture2)
 
-                #Something has changes
+                # Something has changes
                 if diff.getbbox():
                     logging.info('Detected screen updates')
                     break
             else:
                 logging.info('Detected black GGPO screen')
-       
+
         if running_time > kill_time:
             logging.info('Match never started, exiting')
             cleanup_tasks()
@@ -132,6 +137,10 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
         running_time = (datetime.datetime.now() - begin_time).seconds
         obs_running = '/usr/bin/obs' in str(subprocess.run(
             ['ps', '-ef'], stdout=subprocess.PIPE, stderr=subprocess.PIPE))
+
+        if (running_time % 60) == 0:
+            logging.info(
+                f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
 
         if running_time > fc_time:
             # We have reached the end of the video. Killing processes
