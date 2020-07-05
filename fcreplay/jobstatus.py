@@ -39,9 +39,7 @@ def get_current_job_remaining():
     start_time = job.start_time
     length = job.length
 
-
-    # TODO Need to fix time check
-    running_time = current_time - start_time
+    running_time = (current_time - start_time).seconds
     time_left = length - running_time
 
     logging.info(f"Current job status: running_time: {running_time}, time_left: {time_left}")
