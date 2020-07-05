@@ -107,7 +107,7 @@ def get_replays(fc_profile):
     check_for_profile(profile)
 
     # Get replays
-    for i in range(3, int(config['replay_pages'])):
+    for i in range(1, int(config['replay_pages'])):
         page = i * 10
         ms_time = str(int((datetime.datetime.utcnow() - epoch).total_seconds() * 1000))
         # This could probably be better. But it works for usernames fine.
