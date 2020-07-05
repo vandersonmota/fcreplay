@@ -25,7 +25,9 @@ setup(name='fcreplay',
           'retrying',
           'internetarchive',
           'opencv-python',
-          'beautifulsoup4'
-
+          'beautifulsoup4',
+          'SQLAlchemy',
+          'SQLAlchemy-Utils',
+          'psycopg2',
       ],
       zip_safe=False)

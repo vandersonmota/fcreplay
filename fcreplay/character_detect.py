@@ -5,10 +5,8 @@ import sys
 import pkg_resources
 import json
 import logging
-import sqlite3
-from fcreplay import setup_sqlite as fc_setup_sqlite
 
-with open("config.json") as json_data_file:
+with open("config.json", "r") as json_data_file:
     config = json.load(json_data_file)
 
 # Setup Log

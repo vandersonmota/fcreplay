@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sqlite3
 import subprocess
 import shutil
 import os
@@ -7,10 +6,10 @@ import logging
 import json
 import sys
 import time
+from fcreplay.database import Database
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
-from fcreplay import setup_sqlite as fc_setup_sqlite
 import argparse
 import datetime
 from soundmeter import meter as sm
@@ -20,8 +19,7 @@ from retrying import retry
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
 
-sql_conn = sqlite3.connect(config['sqlite_db'])
-c = sql_conn.cursor()
+db = Database()
 
 # Setup Log
 logging.basicConfig(
@@ -42,78 +40,78 @@ if not os.path.exists(f"{config['fcreplay_dir']}/finished"):
     os.mkdir(f"{config['fcreplay_dir']}/finished")
 
 
-def add_detected_characters(row, detected_chars):
+def add_detected_characters(replay, detected_chars):
     logging.info("Adding detected characters to DB")
     logging.info(f"Data is: {detected_chars}")
     for i in detected_chars:
-        c.execute(f"INSERT INTO character_detect VALUES (null,?,?,?,?)",(
-            row[0],
-            i[0],
-            i[1],
-            i[2],
-            ))
-        sql_conn.commit()
+        db.add_detected_characters(
+            challenge_id=replay.id,p1_char=i[0],p2_char=[1],vid_time=[2]
+        )
 
 
-def setcurrentjob(row):
+def add_current_job(replay):
     # Insert current job, with start_time and length
-    current_time = str(time.time())
-    c.execute("INSERT INTO job VALUES (null, ?, ?, ?);",(row[0], current_time, row[7],))
-    sql_conn.commit()
+    start_time = datetime.datetime.utcnow()
+    db.add_current_job(
+        challenge_id=replay.id,start_time=start_time,length=replay.length
+    )
 
-def update_status(row, status):
+
+def update_status(replay, status):
     # Update the replay table status of the current job
-    c.execute("UPDATE replays SET status = ? WHERE ID = ?", (status, row[0],))
     logging.info(f"Set status to {status}")
-    sql_conn.commit()
+    db.update_status(
+        challenge_id=replay.id,status=status
+    )
 
-def record(row):
-    logging.info(f"Running capture with {row[0]} and {row[7]}")
-    time_min = int(row[7]/60)
+def record(replay):
+    logging.info(f"Running capture with {replay.id} and {replay.length}")
+    time_min = int(replay.length/60)
     logging.info(f"Capture will take {time_min} minutes")
 
-    update_status(row, 'RECORDING')
+    update_status(replay, 'RECORDING')
     
-    record_status = fc_record.main(fc_challange=row[0], fc_time=row[7], kill_time=config['record_timeout'], ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
+    record_status = fc_record.main(fc_challange=replay.id, fc_time=replay.length, kill_time=config['record_timeout'], ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
     if not record_status == "Pass":
-        logging.error(f"Recording failed on {row[0]}, Status: \"{record_status}\", exiting.")
+        logging.error(f"Recording failed on {replay.id}, Status: \"{record_status}\", exiting.")
         # Depending on the exit status, do different things:
         if record_status == "FailTimeout":
             # Just do a new recording and mark the current one as failed
-            logging.error(f"Setting {row[0]} to failed and continuing")
-            set_failed(row)
+            logging.error(f"Setting {replay.id} to failed and continuing")
+            set_failed(replay)
             return False
         else:
             logging.error("Exiting")
             sys.exit(1)
             return False
     logging.info("Capture finished")
-    update_status(row, 'RECORDED')
+    update_status(replay, 'RECORDED')
     return True
 
 
-def move(row):
-    filename = f"{row[0]}.mkv"
+def move(replay):
+    filename = f"{replay.id}.mkv"
     shutil.move(f"{config['fcreplay_dir']}/videos/{config['obs_video_filename']}",
                 f"{config['fcreplay_dir']}/finished/dirty_{filename}")
 
-    update_status(row, 'MOVED')
+    update_status(replay, 'MOVED')
 
 
-def description(row, detected_chars=None):
+def description(replay, detected_chars=None):
+    replay_date = replay.date_replay
     # Create description
     logging.info("Creating description")
     if detected_chars is not None:
-        description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
-Fightcade replay id: {row[0]}"""
+        description_text = f"""({replay.p1_loc}) {replay.p1} vs ({replay.p2_loc}) {replay.p2} - {replay_date}
+Fightcade replay id: {replay.id}"""
         for match in detected_chars:
             description_text += f"""
-{row[3]}: {match[0]}, {row[4]}: {match[1]}  - {match[2]}
+{replay.p1}: {match[0]}, {replay.p2}: {match[1]}  - {match[2]}
 {match[0]} vs {match[1]}
 """
     else:
-        description_text = f"""({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}
-Fightcade replay id: {row[0]}"""
+        description_text = f"""({replay.p1_loc}) {replay.p1} vs ({replay.p2_loc}) {replay.p2} - {replay_date}
+Fightcade replay id: {replay.id}"""
 
     # Read the append file:
     if config['description_append_file'][0] is True:
@@ -125,21 +123,21 @@ Fightcade replay id: {row[0]}"""
             with open(config['description_append_file'][1]) as description_append:
                 description_text += description_append.read()
 
-    update_status(row, 'DESCRIPTION_CREATED')
+    update_status(replay, 'DESCRIPTION_CREATED')
     logging.info("Finished creating description")
 
-    # Add description to sqlite database
+    # Add description to database
     logging.info('Adding description to database')
-    c.execute(f'INSERT INTO descriptions VALUES (?,?)',(row[0], description_text,))
+    db.add_description(challenge_id=replay.id,description=description_text) 
 
     if DEBUG:
         print(f'Description Text is: {description_text}')
     return description_text
 
 
-def broken_fix(row):
+def broken_fix(replay):
     # Fix broken videos:
-    filename = f"{row[0]}.mkv"
+    filename = f"{replay.id}.mkv"
     logging.info("Running ffmpeg to fix dirty video")
     dirty_rc = subprocess.run([
         "ffmpeg", "-err_detect", "ignore_err",
@@ -148,15 +146,15 @@ def broken_fix(row):
         f"{config['fcreplay_dir']}/finished/{filename}"])
     logging.info("Removing dirty file")
     os.remove(f"{config['fcreplay_dir']}/finished/dirty_{filename}")
-    update_status(row,'BROKEN_CHECK')
+    update_status(replay,'BROKEN_CHECK')
     logging.info("Removed dirty file")
     logging.info("Fixed file")
 
 
-def black_check(row):
+def black_check(replay):
     # Use ffmpeg to check for black frames to see if something is broken
     logging.info("Checking for black frames")
-    filename = f"{row[0]}.mkv"
+    filename = f"{replay.id}.mkv"
     black_rc = subprocess.run([
         "ffmpeg",
         "-i",
@@ -170,14 +168,14 @@ def black_check(row):
         # If there are too many black frames, then we need to debug processing
         sys.exit(1)
     
-    update_status(row, 'EMPTY_CHECK')
+    update_status(replay, 'EMPTY_CHECK')
     logging.info("Finished checking black frames")
 
 
-def create_thumbnail(row):
+def create_thumbnail(replay):
     # Create thumbnail
     logging.info("Making thumbnail")
-    filename = f"{row[0]}.mkv"
+    filename = f"{replay.id}.mkv"
     thumbnail_rc = subprocess.run([
         "ffmpeg",
         "-ss", "20",
@@ -185,21 +183,22 @@ def create_thumbnail(row):
         "-vframes:v", "1",
         f"{config['fcreplay_dir']}/tmp/thumbnail.jpg"])
 
-    update_status(row, 'THUMBNAIL_CREATED')
+    update_status(replay, 'THUMBNAIL_CREATED')
     logging.info("Finished making thumbnail")
 
 
 @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
-def upload_to_ia(row, description_text):
+def upload_to_ia(replay, description_text):
+    replay_date = replay.date_replay
     # Do Upload to internet archive. Sometimes it will return a 403, even
     # though the file doesn't already exist. So we decorate the function with
     # the @retry decorator to try again in a little bit. Max of 3 tries.
-    title = f"Street Fighter III: 3rd Strike: ({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}"
-    filename = f"{row[0]}.mkv"
-    date_short = str(row[6])[10]
+    title = f"Street Fighter III: 3rd Strike: ({replay.p1_loc}) {replay.p1} vs ({replay.p2_loc}) {replay.p2} - {replay_date}"
+    filename = f"{replay.id}.mkv"
+    date_short = str(replay_date)[10]
 
     # Make identifier for Archive.org
-    ident = str(row[0]).replace("@", "-")
+    ident = str(replay.id).replace("@", "-")
     fc_video = get_item(ident)
 
     md = {'title': title,
@@ -216,15 +215,16 @@ def upload_to_ia(row, description_text):
     fc_video.upload(f"{config['fcreplay_dir']}/finished/{filename}",
                     metadata=md, verbose=True)
 
-    update_status(row, 'UPLOADED_TO_IA')
+    update_status(replay, 'UPLOADED_TO_IA')
     logging.info("Finished upload to archive.org")
 
 
-def upload_to_yt(row, description_text):
-    title = f"Street Fighter III: 3rd Strike: ({row[1]}) {row[3]} vs ({row[2]}) {row[4]} - {row[6]}"
-    filename = f"{row[0]}.mkv"
+def upload_to_yt(replay, description_text):
+    replay_date = replay.date_replay
+    title = f"Street Fighter III: 3rd Strike: ({replay.p1_loc}) {replay.p1} vs ({replay.p2_loc}) {replay.p2} - {replay_date}"
+    filename = f"{replay.id}.mkv"
     import_format = '%Y-%m-%d %H:%M:%S'
-    date_raw = datetime.datetime.strptime(str(row[6]), import_format)
+    date_raw = datetime.datetime.strptime(str(replay_date), import_format)
 
     # YYYY-MM-DDThh:mm:ss.sZ
     youtube_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S.0Z')
@@ -241,25 +241,32 @@ def upload_to_yt(row, description_text):
             return False
 
         # Check min and max length:
-        if (int(row[7])/60) < int(config['yt_min_length']):
+        if (int(replay.length)/60) < int(config['yt_min_length']):
             logging.info("Replay is too short. Not uploading to youtube")
             return False
-        if (int(row[7])/60) > int(config['yt_max_length']):
+        if (int(replay.length)/60) > int(config['yt_max_length']):
             logging.info("Replay is too long. Not uploading to youtube")
             return False
 
         # If this isn't a player replay, then check max uploads
-        if row[12] == 'no':
+        if replay.player_requested == 'no':
             # Find number of uploads today
-            c.execute("SELECT count(date) FROM day_log WHERE date = date('now')")
-            num_uploads = c.fetchone()[0]
-            if num_uploads >= int(config['youtube_max_daily_uploads']):
-                logging.info("Maximum uploads reached for today")
-                return False
-            elif num_uploads == 0:
-                logging.info("Clearing table day_log as no entries found for today")
-                c.execute('DELETE FROM day_log')
-                sql_conn.commit()
+            day_log = db.get_youtube_day_log()
+            
+            # Check max uploads
+            # Get todays date, dd-mm-yyyy
+            today = datetime.datetime.utcnow().strftime("%d-%m-%Y")
+            
+            # Check the log is for today
+            if day_log.date == today:
+                # Check number of uploads
+                if day_log.count >= int(config['youtube_max_daily_uploads']):
+                    logging.info("Maximum uploads reached for today")
+                    return False
+            else:
+                # It's a new day, update the counter
+                db.update_youtube_day_log_count(count=1,date=today)
+
     
         # Create description file
         with open(f"{config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
@@ -284,25 +291,26 @@ def upload_to_yt(row, description_text):
         logging.info(yt_rc.stdout.decode())
         logging.info(yt_rc.stderr.decode())
 
-        if row[12] == 'yes':
+        if replay.player_requested == 'yes':
             # Add upload to day_log dable
             logging.info('Updating day_log')
-            c.execute("INSERT INTO day_log VALUES (?, date('now'))", (row[0],))
-            sql_conn.commit()
+            # Update count for today
+            logging.info("Updating counter")
+            db.update_youtube_day_log_count(count=day_log.count+1,date=today)
 
         # Remove description file
         os.remove(f"{config['fcreplay_dir']}/tmp/description.txt")
 
-        update_status(row, 'UPLOADED_TO_YOUTUBE')
+        update_status(replay, 'UPLOADED_TO_YOUTUBE')
         logging.info('Finished uploading to Youtube')
     else:
         logging.error("youtube-upload is not installed")
 
 
-def remove_generated_files(row):
+def remove_generated_files(replay):
     # Remove dirty file, description and thumbnail
     logging.info("Removing old files")
-    filename = f"{row[0]}.mkv"
+    filename = f"{replay.id}.mkv"
     try:
         os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
     except:
@@ -313,63 +321,45 @@ def remove_generated_files(row):
     except:
         pass
 
-    update_status(row, "REMOVED_GENERATED_FILES")
+    update_status(replay, "REMOVED_GENERATED_FILES")
     logging.info("Finished removing files")
 
 
-def update_db(row):
-    # Update to processed
-    logging.info(f"sqlite updating id {row[0]} created to yes")
-    c2 = sql_conn.cursor()
-    c2.execute("UPDATE replays SET created = 'yes' WHERE ID = ?", (row[0],))
-    sql_conn.commit()
-    logging.info("Updated sqlite")
+def set_failed(replay):
+    logging.info(f"Setting {replay.id} to failed")
+    db.update_failed_replay(challenge_id=replay.id)
 
-    update_status(row, "FINISHED")
-    logging.info(f"Finished processing {row[0]}")
+    update_status(replay, "FAILED")
+    logging.info("Finished updating datebase")
 
 
-def set_failed(row):
-    logging.info(f"Setting {row[0]} to failed")
-    c3 = sql_conn.cursor()
-    c3.execute("UPDATE replays SET failed = 'yes' WHERE ID = ?", (row[0],))
-    sql_conn.commit()
-
-    update_status(row, "FAILED")
-    logging.info("Finished updating sqlite")
-
-
-def get_row():
-    logging.info('Getting replay from sqlite database')
+def get_replay():
+    logging.info('Getting replay from database')
     if config['player_replay']:
-        c.execute("SELECT * FROM replays WHERE player_requested = 'yes' AND created = 'no' AND failed ='no' ORDER BY datetime(date_added) ASC LIMIT 1")
-        row = c.fetchone()
-        if row is not None:
+        replay = db.get_oldest_player_replay()
+        if replay is not None:
             logging.info('Found player replay to encode')
-            return row
+            return(replay)
         else:
             logging.info('No more player replays, encoding a random one')
     if config['random_replay']:
         logging.info('Getting random replay')
-        c.execute("SELECT * FROM replays WHERE created = 'no' AND failed = 'no' ORDER BY RANDOM() LIMIT 1")
-        return c.fetchone()
+        replay = db.get_random_replay()
+        return(replay)
     else:
-        logging.info('Getting any replay')
-        c.execute("SELECT * FROM replays WHERE created = 'no' AND failed != 'yes' LIMIT 1")
-        return c.fetchone()
+        logging.info('Getting oldest replay')
+        replay = db.get_oldest_replay()
+        return(replay)
 
 
 def main(DEBUG):
-    # Create tables if it does't exist
-    fc_setup_sqlite.main()
-
     while True:
-        row = get_row()
-        if row is not None:
+        replay = get_replay()
+        if replay is not None:
             # Update the current job
-            setcurrentjob(row)
+            add_current_job(replay)
             try:
-                status = record(row)
+                status = record(replay)
                 if status is False:
                     continue
             except FileNotFoundError as e:
@@ -378,14 +368,14 @@ def main(DEBUG):
                 sys.exit(1)
 
             try:
-                move(row)
+                move(replay)
             except FileNotFoundError as e:
                 logging.error(e)
                 logging.error("Exiting due to error in move")
                 sys.exit(1)
 
             try:
-                broken_fix(row)
+                broken_fix(replay)
             except FileNotFoundError as e:
                 logging.error(e)
                 logging.error("Exiting due to error in brokenfix")
@@ -393,7 +383,7 @@ def main(DEBUG):
 
             if config['blackdetect']:
                 try:
-                    black_check(row)
+                    black_check(replay)
                 except FileNotFoundError as e:
                     logging.error(e)
                     logging.error("Exiting due to error in black_check")
@@ -402,20 +392,20 @@ def main(DEBUG):
             if config['detect_chars']:
                 try:
                     logging.info("Detecting characters")
-                    detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{row[0]}.mkv")
-                    add_detected_characters(row, detected_chars)
-                    description_text = description(row, detected_chars)
+                    detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
+                    add_detected_characters(replay, detected_chars)
+                    description_text = description(replay, detected_chars)
                     logging.info(f"Description is: {description_text}")
                 except Exception as e:
                     logging.error(e)
                     logging.error("Exiting due to error in character detection")
                     sys.exit(1)
             else:
-                description_text = description(row)
+                description_text = description(replay)
                 logging.info(f"Description is {description_text}")
 
             try:
-                create_thumbnail(row)
+                create_thumbnail(replay)
 
             except FileNotFoundError as e:
                 logging.error(e)
@@ -424,26 +414,26 @@ def main(DEBUG):
 
             if config['upload_to_ia']:
                 try:
-                    upload_to_ia(row, description_text)
+                    upload_to_ia(replay, description_text)
                 except:
-                    set_failed(row)
+                    set_failed(replay)
 
             if config['upload_to_yt']:
                 try:
-                    upload_to_yt(row, description_text)
+                    upload_to_yt(replay, description_text)
                 except Exception as e:
                     logging.error(e)
-                    set_failed(row)
+                    set_failed(replay)
 
             if config['remove_generated_files']:
                 try:
-                    remove_generated_files(row)
+                    remove_generated_files(replay)
                 except FileNotFoundError as e:
                     logging.error(e)
                     logging.error("Exiting due to error in remove_generated_files")
                     sys.exit(1)
 
-            update_db(row)
+            db.update_created_replay(challenge_id=replay.id)
         else:
             if config['auto_add_more']:
                 logging.info('Auto adding more replays')

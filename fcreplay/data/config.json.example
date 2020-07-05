@@ -2,7 +2,7 @@
   "fcreplay_dir": "/home/fbarecorder/fcreplay",
   "pyqtggpo_dir": "/home/fbarecorder/fcreplay/pyqtggpo-master",
   "logfile": "/home/fbarecorder/fcreplay/fcreplay.log",
-  "sqlite_db": "replays.db",
+  "sql_baseurl": "postgres://user:pass@address:port",
   "loglevel": "DEBUG",
   "replay_pages": "20",
   "min_replay_length": 60,

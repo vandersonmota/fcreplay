@@ -12,6 +12,7 @@ build
 .youtube-upload-credentials.json
 __pycache__/
 config.json
+database_config.py
 description_append.txt
 fcreplay.log
 finished/

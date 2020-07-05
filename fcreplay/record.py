@@ -13,7 +13,7 @@ import pyscreenshot as ImageGrab
 from PIL import Image
 from PIL import ImageChops
 
-with open("config.json") as json_data_file:
+with open("config.json", "r") as json_data_file:
     config = json.load(json_data_file)
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',

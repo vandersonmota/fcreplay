@@ -1,5 +1,4 @@
 import requests
-import sqlite3
 import logging
 import json
 import sys
@@ -8,7 +7,7 @@ from retrying import retry
 from fcreplay import get as fcreplayget
 from bs4 import BeautifulSoup
 
-with open("config.json") as json_data_file:
+with open("config.json", "r") as json_data_file:
     config = json.load(json_data_file)
 
 # Setup Log
