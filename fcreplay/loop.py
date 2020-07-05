@@ -249,7 +249,7 @@ def upload_to_yt(replay, description_text):
             return False
 
         # If this isn't a player replay, then check max uploads
-        if replay.player_requested == 'no':
+        if replay.player_requested == False:
             # Find number of uploads today
             day_log = db.get_youtube_day_log()
             
