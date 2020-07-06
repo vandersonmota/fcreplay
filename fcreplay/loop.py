@@ -291,7 +291,7 @@ def upload_to_yt(replay, description_text):
         logging.info(yt_rc.stdout.decode())
         logging.info(yt_rc.stderr.decode())
 
-        if replay.player_requested == 'yes':
+        if replay.player_requested == False:
             # Add upload to day_log dable
             logging.info('Updating day_log')
             # Update count for today

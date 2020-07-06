@@ -111,7 +111,7 @@ class Database:
     def update_youtube_day_log_count(self, **kwargs):
         session = self.Session()
         session.query(Youtube_day_log).filter_by(
-            count='count'
+            id='count'
         ).update(
             {
                 'count': kwargs['count'],
