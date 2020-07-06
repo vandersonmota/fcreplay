@@ -45,7 +45,7 @@ def add_detected_characters(replay, detected_chars):
     logging.info(f"Data is: {detected_chars}")
     for i in detected_chars:
         db.add_detected_characters(
-            challenge_id=replay.id,p1_char=i[0],p2_char=[1],vid_time=[2]
+            challenge_id=replay.id,p1_char=i[0],p2_char=i[1],vid_time=i[2]
         )
 
 
