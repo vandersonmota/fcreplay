@@ -86,7 +86,7 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
 
     logging.info('Starting image capture loop')
     while True:
-        running_time = (datetime.datetime.now() - begin_time).seconds
+        running_time = (datetime.datetime.now() - begin_time).seconds - 5
 
         screen_ggpo_capture = ImageGrab.grab(
             bbox=(485, 0, 514, 18)).convert('RGB')
