@@ -145,7 +145,8 @@ class Database:
         ).order_by(
             Replays.date_added.desc()
         ).first()
-
+        session.close()
+        
         return(replay)
 
     def get_random_replay(self):
@@ -159,6 +160,7 @@ class Database:
         ).order_by(
             func.random()
         ).first()
+        session.close()
 
         return(replay)
 
@@ -173,6 +175,7 @@ class Database:
         ).order_by(
             Replays.date_added.desc()
         ).first()
+        session.close()
 
         return(replay)
 

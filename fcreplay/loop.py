@@ -341,7 +341,7 @@ def get_replay():
             logging.info('Found player replay to encode')
             return(replay)
         else:
-            logging.info('No more player replays, encoding a random one')
+            logging.info('No more player replays')
     if config['random_replay']:
         logging.info('Getting random replay')
         replay = db.get_random_replay()
