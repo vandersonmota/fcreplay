@@ -439,7 +439,9 @@ def main(DEBUG):
                 logging.info('Auto adding more replays')
                 fc_get.get_replays(config['auto_add_search_string'])                
             else:
-                break
+                logging.info("No more replays. Waiting for replay submission")
+                time.sleep(5)
+
 
         if DEBUG:
             sys.exit(0)
