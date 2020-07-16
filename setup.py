@@ -29,5 +29,6 @@ setup(name='fcreplay',
           'sqlalchemy',
           'sqlalchemy-utils',
           'psycopg2',
+          'sqlalchemy'
       ],
       zip_safe=False)
