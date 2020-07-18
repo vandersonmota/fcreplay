@@ -10,6 +10,7 @@ from fcreplay.database import Database
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
+from fcreplay import gcloud
 import argparse
 import datetime
 from soundmeter import meter as sm
@@ -139,7 +140,7 @@ def broken_fix(replay):
     # Fix broken videos:
     filename = f"{replay.id}.mkv"
     logging.info("Running ffmpeg to fix dirty video")
-    dirty_rc = subprocess.run([
+    subprocess.run([
         "ffmpeg", "-err_detect", "ignore_err",
         "-i", f"{config['fcreplay_dir']}/finished/dirty_{filename}",
         "-c", "copy",
@@ -176,7 +177,7 @@ def create_thumbnail(replay):
     # Create thumbnail
     logging.info("Making thumbnail")
     filename = f"{replay.id}.mkv"
-    thumbnail_rc = subprocess.run([
+    subprocess.run([
         "ffmpeg",
         "-ss", "20",
         "-i", f"{config['fcreplay_dir']}/finished/{filename}",
@@ -352,7 +353,87 @@ def get_replay():
         return(replay)
 
 
-def main(DEBUG):
+def gcloud_postprocessing():
+    # Get currently processing replay
+    job = db.get_current_job()
+    replay = db.get_single_replay(challenge_id=job.challenge_id)
+
+    # Download replay:
+    gcloud.download_video(replay.id,f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
+
+    # Do post processing
+    postprocessing(replay)
+
+    # Destroy postprocessing
+    status = gcloud.destroy_fcreplay_postprocessing()
+    if not status['status']:
+        print("Postprocessing already running. This shouldn't happen")
+        sys.exit(1)
+
+def postprocessing(replay):
+    try:
+        broken_fix(replay)
+    except FileNotFoundError as e:
+        logging.error(e)
+        logging.error("Exiting due to error in brokenfix")
+        sys.exit(1)
+
+    if config['blackdetect']:
+        try:
+            black_check(replay)
+        except FileNotFoundError as e:
+            logging.error(e)
+            logging.error("Exiting due to error in black_check")
+            sys.exit(1)
+
+    if config['detect_chars']:
+        try:
+            logging.info("Detecting characters")
+            detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
+            add_detected_characters(replay, detected_chars)
+            description_text = description(replay, detected_chars)
+            logging.info(f"Description is: {description_text}")
+        except Exception as e:
+            logging.error(e)
+            logging.error("Exiting due to error in character detection")
+            sys.exit(1)
+    else:
+        description_text = description(replay)
+        logging.info(f"Description is {description_text}")
+
+    try:
+        create_thumbnail(replay)
+
+    except FileNotFoundError as e:
+        logging.error(e)
+        logging.error("Exiting due to error in create_thumbnail")
+        sys.exit(1)
+
+    if config['upload_to_ia']:
+        try:
+            upload_to_ia(replay, description_text)
+        except:
+            set_failed(replay)
+
+    if config['upload_to_yt']:
+        try:
+            upload_to_yt(replay, description_text)
+        except Exception as e:
+            logging.error(e)
+            set_failed(replay)
+
+    if config['remove_generated_files']:
+        try:
+            remove_generated_files(replay)
+        except FileNotFoundError as e:
+            logging.error(e)
+            logging.error("Exiting due to error in remove_generated_files")
+            sys.exit(1)
+
+    db.update_created_replay(challenge_id=replay.id)
+
+
+def main(DEBUG, GCLOUD):
     while True:
         replay = get_replay()
         if replay is not None:
@@ -374,66 +455,21 @@ def main(DEBUG):
                 logging.error("Exiting due to error in move")
                 sys.exit(1)
 
-            try:
-                broken_fix(replay)
-            except FileNotFoundError as e:
-                logging.error(e)
-                logging.error("Exiting due to error in brokenfix")
-                sys.exit(1)
-
-            if config['blackdetect']:
+            if GCLOUD:
                 try:
-                    black_check(replay)
-                except FileNotFoundError as e:
-                    logging.error(e)
-                    logging.error("Exiting due to error in black_check")
-                    sys.exit(1)
-
-            if config['detect_chars']:
-                try:
-                    logging.info("Detecting characters")
-                    detected_chars = character_detect.character_detect(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
-                    add_detected_characters(replay, detected_chars)
-                    description_text = description(replay, detected_chars)
-                    logging.info(f"Description is: {description_text}")
+                    gcloud.upload_video(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv", f"{replay.id}.mkv")
                 except Exception as e:
-                    logging.error(e)
-                    logging.error("Exiting due to error in character detection")
+                    logging.error(f"There was an error uploading to google storge: {e}")
                     sys.exit(1)
-            else:
-                description_text = description(replay)
-                logging.info(f"Description is {description_text}")
 
-            try:
-                create_thumbnail(replay)
-
-            except FileNotFoundError as e:
-                logging.error(e)
-                logging.error("Exiting due to error in create_thumbnail")
-                sys.exit(1)
-
-            if config['upload_to_ia']:
                 try:
-                    upload_to_ia(replay, description_text)
-                except:
-                    set_failed(replay)
-
-            if config['upload_to_yt']:
-                try:
-                    upload_to_yt(replay, description_text)
+                    gcloud.destroy_fcreplay()
                 except Exception as e:
-                    logging.error(e)
-                    set_failed(replay)
-
-            if config['remove_generated_files']:
-                try:
-                    remove_generated_files(replay)
-                except FileNotFoundError as e:
-                    logging.error(e)
-                    logging.error("Exiting due to error in remove_generated_files")
+                    logging.error(f"There was an error destroying instance: {e}")
                     sys.exit(1)
+            
+            postprocessing(replay)
 
-            db.update_created_replay(challenge_id=replay.id)
         else:
             if config['auto_add_more']:
                 logging.info('Auto adding more replays')
@@ -442,16 +478,21 @@ def main(DEBUG):
                 logging.info("No more replays. Waiting for replay submission")
                 time.sleep(5)
 
-
         if DEBUG:
+            sys.exit(0)
+
+        if GCLOUD:
+            from fcreplay import gcloud
+            gcloud.destroy_fcreplay()
             sys.exit(0)
 
 
 def console():
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
     parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
+    parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
     args = parser.parse_args()
-    main(args.debug)
+    main(args.debug, args.gcloud)
 
 # Loop and choose a random replay every time
 if __name__ == "__main__":

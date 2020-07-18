@@ -57,7 +57,7 @@ To run this yourself you need:
      1. With at least 4 Cores (Fast ones would be ideal)
      1. With at least 2GB Ram
      1. With at least 20GB of storage (Though you probably won't use that much)
- 1. Running Debian (you can probably make this work in other distributions as well)
+ 1. Running Fedora 32 (you can probably make this work in other distributions as well)
      1. You really want to use a minimal installation
  1. Some familiarity with linux will help
 
@@ -74,43 +74,32 @@ I'll probably create an Ansible script, but the manual steps are:
 
 Install the packages:
 ```
-apt-get install \
-        i3 \
-        xinit \
-        vim \
-        obs-studio \
-        x11vnc \
-        firewalld \
-        pulseaudio \
-        xserver-xorg-video-dummy \
-        tmux \
-        git \
-        unzip \
-        xterm \
-        rsync \
-        portaudio19-dev \
-        python-dev \
+dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+dnf install \
         alsa-utils \
+        firewalld \
         gcc \
-        python3-dev \
-        python3-venv \
-        sqlite3 \
-        ffmpeg \
+        git \
+        i3 \
+        jq \
+        libpq-devel \
+        obs-studio \
         pavucontrol \
-        jq
-```
-
-Install wine:
-```commandline
-dpkg --add-architecture i386
-apt-get update
-apt install \
-    wine \
-    wine32 \
-    wine64 \
-    libwine \
-    libwine:i386 \
-    fonts-wine
+        portaudio \
+        portaudio-devel \
+        pulseaudio \
+        pulseaudio-libs \
+        python3 \
+        python3-devel \
+        rsync \
+        tmux \
+        unzip \
+        vim \
+        wine.i686
+        x11vnc \
+        xinit \
+        xorg-x11-drv-dummy \
+        xterm \
 ```
 
 Enable firewalld:
@@ -139,12 +128,29 @@ Switch to the fbarecorder user and install the package in a virtual env:
 ```commandline
 su fbarecorder -
 git clone https://github.com/glisignoli/fcreplay.git ~/fcreplay_install
-cd ~/fcreplay_install
+mkdir ~/fcreplay
+cd ~/fcreplay
 python3 -m venv ./venv
-python3 setup install
+source ./venv/bin/activate
+cd ~/fcreplay_install
+python3 setup.py install
 ```
 
-Edit the config file and replace the defaults `fcreplay.config`
+Install youtube-upload
+```
+cd ~/fcreplay
+source ./venv/bin/activate
+pip install --upgrade google-api-python-client oauth2client progressbar2
+cd ~/
+git clone https://github.com/tokland/youtube-upload.git youtube-upload_install
+cd youtube-upload_install
+python setup.py install
+```
+
+Edit the config file and replace the defaults
+```
+vi ~/fcreplay/config.json
+```
 
 Create a x11vnc password as the fbarecorder user (It will be stored in ~/.vnc/passwd):
 ```commandline
@@ -153,23 +159,21 @@ x11vnc -storepasswd
 
 Download pyqtggpo-0.42 and unzip it as the fbarecorder user:
 ```commandline
-mkdir ~/fcreplay
 cd ~/fcreplay
-wget https://github.com/poliva/pyqtggpo/archive/master.zip
-unzip master.zip
+git clone https://github.com/poliva/pyqtggpo.git pyqtggpo-master
 ```
 
 Copy the xorg.conf and Xwrapper.conf file to /etc/X11 as the root user
 These files are installed in the python package installation directory
+```
+cp /home/fbarecorder/fcreplay/venv/lib/python3.8/site-packages/fcreplay-*-py*.egg/fcreplay/data/{Xwrapper.config,xorg.conf} /etc/X11/
+```
 
-Now you need to start the dummy X server, configure fightcade and configure OBS.
-As the fbarecorder user:
-```commandline
-# Run tmux, and split so you have two panes
-# In the first pane, run startx
-startx
-# In the second pane, run x11vnc
-x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
+Create the default .xinitrc file
+```
+cat << EOF > ~/.xinitrc
+exec i3
+EOF
 ```
 
 Using a vnc client, connect to your server. Once you have authenticated you will be prompted to generate the default i3
@@ -179,6 +183,16 @@ Add the following line to the fbarecorder users i3 config:
 ```
 # Add the following to ~/.config/i3/config
 exec --no-startup-id "/usr/bin/xterm"
+```
+
+Now you need to start the dummy X server, configure fightcade and configure OBS.
+As the fbarecorder user:
+```commandline
+# Run tmux, and split so you have two panes
+# In the first pane, run startx
+startx
+# In the second pane, run x11vnc
+x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
 ```
 
 Start the pulseaudio server

@@ -16,6 +16,7 @@ setup(name='fcreplay',
               'fcreplayloop=fcreplay.loop:console',
               'fcreplayget=fcreplay.get:console',
               'fcreplayplayerget=fcreplay.getplayerreplay:console',
+              'fcreplaycloudpost=fcreplay.loop.gcloud_postprocessing'
           ]
       },
       install_requires = [
@@ -28,7 +29,11 @@ setup(name='fcreplay',
           'beautifulsoup4',
           'sqlalchemy',
           'sqlalchemy-utils',
+          'pillow',
           'psycopg2',
-          'sqlalchemy'
+          'pyscreenshot',
+          'sqlalchemy',
+          'google-api-python-client',
+          'google-cloud-storage'
       ],
       zip_safe=False)
