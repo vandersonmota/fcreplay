@@ -21,7 +21,7 @@ PROJECT_ID = config['gcloud_project']
 BUCKET_NAME = config['gcloud_bucket']
 
 # This requires: export GOOGLE_APPLICATION_CREDENTIALS="[PATH]"
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = config['gcloud_stroage_creds_path']
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = config['gcloud_storage_creds_path']
 
 
 def upload_video(source_file_name, destination_file_name):
