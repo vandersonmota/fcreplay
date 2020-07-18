@@ -358,7 +358,7 @@ def gcloud_postprocessing():
     replay = db.get_single_replay(challenge_id=job.challenge_id)
 
     # Download replay:
-    download_video(replay.id,f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
+    download_video(f"{replay.id}.mkv",f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
 
     # Do post processing
     postprocessing(replay)
