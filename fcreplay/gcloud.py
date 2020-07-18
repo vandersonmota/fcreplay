@@ -59,7 +59,7 @@ def launch_fcreplay():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
-    return(function_response.data.json())
+    return(function_response.status_code)
 
 
 def launch_fcreplay_postprocessing():
@@ -78,7 +78,7 @@ def launch_fcreplay_postprocessing():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
-    return(function_response.data.json())
+    return(function_response.status_code)
 
 
 def destroy_fcreplay_postprocessing():
@@ -98,10 +98,10 @@ def destroy_fcreplay_postprocessing():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
-    return(function_response.json())
+    return(function_response.status_code)
 
 
-def destroy_fcreplay():
+def destroy_fcreplay(request):
     RECEIVING_FUNCTION = 'destroy_fcreplay'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -118,7 +118,7 @@ def destroy_fcreplay():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
-    return(function_response.json())
+    return(function_response.status_code)
 
 def check_if_postprocessig_running():
     RECEIVING_FUNCTION = 'fcreplay_postprocessing_running'
@@ -137,7 +137,7 @@ def check_if_postprocessig_running():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
-    return(function_response.json())
+    return(function_response.status_code)
 
 
 def check_if_running():
@@ -157,4 +157,4 @@ def check_if_running():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
-    return(function_response.json())
+    return(function_response.status_code)

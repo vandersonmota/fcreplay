@@ -462,7 +462,7 @@ def main(DEBUG, GCLOUD):
                     sys.exit(1)
 
                 try:
-                    destroy_fcreplay()
+                    destroy_fcreplay(None)
                 except Exception as e:
                     logging.error(f"There was an error destroying instance: {e}")
                     sys.exit(1)
