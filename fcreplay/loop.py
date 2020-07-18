@@ -10,7 +10,7 @@ from fcreplay.database import Database
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
-from fcreplay import gcloud
+from fcreplay import gcloud as gcloud
 import argparse
 import datetime
 from soundmeter import meter as sm
@@ -459,7 +459,7 @@ def main(DEBUG, GCLOUD):
                 try:
                     gcloud.upload_video(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv", f"{replay.id}.mkv")
                 except Exception as e:
-                    logging.error(f"There was an error uploading to google storge: {e}")
+                    logging.error(f"There was an error uploading to google storage: {e}")
                     sys.exit(1)
 
                 try:
