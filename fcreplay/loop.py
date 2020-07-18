@@ -365,8 +365,8 @@ def gcloud_postprocessing():
 
     # Destroy postprocessing
     status = destroy_fcreplay_postprocessing()
-    if not status['status']:
-        print("Postprocessing already running. This shouldn't happen")
+    if status['status'] != '200':
+        print("Postprocessing unable to be destroyed. This shouldn't happen")
         sys.exit(1)
 
 def postprocessing(replay):
