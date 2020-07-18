@@ -456,7 +456,7 @@ def main(DEBUG, GCLOUD):
 
             if GCLOUD:
                 try:
-                    upload_video(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv", f"{replay.id}.mkv")
+                    upload_video(f"{config['fcreplay_dir']}/finished/dirty_{replay.id}.mkv", f"{replay.id}.mkv")
                 except Exception as e:
                     logging.error(f"There was an error uploading to google storage: {e}")
                     sys.exit(1)
