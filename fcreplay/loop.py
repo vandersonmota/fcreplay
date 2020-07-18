@@ -10,10 +10,9 @@ from fcreplay.database import Database
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
-from fcreplay import gcloud as gcloud
+from fcreplay.gcloud import upload_video, download_video, destroy_fcreplay_postprocessing, destroy_fcreplay
 import argparse
 import datetime
-from soundmeter import meter as sm
 from internetarchive import get_item
 from retrying import retry
 
@@ -71,7 +70,7 @@ def record(replay):
     logging.info(f"Capture will take {time_min} minutes")
 
     update_status(replay, 'RECORDING')
-    
+
     record_status = fc_record.main(fc_challange=replay.id, fc_time=replay.length, kill_time=config['record_timeout'], ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
     if not record_status == "Pass":
         logging.error(f"Recording failed on {replay.id}, Status: \"{record_status}\", exiting.")
@@ -129,7 +128,7 @@ Fightcade replay id: {replay.id}"""
 
     # Add description to database
     logging.info('Adding description to database')
-    db.add_description(challenge_id=replay.id,description=description_text) 
+    db.add_description(challenge_id=replay.id,description=description_text)
 
     if DEBUG:
         print(f'Description Text is: {description_text}')
@@ -168,7 +167,7 @@ def black_check(replay):
         logging.error("Black frames detected, exiting")
         # If there are too many black frames, then we need to debug processing
         sys.exit(1)
-    
+
     update_status(replay, 'EMPTY_CHECK')
     logging.info("Finished checking black frames")
 
@@ -253,11 +252,11 @@ def upload_to_yt(replay, description_text):
         if replay.player_requested == False:
             # Find number of uploads today
             day_log = db.get_youtube_day_log()
-            
+
             # Check max uploads
             # Get todays date, dd-mm-yyyy
             today = datetime.datetime.utcnow().strftime("%d-%m-%Y")
-            
+
             # Check the log is for today
             if day_log.date == today:
                 # Check number of uploads
@@ -268,7 +267,7 @@ def upload_to_yt(replay, description_text):
                 # It's a new day, update the counter
                 db.update_youtube_day_log_count(count=1,date=today)
 
-    
+
         # Create description file
         with open(f"{config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
             description_file.write(description_text)
@@ -316,7 +315,7 @@ def remove_generated_files(replay):
         os.remove(f"{config['fcreplay_dir']}/finished/{filename}")
     except:
         pass
-    
+
     try:
         os.remove(f"{config['fcreplay_dir']}/tmp/thumbnail.jpg")
     except:
@@ -359,13 +358,13 @@ def gcloud_postprocessing():
     replay = db.get_single_replay(challenge_id=job.challenge_id)
 
     # Download replay:
-    gcloud.download_video(replay.id,f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
+    download_video(replay.id,f"{config['fcreplay_dir']}/finished/{replay.id}.mkv")
 
     # Do post processing
     postprocessing(replay)
 
     # Destroy postprocessing
-    status = gcloud.destroy_fcreplay_postprocessing()
+    status = destroy_fcreplay_postprocessing()
     if not status['status']:
         print("Postprocessing already running. This shouldn't happen")
         sys.exit(1)
@@ -457,23 +456,23 @@ def main(DEBUG, GCLOUD):
 
             if GCLOUD:
                 try:
-                    gcloud.upload_video(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv", f"{replay.id}.mkv")
+                    upload_video(f"{config['fcreplay_dir']}/finished/{replay.id}.mkv", f"{replay.id}.mkv")
                 except Exception as e:
                     logging.error(f"There was an error uploading to google storage: {e}")
                     sys.exit(1)
 
                 try:
-                    gcloud.destroy_fcreplay()
+                    destroy_fcreplay()
                 except Exception as e:
                     logging.error(f"There was an error destroying instance: {e}")
                     sys.exit(1)
-            
+
             postprocessing(replay)
 
         else:
             if config['auto_add_more']:
                 logging.info('Auto adding more replays')
-                fc_get.get_replays(config['auto_add_search_string'])                
+                fc_get.get_replays(config['auto_add_search_string'])
             else:
                 logging.info("No more replays. Waiting for replay submission")
                 time.sleep(5)
@@ -483,7 +482,7 @@ def main(DEBUG, GCLOUD):
 
         if GCLOUD:
             from fcreplay import gcloud
-            gcloud.destroy_fcreplay()
+            destroy_fcreplay()
             sys.exit(0)
 
 

@@ -21,7 +21,6 @@ setup(name='fcreplay',
       },
       install_requires = [
           'numpy',
-          'soundmeter',
           'requests',
           'retrying',
           'internetarchive',
