@@ -102,6 +102,7 @@ def destroy_fcreplay_postprocessing():
 
 
 def destroy_fcreplay(request):
+    logging.info("Starting to destroy_fcreplay")
     RECEIVING_FUNCTION = 'destroy_fcreplay'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -118,6 +119,7 @@ def destroy_fcreplay(request):
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
+    logging.info(f"destroy_fcreplay retruned: {function_response.status_code}")
     return(function_response.status_code)
 
 def check_if_postprocessig_running():
