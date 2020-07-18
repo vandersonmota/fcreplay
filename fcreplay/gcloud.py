@@ -43,6 +43,7 @@ def download_video(source_file_name, destination_file_name):
 
 
 def launch_fcreplay():
+    logging.info("Starting launch_fcreplay")
     RECEIVING_FUNCTION = 'launch_fcreplay'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -59,10 +60,13 @@ def launch_fcreplay():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
+    logging.info(f"launch_fcreplay returned: {function_response.status_code}")
     return(function_response.status_code)
 
 
 def launch_fcreplay_postprocessing():
+    logging.info("Starting launch_fcreplay_postprocessing")
+
     RECEIVING_FUNCTION = 'launch_fcreplay_postprocessing'
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
     metadata_server_url = \
@@ -78,10 +82,12 @@ def launch_fcreplay_postprocessing():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
+    logging.info(f"launch_fcreplay_postprocessing returned: {function_response.status_code}")
     return(function_response.status_code)
 
 
 def destroy_fcreplay_postprocessing():
+    logging.info("Starting destroy_fcreplay_postprocessing")
     RECEIVING_FUNCTION = 'destroy_fcreplay_postprocessing'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -98,11 +104,12 @@ def destroy_fcreplay_postprocessing():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
+    logging.info(f"destroy_fcreplay_postprocessing returned: {function_response.status_code}")
     return(function_response.status_code)
 
 
 def destroy_fcreplay(request):
-    logging.info("Starting to destroy_fcreplay")
+    logging.info("Starting destroy_fcreplay")
     RECEIVING_FUNCTION = 'destroy_fcreplay'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -123,6 +130,7 @@ def destroy_fcreplay(request):
     return(function_response.status_code)
 
 def check_if_postprocessig_running():
+    logging.info("Starting check_if_postprocessing_running")
     RECEIVING_FUNCTION = 'fcreplay_postprocessing_running'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -139,10 +147,12 @@ def check_if_postprocessig_running():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
+    logging.info(f"check_if_postprocessing_running retruned: {function_response.status_code}")
     return(function_response.status_code)
 
 
 def check_if_running():
+    logging.info("Starting check_if_running")
     RECEIVING_FUNCTION = 'fcreplay_running'
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
@@ -159,4 +169,5 @@ def check_if_running():
     function_headers = {'Authorization': f'bearer {jwt}'}
     function_response = requests.get(function_url, headers=function_headers)
 
+    logging.info(f"check_if_running retruned: {function_response.status_code}")
     return(function_response.status_code)
