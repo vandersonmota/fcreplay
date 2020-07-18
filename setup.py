@@ -16,7 +16,7 @@ setup(name='fcreplay',
               'fcreplayloop=fcreplay.loop:console',
               'fcreplayget=fcreplay.get:console',
               'fcreplayplayerget=fcreplay.getplayerreplay:console',
-              'fcreplaycloudpost=fcreplay.loop.gcloud_postprocessing'
+              'fcreplaycloudpost=fcreplay.loop:gcloud_postprocessing'
           ]
       },
       install_requires = [
