@@ -61,7 +61,8 @@ def launch_fcreplay():
     function_response = requests.get(function_url, headers=function_headers)
 
     logging.info(f"launch_fcreplay returned: {function_response.status_code}")
-    return(function_response.status_code)
+    status = function_response.status_code
+    return(status)
 
 
 def launch_fcreplay_postprocessing():
@@ -83,7 +84,8 @@ def launch_fcreplay_postprocessing():
     function_response = requests.get(function_url, headers=function_headers)
 
     logging.info(f"launch_fcreplay_postprocessing returned: {function_response.status_code}")
-    return(function_response.status_code)
+    status = function_response.status_code
+    return(status)
 
 
 def destroy_fcreplay_postprocessing():
@@ -105,7 +107,8 @@ def destroy_fcreplay_postprocessing():
     function_response = requests.get(function_url, headers=function_headers)
 
     logging.info(f"destroy_fcreplay_postprocessing returned: {function_response.status_code}")
-    return(function_response.status_code)
+    status = function_response.status_code
+    return(status)
 
 
 def destroy_fcreplay(request):
@@ -127,7 +130,8 @@ def destroy_fcreplay(request):
     function_response = requests.get(function_url, headers=function_headers)
 
     logging.info(f"destroy_fcreplay retruned: {function_response.status_code}")
-    return(function_response.status_code)
+    status = function_response.status_code
+    return(status)
 
 def check_if_postprocessig_running():
     logging.info("Starting check_if_postprocessing_running")
@@ -148,7 +152,8 @@ def check_if_postprocessig_running():
     function_response = requests.get(function_url, headers=function_headers)
 
     logging.info(f"check_if_postprocessing_running retruned: {function_response.status_code}")
-    return(function_response.status_code)
+    status = function_response.status_code
+    return(status)
 
 
 def check_if_running():
@@ -170,4 +175,5 @@ def check_if_running():
     function_response = requests.get(function_url, headers=function_headers)
 
     logging.info(f"check_if_running retruned: {function_response.status_code}")
-    return(function_response.status_code)
+    status = function_response.status_code
+    return(status)
