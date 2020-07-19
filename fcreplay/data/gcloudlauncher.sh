@@ -3,13 +3,15 @@
 # Obviously this isn't the best solutions, but should work fine.
 # This file needs to put in /usr/local/bin, owned by fbarecorder
 
+service_name = $(curl http://metadata.google.internal/computeMetadata/v1/instance/name --header 'Metadata-Flavor: Google')
+
 # Do recording
-if [[ "$(cat /etc/hostname)" == 'fcreplay-image-1' ]]; then
+if [[ "$service_name" == 'fcreplay-image-1' ]]; then
     startx
 fi
 
 # Do post processing
-if [[ "$(cat /etc/hostname)" == 'fcreplay-postprocessing-1' ]]; then
+if [[ "$service_name" == 'fcreplay-postprocessing-1' ]]; then
     cd ~/fcreplay
     source ./venv/bin/activate
     fcreplaycloudpost
