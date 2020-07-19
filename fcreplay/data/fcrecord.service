@@ -3,9 +3,9 @@ Description=FightCade Record
 After=network.target remote-fs.target nss-lookup.target
 
 [Service]
-Type=simple
+Type=oneshot
 ExecStart=/usr/local/bin/gcloudlauncher.sh
-ExecStop=/bin/kill -- $MAINPID
+#ExecStop=/bin/kill -- $MAINPID
 User=fbarecorder
 Group=fbarecorder
 WorkingDirectory=/home/fbarecorder

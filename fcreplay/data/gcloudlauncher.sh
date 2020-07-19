@@ -9,8 +9,10 @@ if [[ "$HOSTNAME" == 'fcreplay-image-1' ]]; then
 fi
 
 # Do post processing
-if [[ "$HOSTANME" == 'fcreplay-postprocessing-1' ]]; then
+if [[ "$HOSTNAME" == 'fcreplay-postprocessing-1' ]]; then
     cd ~/fcreplay
     source ./venv/bin/activate
     fcreplaycloudpost
 fi
+
+exit 0
