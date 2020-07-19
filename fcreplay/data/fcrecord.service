@@ -4,7 +4,7 @@ After=network.target remote-fs.target nss-lookup.target
 
 [Service]
 Type=simple
-ExecStart=/home/fbarecorder/gcloudlauncher.sh
+ExecStart=/usr/local/bin/gcloudlauncher.sh
 ExecStop=/bin/kill -- $MAINPID
 User=fbarecorder
 Group=fbarecorder
