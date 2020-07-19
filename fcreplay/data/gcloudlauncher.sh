@@ -4,12 +4,12 @@
 # This file needs to put in /usr/local/bin, owned by fbarecorder
 
 # Do recording
-if [ $HOSTNAME -eq 'fcreplay-image-1' ]; then
+if [ $HOSTNAME = 'fcreplay-image-1' ]; then
     startx
 fi
 
 # Do post processing
-if [ $HOSTANME -eq 'fcreplay-postprocessing-1' ]; then
+if [ $HOSTANME = 'fcreplay-postprocessing-1' ]; then
     cd ~/fcreplay
     source ./venv/bin/activate
     fcreplaycloudpost
