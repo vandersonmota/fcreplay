@@ -42,6 +42,15 @@ def download_video(source_file_name, destination_file_name):
     blob.download_to_filename(destination_file_name)
 
 
+def delete_video(file_name):
+    """Delete a blob from the bucket."""
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob(file_name)
+    blob.delete()
+
+
 def launch_fcreplay():
     logging.info("Starting launch_fcreplay")
     RECEIVING_FUNCTION = 'launch_fcreplay'

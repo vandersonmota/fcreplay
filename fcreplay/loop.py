@@ -10,7 +10,7 @@ from fcreplay.database import Database
 from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay import get as fc_get
-from fcreplay.gcloud import upload_video, download_video, destroy_fcreplay_postprocessing, destroy_fcreplay
+from fcreplay.gcloud import upload_video, download_video, destroy_fcreplay_postprocessing, destroy_fcreplay, delete_video
 import argparse
 import datetime
 from internetarchive import get_item
@@ -362,6 +362,9 @@ def gcloud_postprocessing():
 
     # Do post processing
     postprocessing(replay)
+
+    # Delete the storage video
+    delete_video(f"{replay.id}.mkv")
 
     # Destroy postprocessing
     status = destroy_fcreplay_postprocessing()
