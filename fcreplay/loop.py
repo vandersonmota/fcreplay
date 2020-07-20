@@ -486,7 +486,7 @@ def main(DEBUG, GCLOUD):
 
         if GCLOUD:
             from fcreplay import gcloud
-            destroy_fcreplay()
+            destroy_fcreplay(None)
             sys.exit(0)
 
 
