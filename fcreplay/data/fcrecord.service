@@ -5,9 +5,9 @@ After=cloud-init.target
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/gcloudlauncher.sh
-User=fbarecorder
-Group=fbarecorder
-WorkingDirectory=/home/fbarecorder
+User=fcrecorder
+Group=fcrecorder
+WorkingDirectory=/home/fcrecorder
 
 [Install]
 WantedBy=cloud-init.target

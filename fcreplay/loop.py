@@ -65,6 +65,7 @@ def update_status(replay, status):
         challenge_id=replay.id,status=status
     )
 
+
 def record(replay):
     logging.info(f"Running capture with {replay.id} and {replay.length}")
     time_min = int(replay.length/60)

@@ -8,7 +8,7 @@
         "/path/to/file.txt"
     ],
     "detect_chars": true,
-    "fcreplay_dir": "/home/fbarecorder/fcreplay",
+    "fcreplay_dir": "/home/fcrecorder/fcreplay",
     "gcloud_bucket": "fba-recorder_temp-videos",
     "gcloud_project": "gcloud project id",
     "gcloud_region": "gcloud region id",
@@ -26,14 +26,14 @@
             "fightcade"
         ]
     },
-    "logfile": "/home/fbarecorder/fcreplay/fcreplay.log",
+    "logfile": "/home/fcrecorder/fcreplay/fcreplay.log",
     "loglevel": "DEBUG",
     "max_replay_length": 10800,
     "min_replay_length": 60,
     "obs_video_filename": "replay.mkv",
     "password": "CHAT_PASSWORD",
     "player_replay": true,
-    "pyqtggpo_dir": "/home/fbarecorder/fcreplay/pyqtggpo-master",
+    "pyqtggpo_dir": "/home/fcrecorder/fcreplay/pyqtggpo-master",
     "random_replay": true,
     "record_timeout": 120,
     "remove_generated_files": true,
@@ -42,9 +42,9 @@
     "upload_to_ia": false,
     "upload_to_yt": false,
     "username": "CHAT_USERNAME"m
-    "youtube_credentials": "/home/fcreplay/.youtube-upload-credentials.json",
+    "youtube_credentials": "/home/fcrecorder/.youtube-upload-credentials.json",
     "youtube_max_daily_uploads": "5",
-    "youtube_secrets": "/home/fcreplay/.client_secrets.json",
+    "youtube_secrets": "/home/fcrecorder/.client_secrets.json",
     "yt_max_length": 120,
     "yt_min_length": 0
 }
