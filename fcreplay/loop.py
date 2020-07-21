@@ -52,6 +52,7 @@ def add_detected_characters(replay, detected_chars):
 def add_current_job(replay):
     # Insert current job, with start_time and length
     start_time = datetime.datetime.utcnow()
+    update_status(replay, "JOB_ADDED")
     db.add_current_job(
         challenge_id=replay.id,start_time=start_time,length=replay.length
     )
