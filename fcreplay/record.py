@@ -86,9 +86,7 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
 
     logging.info('Starting image capture loop')
     while True:
-        # Due to the time it takes to start FBA and a replay, we need to 'guess'
-        # the an amount of time to 'appened'. There's probably a better way to do this.
-        running_time = (datetime.datetime.now() - begin_time).seconds - 10
+        running_time = (datetime.datetime.now() - begin_time).seconds
 
         screen_ggpo_capture = ImageGrab.grab(
             bbox=(485, 0, 514, 18)).convert('RGB')
@@ -135,6 +133,7 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     obs_thread.start()
     logging.info("Started obs")
 
+    begin_time = datetime.datetime.now()
     while True:
         running_time = (datetime.datetime.now() - begin_time).seconds
         obs_running = '/usr/bin/obs' in str(subprocess.run(
