@@ -1,29 +1,20 @@
+# IDE and build
 .idea
 venv
 .vscode
-
 dist
 *.egg-info
 build
-
-# Misc files
-.client_secrets.json
-.client_secrets.json.old
-.youtube-upload-credentials.json
 __pycache__/
+fcreplay/__pycache__/
+
+# Config files
+.client_secrets.json
+.ia
+.storage_creds.json
+.youtube-upload-credentials.json
 config.json
-database_config.py
 description_append.txt
+
+# Log file
 fcreplay.log
-finished/
-manualupload.py
-master.zip
-pyqtggpo-master/
-replays.db
-replays.db.bak
-roms/
-soundmeter/
-start.sh
-test_upload.py
-tmp/
-youtube-upload-master/

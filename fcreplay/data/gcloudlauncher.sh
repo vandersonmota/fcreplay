@@ -1,7 +1,7 @@
 #!/bin/bash
 # Depending on the hostname we want to do different things.
 # Obviously this isn't the best solutions, but should work fine.
-# This file needs to put in /usr/local/bin, owned by fbarecorder
+# This file needs to put in /usr/local/bin, owned by fcrecorder
 
 service_name=$(curl http://metadata.google.internal/computeMetadata/v1/instance/name --header 'Metadata-Flavor: Google')
 

@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /home/fcreplay/fcreplay
+cd /home/fcrecorder/fcreplay
 source ./venv/bin/activate
 fcreplayloop --gcloud

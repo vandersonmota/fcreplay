@@ -1,0 +1,234 @@
+---
+- name: Setup fcrecorder machine
+  hosts: all
+  become: True
+  tasks:
+    - name: Install obs-repo
+      yum:
+        name: "{{packages}}"
+      vars:
+        packages:
+          - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_version }}.noarch.rpm 
+          - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_distribution_version }}.noarch.rpm
+    
+    - name: Install packages
+      yum:
+        name: "{{packages}}"
+      vars:
+        packages:
+          - alsa-utils
+          - firewalld
+          - gcc
+          - git
+          - i3
+          - jq
+          - libpq-devel
+          - obs-studio
+          - pavucontrol
+          - portaudio
+          - portaudio-devel
+          - pulseaudio
+          - pulseaudio-libs
+          - python3
+          - python3-devel
+          - rsync
+          - tmux
+          - unzip
+          - vim
+          - wine.i686
+          - x11vnc
+          - xinit
+          - xorg-x11-drv-dummy
+          - xterm
+    
+    - name: Enable firewalld
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+    
+    - name: VNC Rules
+      firewalld:
+        zone: public
+        port: 5900/tcp
+        permanent: yes
+        state: enabled
+    
+    - name: Create group
+      group:
+        name: fcrecorder
+        state: present
+    
+    - name: Create user
+      user:
+        name: fcrecorder
+        comment: FC Recorder
+        create_home: True
+        home: /home/fcrecorder
+        shell: /bin/bash
+        group: fcrecorder
+        groups: pulse,pulse-access,input
+    
+    - name: Clone fcreplay
+      command: git clone https://github.com/glisignoli/fcreplay.git /home/fcrecorder/fcreplay_install
+      become_user: fcrecorder
+      become: True
+    
+    - name: Make install directory
+      file:
+        path: /home/fcrecorder/fcreplay
+        state: directory
+        mode: '0750'
+      become_user: fcrecorder
+      become: True
+    
+    - name: Create venv
+      command: python3 -m venv ./venv
+      args:
+        chdir: /home/fcrecorder/fcreplay
+      become_user: fcrecorder
+      become: True
+    
+    - name: Install fcreplay
+      shell: |
+        cd /home/fcrecorder/fcreplay
+        source ./venv/bin/activate
+        cd /home/fcrecorder/fcreplay_install
+        python setup.py install
+      become_user: fcrecorder
+      become: True
+   
+    - name: Clone youtube-upload
+      command: git clone https://github.com/tokland/youtube-upload.git /home/fcrecorder/youtube-upload
+      become_user: fcrecorder
+      become: True
+ 
+    - name: Install youtube-upload
+      shell: |
+        cd /home/fcrecorder/fcreplay
+        source ./venv/bin/activate
+        pip install --upgrade google-api-python-client oauth2client progressbar2
+        cd /home/fcrecorder/youtube-upload
+        python setup.py install
+      become_user: fcrecorder
+      become: True
+    
+    - name: Copy config.json
+      copy:
+        src: ./config.json
+        dest: /home/fcrecorder/fcreplay/config.json
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0600'
+      ignore_errors: yes
+    
+    - name: Copy description append
+      copy:
+        src: ./description_append.txt
+        dest: /home/fcrecorder/fcreplay/description_append.txt
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0640'
+      ignore_errors: yes
+    
+    - name: Copy google cloud storage credentials
+      copy:
+        src: ./.storage_creds.json
+        dest: /home/fcrecorder/.storage_creds.json
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0600'
+      ignore_errors: yes
+    
+    - name: Copy youtube upload credentials
+      copy:
+        src: ./.youtube-upload-credentials.json
+        dest: /home/fcrecorder/.youtube-upload-credentials.json
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0600'
+      ignore_errors: yes
+    
+    - name: Copy google api client secrets
+      copy:
+        src: ./.client_secrets.json
+        dest: /home/fcrecorder/.client_secrets.json
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0600'
+      ignore_errors: yes
+    
+    - name: Copy archive.org secrets
+      copy:
+        src: ./.ia
+        dest: /home/fcrecorder/.ia
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0600'
+      ignore_errors: yes
+    
+    - name: Download pyqtggpo
+      command: git clone https://github.com/poliva/pyqtggpo.git /home/fcrecorder/fcreplay/pyqtggpo-master
+      become_user: fcrecorder
+      become: True
+    
+    - name: Copy xorg.conf
+      copy:
+        src: ./fcreplay/data/xorg.conf
+        dest: /etc/X11/
+        owner: root
+        group: root
+        mode: '0644'
+    
+    - name: Copy Xwrapper
+      copy:
+        src: ./fcreplay/data/Xwrapper.config
+        dest: /etc/X11/
+        owner: root
+        group: root
+        mode: '0644'
+    
+    - name: Create xinitrc
+      copy:
+        content: exec i3
+        dest: /home/fcrecorder/.xinitrc
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0640'
+    
+    - name: Create i3 config directory
+      command: mkdir -p /home/fcrecorder/.config/i3
+      become_user: fcrecorder
+      become: True
+    
+    - name: Copy i3 config
+      copy:
+        src: ./fcreplay/data/i3_config
+        dest: /home/fcrecorder/.config/i3/config
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0664'
+    
+    - name: Copy the gcloudlauncher
+      copy:
+        src: ./fcreplay/data/gcloudlauncher.sh
+        dest: /usr/local/bin/gcloudlauncher.sh
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0750'
+    
+    - name: Copy the service file
+      copy:
+        src: ./fcreplay/data/fcrecord.service
+        dest: /usr/lib/systemd/system/fcrecord.service
+        owner: root
+        group: root
+        mode: '664'
+    
+    - name: Copy the startup file
+      copy:
+        src: ./fcreplay/data/startup.sh
+        dest: /home/fcrecorder/startup.sh
+        owner: fcrecorder
+        group: fcrecorder
+        mode: 0750
