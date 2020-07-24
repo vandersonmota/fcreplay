@@ -17,6 +17,7 @@
       vars:
         packages:
           - alsa-utils
+          - chkconfig
           - firewalld
           - gcc
           - git
@@ -232,3 +233,40 @@
         owner: fcrecorder
         group: fcrecorder
         mode: 0750
+
+    - name: Enable cloud logging
+      yum_repository:
+        name: 'google-cloud-logging'
+        description: 'Google cloud logging'
+        baseurl: 'https://packages.cloud.google.com/yum/repos/google-cloud-logging-el8-$basearch-all'
+        gpgkey:
+          - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+          -  https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+    - name: Install google cloud logging
+      yum:
+        name: google-fluentd
+        state: latest
+
+    - name: Install cloud logging config
+      yum:
+        name: google-fluentd-catch-all-config
+        state: latest
+
+    - name: Add google cloud fcreplay logging
+      copy:
+        src: ./fcreplay/data/google-cloud-fcreplay.conf
+        dest: /etc/google-fluentd/config.d/
+        owner: root
+        group: root
+        mode: '0640'
+    
+    - name: Add google cloud logging systemd service
+      command: /usr/lib/systemd/system-generators/systemd-sysv-generator
+
+    - name: Enable google cloud logging systemd service
+      service:
+        name: google-fluentd
+        state: started
+        enabled: yes
+    
