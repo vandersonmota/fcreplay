@@ -241,17 +241,20 @@
         baseurl: 'https://packages.cloud.google.com/yum/repos/google-cloud-logging-el8-$basearch-all'
         gpgkey:
           - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-          -  https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+          - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      when: gcloud
 
     - name: Install google cloud logging
       yum:
         name: google-fluentd
         state: latest
+      when: gcloud
 
     - name: Install cloud logging config
       yum:
         name: google-fluentd-catch-all-config
         state: latest
+      when: gcloud
 
     - name: Add google cloud fcreplay logging
       copy:
@@ -260,13 +263,22 @@
         owner: root
         group: root
         mode: '0640'
+      when: gcloud
     
     - name: Add google cloud logging systemd service
       command: /usr/lib/systemd/system-generators/systemd-sysv-generator
+      when: gcloud
 
     - name: Enable google cloud logging systemd service
       service:
         name: google-fluentd
         state: started
         enabled: yes
-    
+      when: gcloud
+
+    - name: Remove deployment user
+      user:
+        name: deployment
+        state: absent
+        force: true
+      ignore_errors: true
