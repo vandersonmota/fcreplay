@@ -79,7 +79,7 @@ class Database:
         session.commit()
         session.close()
 
-    def add_current_job(self, **kwargs):
+    def add_job(self, **kwargs):
         session = self.Session()
         session.add(Job(
             challenge_id=kwargs['challenge_id'],

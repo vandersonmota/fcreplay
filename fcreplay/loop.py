@@ -29,8 +29,6 @@ logging.basicConfig(
         datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-DEBUG=False
-
 # Create directories if they don't exist
 if not os.path.exists(f"{config['fcreplay_dir']}/tmp"):
     os.mkdir(f"{config['fcreplay_dir']}/tmp")
@@ -38,6 +36,28 @@ if not os.path.exists(f"{config['fcreplay_dir']}/videos"):
     os.mkdir(f"{config['fcreplay_dir']}/videos")
 if not os.path.exists(f"{config['fcreplay_dir']}/finished"):
     os.mkdir(f"{config['fcreplay_dir']}/finished")
+
+class RecordIteration:
+    def __init__(self):
+        replay = self.get_replay()
+
+    def get_replay(self):
+        logging.info('Getting replay from database')
+        if config['player_replay']:
+            replay = db.get_oldest_player_replay()
+            if replay is not None:
+                logging.info('Found player replay to encode')
+                return(replay)
+            else:
+                logging.info('No more player replays')
+        if config['random_replay']:
+            logging.info('Getting random replay')
+            replay = db.get_random_replay()
+            return(replay)
+        else:
+            logging.info('Getting oldest replay')
+            replay = db.get_oldest_replay()
+            return(replay)
 
 
 def add_detected_characters(replay, detected_chars):
@@ -49,11 +69,11 @@ def add_detected_characters(replay, detected_chars):
         )
 
 
-def add_current_job(replay):
+def add_job(replay):
     # Insert current job, with start_time and length
     start_time = datetime.datetime.utcnow()
     update_status(replay, "JOB_ADDED")
-    db.add_current_job(
+    db.add_job(
         challenge_id=replay.id,start_time=start_time,length=replay.length
     )
 
@@ -70,12 +90,22 @@ def record(replay):
     logging.info(f"Running capture with {replay.id} and {replay.length}")
     time_min = int(replay.length/60)
     logging.info(f"Capture will take {time_min} minutes")
-
+    
     update_status(replay, 'RECORDING')
 
-    record_status = fc_record.main(fc_challange=replay.id, fc_time=replay.length, kill_time=config['record_timeout'], ggpo_path=config['pyqtggpo_dir'], fcreplay_path=config['fcreplay_dir'])
+    #Star a recording store recording status
+    record_status = fc_record.main(fc_challange=replay.id,
+        fc_time=replay.length,
+        kill_time=config['record_timeout'],
+        ggpo_path=config['pyqtggpo_dir'],
+        fcreplay_path=config['fcreplay_dir']
+    )
+    
+    # Check recording status
     if not record_status == "Pass":
-        logging.error(f"Recording failed on {replay.id}, Status: \"{record_status}\", exiting.")
+        logging.error(f"Recording failed on {replay.id}," \
+                       "Status: \"{record_status}\", exiting.")
+        
         # Depending on the exit status, do different things:
         if record_status == "FailTimeout":
             # Just do a new recording and mark the current one as failed
@@ -83,7 +113,8 @@ def record(replay):
             set_failed(replay)
             return False
         else:
-            logging.error("Exiting")
+            logging.error(f"Unknown error: ${record_status}, exiting")
+            set_failed(replay)
             sys.exit(1)
             return False
     logging.info("Capture finished")
@@ -133,7 +164,9 @@ Fightcade replay id: {replay.id}"""
     db.add_description(challenge_id=replay.id,description=description_text)
 
     if DEBUG:
-        print(f'Description Text is: {description_text}')
+        # 
+        decode_text
+        logging.debug(f'Description Text is: {description_text.encode('unicode-escape')}')
     return description_text
 
 
@@ -330,28 +363,9 @@ def remove_generated_files(replay):
 def set_failed(replay):
     logging.info(f"Setting {replay.id} to failed")
     db.update_failed_replay(challenge_id=replay.id)
-
     update_status(replay, "FAILED")
-    logging.info("Finished updating datebase")
+    if config['']
 
-
-def get_replay():
-    logging.info('Getting replay from database')
-    if config['player_replay']:
-        replay = db.get_oldest_player_replay()
-        if replay is not None:
-            logging.info('Found player replay to encode')
-            return(replay)
-        else:
-            logging.info('No more player replays')
-    if config['random_replay']:
-        logging.info('Getting random replay')
-        replay = db.get_random_replay()
-        return(replay)
-    else:
-        logging.info('Getting oldest replay')
-        replay = db.get_oldest_replay()
-        return(replay)
 
 
 def gcloud_postprocessing():
@@ -442,7 +456,7 @@ def main(DEBUG, GCLOUD):
         replay = get_replay()
         if replay is not None:
             # Update the current job
-            add_current_job(replay)
+            add_job(replay)
             try:
                 status = record(replay)
                 if status is False:
@@ -462,16 +476,17 @@ def main(DEBUG, GCLOUD):
             if GCLOUD:
                 try:
                     upload_video(f"{config['fcreplay_dir']}/finished/dirty_{replay.id}.mkv", f"{replay.id}.mkv")
+                    update_status(replay, 'GLOUD_UPLOADED_TEMP_VIDEO')
                 except Exception as e:
                     logging.error(f"There was an error uploading to google storage: {e}")
-                    sys.exit(1)
+                    set_failed(replay)
 
                 try:
+                    update_status('GCLOUD_DESTROY_IMAGE')
                     destroy_fcreplay(None)
-                    sys.exit(1)
                 except Exception as e:
+                    set_failed(replay)
                     logging.error(f"There was an error destroying instance: {e}")
-                    sys.exit(1)
 
             postprocessing(replay)
 
