@@ -57,6 +57,3 @@ resource "null_resource" "get_storage_key" {
   }
   depends_on = [google_service_account.fcrecorder-storage-access]
 }
-
-# Use the bash script to deploy cloud functions since local folder deployment option doesn't exsit yet in terraform
-
