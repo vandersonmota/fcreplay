@@ -1,7 +1,7 @@
-import logging
 import json
-import requests
+import logging
 import os
+import requests
 
 import google.cloud.storage as storage
 
@@ -71,7 +71,7 @@ def launch_fcreplay():
 
     logging.info(f"launch_fcreplay returned: {function_response.status_code}")
     status = function_response.status_code
-    return(status)
+    return status
 
 
 def launch_fcreplay_postprocessing():
@@ -120,7 +120,7 @@ def destroy_fcreplay_postprocessing():
     return(status)
 
 
-def destroy_fcreplay(request):
+def destroy_fcreplay():
     logging.info("Starting destroy_fcreplay")
     RECEIVING_FUNCTION = 'destroy_fcreplay'
 

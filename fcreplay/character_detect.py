@@ -59,7 +59,14 @@ def process_img(frame_rgb, character_images, count):
 
 
 def character_detect(videofile):
-    begin_time = datetime.datetime.now()
+    """Detects characters
+
+    Args:
+        videofile (String): Path to video
+
+    Returns:
+        List: [[p1,p2,time][p1,p2,time]...]
+    """
     vidcap = cv2.VideoCapture(videofile)
     characters = [
         "alex",

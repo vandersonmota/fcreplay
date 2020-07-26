@@ -1,7 +1,6 @@
 {
     "auto_add_more": true,
     "auto_add_search_string": "sfiii3n",
-    "blackdetect": true,
     "channel": "sfiii3n",
     "description_append_file": [
         false,
@@ -10,6 +9,7 @@
     "detect_chars": true,
     "fcreplay_dir": "/home/fcrecorder/fcreplay",
     "gcloud_bucket": "fba-recorder_temp-videos",
+    "gcloud_destroy_on_failed": true,
     "gcloud_project": "gcloud project id",
     "gcloud_region": "gcloud region id",
     "gcloud_storage_creds_path": "/path/to/creds.json",

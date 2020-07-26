@@ -7,6 +7,9 @@ dist
 build
 __pycache__/
 fcreplay/__pycache__/
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
 
 # Config files
 .client_secrets.json
