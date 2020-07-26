@@ -1,15 +1,16 @@
 # IDE and build
-.idea
-venv
-.vscode
-dist
 *.egg-info
-build
+.idea
+.terraform/
+.vscode
 __pycache__/
+build
+dist
 fcreplay/__pycache__/
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
+venv
 
 # Config files
 .client_secrets.json
