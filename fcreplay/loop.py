@@ -37,6 +37,7 @@ def main(Debug, Gcloud):
         Debug (bool): Exit after one loop
         Gcloud (bool): Cloud shutdown after processing
     """
+    ## TODO Capture kill signal and handle within 30 secods
     while True:
         replay = Replay()
         if replay.replay is not None:
