@@ -7,7 +7,7 @@ provider "google" {
   region  = "us-central1"
   zone    = "us-central1-a"
 }
-
+//TODO Handle adding shutdown script
 
 //Create service accounts
 resource "google_service_account" "fcrecorder-storage-access" {
