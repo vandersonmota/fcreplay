@@ -62,6 +62,8 @@ def main(Debug, Gcloud):
             if config['remove_generated_files']:
                 replay.remove_generated_files()
 
+            replay.remove_job()
+
         else:
             if config['auto_add_more']:
                 logging.info('Auto adding more replays')

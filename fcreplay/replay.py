@@ -89,6 +89,15 @@ class Replay:
             length=self.replay.length
         )
 
+
+    @handle_fail
+    def remove_job(self):
+        """Remove job from database
+        """
+        self.db.remove_job(challenge_id=self.replay.id)
+        self.update_status("FINISHED")
+
+
     @handle_fail
     def update_status(self, status):
         """Update the replay status

@@ -11,15 +11,16 @@ setup(name='fcreplay',
           'data/*',
           'data/charnames/*'
       ]},
-      entry_points = {
+      entry_points={
           'console_scripts': [
-              'fcreplayloop=fcreplay.loop:console',
+              'fcreplaychat=fcreplay.chat.main:main',
+              'fcreplaycloudpost=fcreplay.loop:gcloud_postprocessing',
               'fcreplayget=fcreplay.get:console',
-              'fcreplayplayerget=fcreplay.getplayerreplay:console',
-              'fcreplaycloudpost=fcreplay.loop:gcloud_postprocessing'
+              'fcreplayloop=fcreplay.loop:console',
+              'fcreplayplayerget=fcreplay.getplayerreplay:console'
           ]
       },
-      install_requires = [
+      install_requires=[
           'numpy',
           'requests',
           'retrying',

@@ -1,0 +1,15 @@
+[Unit]
+Description=FightCade Chatbot
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/chatlauncher.sh
+ExecStop=/bin/kill -- $MAINPID
+User=fcrecorder
+Group=fcrecorder
+WorkingDirectory=/home/fcrecorder
+PIDFile=/run/fightcadechat.pid
+
+[Install]
+WantedBy=multi-user.target

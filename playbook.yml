@@ -175,7 +175,7 @@
     
     - name: Copy xorg.conf
       copy:
-        src: ./fcreplay/data/xorg.conf
+        src: ./files/xorg.conf
         dest: /etc/X11/
         owner: root
         group: root
@@ -183,7 +183,7 @@
     
     - name: Copy Xwrapper
       copy:
-        src: ./fcreplay/data/Xwrapper.config
+        src: ./files/Xwrapper.config
         dest: /etc/X11/
         owner: root
         group: root
@@ -204,7 +204,7 @@
     
     - name: Copy i3 config
       copy:
-        src: ./fcreplay/data/i3_config
+        src: ./files/i3_config
         dest: /home/fcrecorder/.config/i3/config
         owner: fcrecorder
         group: fcrecorder
@@ -212,7 +212,7 @@
     
     - name: Copy the gcloudlauncher
       copy:
-        src: ./fcreplay/data/gcloudlauncher.sh
+        src: ./files/gcloudlauncher.sh
         dest: /usr/local/bin/gcloudlauncher.sh
         owner: fcrecorder
         group: fcrecorder
@@ -220,19 +220,35 @@
     
     - name: Copy the service file
       copy:
-        src: ./fcreplay/data/fcrecord.service
+        src: ./files/fcrecord.service
         dest: /usr/lib/systemd/system/fcrecord.service
         owner: root
         group: root
-        mode: '664'
+        mode: '0664'
     
     - name: Copy the startup file
       copy:
-        src: ./fcreplay/data/startup.sh
+        src: ./files/startup.sh
         dest: /home/fcrecorder/startup.sh
         owner: fcrecorder
         group: fcrecorder
-        mode: 0750
+        mode: '0750'
+
+    - name: Copy fcreplaychat launcher
+      copy:
+        src: ./files/chatlauncher.sh
+        dest: /usr/local/bin/chatlauncher.sh
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0750'
+
+    - name: Copy fcreplaychat service
+      copy:
+        src: ./files/fcreplaychat.service
+        dest: /usr/lib/systemd/system/fcreplaychat.service
+        owner: root
+        group: root
+        mode: '0644'
 
     - name: Enable cloud logging
       yum_repository:
@@ -258,7 +274,7 @@
 
     - name: Add google cloud fcreplay logging
       copy:
-        src: ./fcreplay/data/google-cloud-fcreplay.conf
+        src: ./files/google-cloud-fcreplay.conf
         dest: /etc/google-fluentd/config.d/
         owner: root
         group: root

@@ -68,6 +68,7 @@ class Database:
         session.commit()
         session.close()
 
+
     def add_detected_characters(self, **kwargs):
         session = self.Session()
         session.add(Character_detect(
@@ -79,12 +80,22 @@ class Database:
         session.commit()
         session.close()
 
+
     def add_job(self, **kwargs):
         session = self.Session()
         session.add(Job(
             challenge_id=kwargs['challenge_id'],
             start_time=kwargs['start_time'],
             length=kwargs['length']
+        ))
+        session.commit()
+        session.close()
+
+
+    def remove_job(self, **kwargs):
+        session = self.Session()
+        session.delete(Job.query.filter_by(
+            challenge_id=kwargs['challenge_id']
         ))
         session.commit()
         session.close()
