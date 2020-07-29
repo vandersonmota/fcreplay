@@ -15,7 +15,7 @@ setup(name='fcreplay',
           'console_scripts': [
               'fcreplaychat=fcreplay.chat.main:main',
               'fcreplaycloudpost=fcreplay.loop:gcloud_postprocessing',
-              'fcreplaygetreplay=fcreplay.getreplay:console',
+              'fcreplayget=fcreplay.getreplay:console',
               'fcreplayloop=fcreplay.loop:console',
           ]
       },

@@ -71,7 +71,9 @@
         groups: pulse,pulse-access,input
     
     - name: Clone fcreplay
-      command: git clone https://github.com/glisignoli/fcreplay.git /home/fcrecorder/fcreplay_install
+      git:
+        repo: https://github.com/glisignoli/fcreplay.git
+        dest: /home/fcrecorder/fcreplay_install
       become_user: fcrecorder
       become: True
     
@@ -100,7 +102,9 @@
       become: True
    
     - name: Clone youtube-upload
-      command: git clone https://github.com/tokland/youtube-upload.git /home/fcrecorder/youtube-upload
+      git:
+        repo: https://github.com/tokland/youtube-upload.git
+        dest: /home/fcrecorder/youtube-upload
       become_user: fcrecorder
       become: True
  
@@ -132,15 +136,6 @@
         mode: '0640'
       ignore_errors: yes
     
-    - name: Copy google cloud storage credentials
-      copy:
-        src: ./.storage_creds.json
-        dest: /home/fcrecorder/.storage_creds.json
-        owner: fcrecorder
-        group: fcrecorder
-        mode: '0600'
-      ignore_errors: yes
-    
     - name: Copy youtube upload credentials
       copy:
         src: ./.youtube-upload-credentials.json
@@ -167,11 +162,12 @@
         group: fcrecorder
         mode: '0600'
       ignore_errors: yes
-    
-    - name: Download pyqtggpo
-      command: git clone https://github.com/poliva/pyqtggpo.git /home/fcrecorder/fcreplay/pyqtggpo-master
-      become_user: fcrecorder
-      become: True
+   
+    # Install fightcade?
+    #- name: Download pyqtggpo
+    #  command: git clone https://github.com/poliva/pyqtggpo.git /home/fcrecorder/fcreplay/pyqtggpo-master
+    #  become_user: fcrecorder
+    #  become: True
     
     - name: Copy xorg.conf
       copy:
@@ -274,7 +270,7 @@
 
     - name: Add google cloud fcreplay logging
       copy:
-        src: ./files/google-cloud-fcreplay.conf
+        src: ./files/google-cloud-fcreplay-looging.conf
         dest: /etc/google-fluentd/config.d/
         owner: root
         group: root
