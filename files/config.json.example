@@ -39,6 +39,9 @@
     "remove_generated_files": true,
     "replay_pages": "20",
     "sql_baseurl": "postgres://user:pass@address:port",
+    "supported_games": [
+        "sfiii3nr1"
+    ],
     "upload_to_ia": false,
     "upload_to_yt": false,
     "username": "CHAT_USERNAME"m

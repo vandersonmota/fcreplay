@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-import re
 import socket
 import time
 import struct
@@ -16,7 +15,7 @@ from fcreplay.chat.playerstate import PlayerStates
 
 from threading import Thread
 
-from fcreplay.getplayerreplay import main as getfcplayerreplay
+from fcreplay.getreplay import get_replay
 import fcreplay.jobstatus as fcjobstatus
 
 with open("config.json") as json_data_file:
@@ -107,7 +106,7 @@ class Controller():
                 self.tcpSock.close()
             self.tcpSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.channelport = self.tcpPort
-            if self.channelport == None:
+            if self.channelport is None:
                 self.channelport = 7000
             self.tcpSock.connect(('ggpo-ng.com', int(self.channelport),))
             self.tcpConnected = True
@@ -149,7 +148,7 @@ class Controller():
             self.dispatchInbandData(seq, data)
 
     def dispatchInbandData(self, seq, data):
-        if not seq in self.tcpCommandsWaitingForResponse:
+        if seq not in self.tcpCommandsWaitingForResponse:
             logging.error("Sequence {} data {} not matched".format(seq, data))
             return
 
@@ -525,7 +524,7 @@ class Controller():
                         if dgram:
                             logging.debug("UDP " + repr(dgram) +
                                           " from " + repr(addr)
-                            )
+                                          )
                             self.handleUdpResponse(dgram, addr)
 
     def sendAndForget(self, command, data=b''):
@@ -554,7 +553,6 @@ class Controller():
     def sendChat(self, line):
         if self.channel == 'unsupported' and self.unsupportedRom:
             line = '[' + self.unsupportedRom + '] ' + line
-        #line = line.encode('utf-8')
         self.sendAndRemember(Protocol.CHAT, Protocol.packTLV(line))
 
     def sendJoinChannelRequest(self, channel=None):
@@ -578,7 +576,7 @@ class Controller():
             self.sendAuth(self.username, self.password)
         self.sendAndRemember(Protocol.JOIN_CHANNEL,
                              Protocol.packTLV(self.channel)
-        )
+                             )
 
     def sendListChannels(self):
         self.sendAndRemember(Protocol.LIST_CHANNELS)
@@ -626,21 +624,22 @@ class Controller():
 
     def sendHelp(self):
         logging.info('Sending help message')
-        returnMessage = '!fcreplay record <challenge>, Eg: "!fcreplay record challenge-1111-1234567890.12@sfiii3n". !fcreplay status <challenge>. ' \
+        returnMessage = '!fcreplay record <urk>, Eg: "!fcreplay record https://replay.fightcade.com/fbneo/sfiii3nr1/1596003335000-1234". !fcreplay status <url>. ' \
             'I can only record replays that show up on your profile page. ' \
-            'Replays will be uploaded to https://www.youtube.com/channel/UCrYudzO9Nceu6mVBnFN6haA and https://fba-recorder.uc.r.appspot.com/'
+            'Replays will be uploaded to https://www.youtube.com/channel/UCrYudzO9Nceu6mVBnFN6haA and https://fightcadevids.com/'
         self.sendChat(returnMessage)
 
     def sendRecord(self, fcreplayCommands, profile):
         logging.info('Got a record request')
+        supported_games = config['supported_games']
 
-        if fcreplayCommands[2].endswith('sfiii3n'):
-            challenge = fcreplayCommands[2]
+        if fcreplayCommands[2].split('/')[4] in supported_games:
+            url = fcreplayCommands[2]
             # Need to return message with status
             try:
-                status = getfcplayerreplay(profile, challenge)
+                status = get_replay(profile, url)
             except Exception as e:
-                status = 'EXCEPTION'
+                status = f'EXCEPTION: {e}'
 
             if status == 'ADDED' or status == 'MARKED_PLAYER':
                 returnMessage = f"Hi @{profile}, I've added your replay to the encoding queue"
@@ -656,8 +655,9 @@ class Controller():
                 returnMessage = f"Sorry @{profile}, there was something wrong with that request"
                 self.sendChat(returnMessage)
         else:
-            logging.info('Not a sfiii3n request')
-            returnMessage = f"Sorry @{profile}, I can only record sfiii3n replays"
+            valid_games = ",".join(supported_games)
+            logging.info('Not a valid game request')
+            returnMessage = f"Sorry @{profile}, I can only record {valid_games} replays"
             self.sendChat(returnMessage)
 
     def sendStatus(self, fcreplayCommands, profile):
@@ -672,10 +672,11 @@ class Controller():
         elif fcreplayCommands[2].endswith('sfiii3n'):
             # Need to check if challenge is valid. Can't do until replay browser is fixed
             # Check to see if replay is finished:
+            game_name = fcreplayCommands[2].split('/')[4]
+            challenge_id = fcreplayCommands[2].split('/')[5]
             status = fcjobstatus.check_if_finished(fcreplayCommands[2])
             if status == 'FINISHED':
-                challenge_replaced = fcreplayCommands[2].replace('@', '-')
-                returnMessage = f"@{profile} That replay has finished being recorded. You can find it here: https://www.youtube.com/channel/UCrYudzO9Nceu6mVBnFN6haA"
+                returnMessage = f"@{profile} That replay has finished being recorded. You can find it here: https://fightcadevids.com/video/challenge-{challenge_id}@{game_name}"
             elif status == 'NO_DATA':
                 returnMessage = f"@{profile} That replay doesn't exist in the queue"
             else:
@@ -709,10 +710,10 @@ class Controller():
             try:
                 emit = self.emitList.pop(0)
                 logging.debug(f'Got Emit: {emit}')
-            except IndexError as e:
+            except IndexError:
                 continue
             except Exception as e:
-                logging.error(f'Unknown emit error: e')
+                logging.error(f'Unknown emit error: {e}')
 
             # Respond to !fcreplay messages
             if str(emit['state']) == 'chatReceived':
