@@ -24,7 +24,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
 
 def start_ggpo(ggpo_path=None, fc_challenge=None):
     challenge_id, game_name = fc_challenge.split('@')
-    ggpofba_rc = subprocess.run(
+    ggpofbneo_rc = subprocess.run(
         [
             '/usr/bin/wine',
             f'{ggpo_path}/ggpofba-ng.exe',
@@ -60,20 +60,20 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     # Get start time
     begin_time = datetime.datetime.now()
 
-    # Start ggpofba
-    logging.info("Starting ggpofba")
+    # Start ggpofbneo
+    logging.info("Starting ggpofbneo")
     ggpo_thread = threading.Thread(target=start_ggpo, args=[
                                    ggpo_path, fc_challange])
     ggpo_thread.start()
-    logging.info("Started ggpofba")
+    logging.info("Started ggpofbneo")
 
-    # Check to see if ggpofba is running. This seems to be quite hard since there arn't
+    # Check to see if ggpofbneo is running. This seems to be quite hard since there arn't
     # any log files. Wait for wine to load emulator, then check the right portion of the
     # screen. If it's black, that means the emulator hasn't started playing the replay.
     # Tried monitoring sound and starting the record when sound plays, but that doesn't
     # work reliably. So going to grab the screen capture. This requires a few edge cases:
-    # 1. Launch GGPOFBA
-    #   1. Check to see if GGPOFBA is loaded
+    # 1. Launch ggpofbneo
+    #   1. Check to see if ggpofbneo is loaded
     #     1. Check to see if there are screen updates
 
     empty_capture = Image.open(pkg_resources.resource_filename(

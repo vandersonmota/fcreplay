@@ -89,14 +89,12 @@ class Replay:
             length=self.replay.length
         )
 
-
     @handle_fail
     def remove_job(self):
         """Remove job from database
         """
         self.db.remove_job(challenge_id=self.replay.id)
         self.update_status("FINISHED")
-
 
     @handle_fail
     def update_status(self, status):
@@ -198,8 +196,8 @@ class Replay:
                 "\nFightcade replay id: {self.replay.id}"
 
             for match in self.detected_characters:
-                description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
-                                    f"\n{match[0]} vs {match[1]}"
+                self.description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
+                    f"\n{match[0]} vs {match[1]}"
         else:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
                                     f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
@@ -261,15 +259,16 @@ class Replay:
         ident = str(self.replay.id).replace("@", "-")
         fc_video = get_item(ident)
 
-        metadata = {'title': title,
-              'mediatype': self.config['ia_settings']['mediatype'],
-              'collection': self.config['ia_settings']['collection'],
-              'date': date_short,
-              'description': self.description_text,
-              'subject': self.config['ia_settings']['subject'],
-              'creator': self.config['ia_settings']['creator'],
-              'language': self.config['ia_settings']['language'],
-              'licenseurl': self.config['ia_settings']['license_url']}
+        metadata = {
+            'title': title,
+            'mediatype': self.config['ia_settings']['mediatype'],
+            'collection': self.config['ia_settings']['collection'],
+            'date': date_short,
+            'description': self.description_text,
+            'subject': self.config['ia_settings']['subject'],
+            'creator': self.config['ia_settings']['creator'],
+            'language': self.config['ia_settings']['language'],
+            'licenseurl': self.config['ia_settings']['license_url']}
 
         logging.info("Starting upload to archive.org")
         fc_video.upload(f"{self.config['fcreplay_dir']}/finished/{filename}",
