@@ -39,7 +39,6 @@ class Replay:
     def handle_fail(self, func):
         """Handle Failure decorator
         """
-
         def failed(self):
             try:
                 func()
@@ -53,9 +52,10 @@ class Replay:
                 if self.config['gcloud_destroy_on_fail']:
                     destroy_fcreplay()
                 sys.exit(1)
+        
         return failed
 
-    @handle_fail
+    @handle_fail()
     def get_replay(self):
         """Get a replay from the database
         """
@@ -78,7 +78,7 @@ class Replay:
 
         return replay
 
-    @handle_fail
+    @handle_fail()
     def add_job(self):
         """Update jobs database table with the current replay
         """
@@ -90,14 +90,14 @@ class Replay:
             length=self.replay.length
         )
 
-    @handle_fail
+    @handle_fail()
     def remove_job(self):
         """Remove job from database
         """
         self.db.remove_job(challenge_id=self.replay.id)
         self.update_status("FINISHED")
 
-    @handle_fail
+    @handle_fail()
     def update_status(self, status):
         """Update the replay status
         """
@@ -107,7 +107,7 @@ class Replay:
             status=status
         )
 
-    @handle_fail
+    @handle_fail()
     def record(self):
         """Start recording a replay
         """
@@ -143,7 +143,7 @@ class Replay:
 
         return True
 
-    @handle_fail
+    @handle_fail()
     def move(self):
         filename = f"{self.replay.id}.mkv"
         shutil.move(f"{self.config['fcreplay_dir']}/videos/{self.config['obs_video_filename']}",
@@ -151,7 +151,7 @@ class Replay:
 
         self.update_status('MOVED')
 
-    @handle_fail
+    @handle_fail()
     def broken_fix(self):
         """Fix broken video
 
@@ -174,14 +174,14 @@ class Replay:
         self.update_status('BROKEN_CHECK')
         logging.info("Removed dirty file and fixed file")
 
-    @handle_fail
+    @handle_fail()
     def detect_characters(self):
         """Detect characters
         """
         self.detected_characters = character_detect.character_detect(
             f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv")
 
-    @handle_fail
+    @handle_fail()
     def set_detected_characters(self):
         logging.info("Adding detected characters to DB")
         logging.info(f"Data is: {self.detected_characters}")
@@ -193,7 +193,7 @@ class Replay:
                 vid_time=i[2]
             )
 
-    @handle_fail
+    @handle_fail()
     def set_description(self):
         """Set the description of the video
 
@@ -239,7 +239,7 @@ class Replay:
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
         return True
 
-    @handle_fail
+    @handle_fail()
     def create_thumbnail(self):
         """Create thumbnail from video
         """
@@ -255,7 +255,7 @@ class Replay:
         self.update_status('THUMBNAIL_CREATED')
         logging.info("Finished making thumbnail")
 
-    @handle_fail
+    @handle_fail()
     @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
     def upload_to_ia(self):
         """Upload to internet archive
@@ -291,7 +291,7 @@ class Replay:
         self.update_status('UPLOADED_TO_IA')
         logging.info("Finished upload to archive.org")
 
-    @handle_fail
+    @handle_fail()
     def upload_to_yt(self):
         """Upload video to youtube
         """
@@ -380,7 +380,7 @@ class Replay:
         else:
             raise ModuleNotFoundError
 
-    @handle_fail
+    @handle_fail()
     def remove_generated_files(self):
         """Remove generated files
 
@@ -394,6 +394,6 @@ class Replay:
         self.update_status("REMOVED_GENERATED_FILES")
         logging.info("Finished removing files")
 
-    @handle_fail
+    @handle_fail()
     def set_created(self):
         self.db.update_created_replay(challenge_id=self.replay.id)
