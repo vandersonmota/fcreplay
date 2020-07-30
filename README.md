@@ -1,4 +1,27 @@
 <!--ts-->
+   * [About](#about)
+   * [Goal](#goal)
+      * [How it works](#how-it-works)
+      * [Character Detection](#character-detection)
+         * [A few more notes:](#a-few-more-notes)
+      * [Todo](#todo)
+      * [Requirements](#requirements)
+         * [Uploading to archive.org](#uploading-to-archiveorg)
+   * [Installation and setup](#installation-and-setup)
+      * [Configuration](#configuration)
+      * [(Optional) Google cloud](#optional-google-cloud)
+         * [Infrastructure Deployment](#infrastructure-deployment)
+         * [Configure base image](#configure-base-image)
+      * [Deployment](#deployment)
+      * [Post Deployment Setup](#post-deployment-setup)
+   * [Usage](#usage)
+      * [Activating](#activating)
+      * [Getting replays](#getting-replays)
+      * [Recording a replay](#recording-a-replay)
+      * [Running automatically on startup](#running-automatically-on-startup)
+
+<!-- Added by: gino, at: Thu 30 Jul 2020 12:22:54 PM NZST -->
+
 <!--te-->
 
 # About
