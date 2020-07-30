@@ -1,32 +1,10 @@
-# FCReplay
+<!--ts-->
+<!--te-->
+
+# About
 This project will upload encoded [fightcade](https://www.fightcade.com/) replays to archive.org: [Gino Lisignoli - Archive.org](https://archive.org/search.php?query=creator%3A%22Gino+Lisignoli%22)
 
 A site the view the replays is here: https://fightcadevids.com
-
-Table of Contents
-=================
-
-   * [FCReplay](#fcreplay)
-   * [Table of Contents](#table-of-contents)
-   * [Goal](#goal)
-      * [How it works](#how-it-works)
-      * [Character Detection](#character-detection)
-         * [A few more notes:](#a-few-more-notes)
-      * [Todo](#todo)
-      * [Requirements](#requirements)
-         * [Uploading to archive.org](#uploading-to-archiveorg)
-   * [Installation and setup](#installation-and-setup)
-      * [Configuration](#configuration)
-      * [(Optional) Google cloud](#optional-google-cloud)
-         * [Infrastructure Deployment](#infrastructure-deployment)
-         * [Configure base image](#configure-base-image)
-      * [Deployment](#deployment)
-      * [Post Deployment Setup](#post-deployment-setup)
-   * [Usage](#usage)
-      * [Activating](#activating)
-      * [Getting replays](#getting-replays)
-      * [Recording a replay](#recording-a-replay)
-      * [Running automatically on startup](#running-automatically-on-startup)
 
 # Goal
 The goal of this is to make fightcade replays accessible to anyone to watch without the need of using an emulator.
