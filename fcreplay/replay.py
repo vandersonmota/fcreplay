@@ -24,6 +24,7 @@ class Replay:
         self.db = Database()
         self.detected_characters = []
         self.description_text = ""
+        self.game_name = ""
 
         with open("config.json", 'r') as json_data_file:
             self.config = json.load(json_data_file)
@@ -118,11 +119,12 @@ class Replay:
         self.update_status('RECORDING')
 
         # Star a recording store recording status
-        record_status = fc_record.main(fc_challange=self.replay.id,
+        record_status = fc_record.main(fc_challange_id=self.replay.id,
                                        fc_time=self.replay.length,
                                        kill_time=self.config['record_timeout'],
-                                       ggpo_path=self.config['pyqtggpo_dir'],
-                                       fcreplay_path=self.config['fcreplay_dir']
+                                       fcadefbneo_path=self.config['fcadefbneo_dir'],
+                                       fcreplay_path=self.config['fcreplay_dir'],
+                                       game_name=self.game_name
                                        )
 
         # Check recording status
@@ -174,6 +176,8 @@ class Replay:
 
     @handle_fail
     def detect_characters(self):
+        """Detect characters
+        """
         self.detected_characters = character_detect.character_detect(
             f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv")
 
@@ -183,14 +187,23 @@ class Replay:
         logging.info(f"Data is: {self.detected_characters}")
         for i in self.detected_characters:
             self.db.add_detected_characters(
-                challenge_id=self.replay.id, p1_char=i[0], p2_char=i[1], vid_time=i[2]
+                challenge_id=self.replay.id,
+                p1_char=i[0],
+                p2_char=i[1],
+                vid_time=i[2]
             )
 
     @handle_fail
     def set_description(self):
-        # Create description
+        """Set the description of the video
+
+        Returns:
+            Boolean: Success or failure
+        """
         logging.info("Creating description")
-        if self.detected_characters is not None:
+
+        # Added detected characters
+        if self.detected_characters is not None and self.game_name in self.config['supported_character_detect']:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
                 "({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
                 "\nFightcade replay id: {self.replay.id}"
@@ -224,6 +237,7 @@ class Replay:
 
         logging.debug(
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
+        return True
 
     @handle_fail
     def create_thumbnail(self):

@@ -20,7 +20,7 @@
       * [Recording a replay](#recording-a-replay)
       * [Running automatically on startup](#running-automatically-on-startup)
 
-<!-- Added by: gino, at: Thu 30 Jul 2020 12:39:56 PM NZST -->
+<!-- Added by: gino, at: Thu 30 Jul 2020 07:45:35 PM NZST -->
 
 <!--te-->
 
@@ -144,6 +144,18 @@ startx
 x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
 ```
 
+Download and install fightcade2:
+```commandline
+cd /home/fcrecorder/
+cd fcreplay
+wget --trust-server-names https://www.fightcade.com/download/windows
+wine Fightcade-win32-latest.exe
+```
+
+* When prompted by wine, install gecko
+* Change installation path to c:\fc2
+  * Ignore any installation errors
+
 Start the pulseaudio server
 ```commandline
 pulseaudio --start
@@ -162,12 +174,12 @@ wine ggpofba-ng.exe
 
 And configure it with:
  1. Select blitter: Enhanced.
- 1. Blitter options, mark these:
+ 2. Blitter options, mark these:
      1. Enable Pre-scale
-     1. Pre-scale using SoftFX
-     1. RGB effects
-     1. Advanced settings: Force 16-bit emulation & Use DirectX texture management
- 1. Stretch: Correct aspect ratio
+     2. Pre-scale using SoftFX
+     3. RGB effects
+     4. Advanced settings: Force 16-bit emulation & Use DirectX texture management
+ 3. Stretch: Correct aspect ratio
 
 Close ggpofba, and run OBS:
 ```commandline

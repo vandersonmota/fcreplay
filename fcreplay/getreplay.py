@@ -24,7 +24,7 @@ logging.basicConfig(
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
 def get_data(query, profile):
     r = requests.post(
-        "https://fightcade.com/api",
+        "https://www.fightcade.com/api/",
         json=query
      )
     if "user not found" in r.text:
@@ -42,7 +42,7 @@ def add_replay(replay, emulator, game, player_replay=True):
     p1_loc = replay['players'][0]['country']
     p2_loc = replay['players'][1]['country']
     p1 = replay['players'][0]['name']
-    p2 = replay['players'][2]['name']
+    p2 = replay['players'][1]['name']
     date_replay = datetime.datetime.fromtimestamp(replay['date']//1000)
     length = replay['duration']
     created = False

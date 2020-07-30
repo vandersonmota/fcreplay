@@ -36,6 +36,7 @@
           - tmux
           - unzip
           - vim
+          - wget
           - wine.i686
           - x11vnc
           - xinit

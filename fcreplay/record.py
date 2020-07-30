@@ -3,7 +3,6 @@ import argparse
 import datetime
 import threading
 import subprocess
-import sys
 import time
 import logging
 import json
@@ -22,13 +21,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 
-def start_ggpo(ggpo_path=None, fc_challenge=None):
-    challenge_id, game_name = fc_challenge.split('@')
-    ggpofbneo_rc = subprocess.run(
+def start_fcadefbneo(fcadefbneo_path=None, fc_challenge_id=None, game_name=None):
+    fbneo_rc = subprocess.run(
         [
             '/usr/bin/wine',
-            f'{ggpo_path}/ggpofba-ng.exe',
-            f'quark:stream,{game_name},{challenge_id},7001',
+            f'{fcadefbneo_path}/fcadefbneo.exe',
+            f'quark:stream,{game_name},{fc_challenge_id},7100',
             '-w'
         ]
     )
@@ -46,14 +44,14 @@ def start_obs():
 
 def cleanup_tasks():
     # Need to kill a bunch of processes and restart pulseaudio
-    subprocess.run(['pkill', '-9', 'ggpo'])
+    subprocess.run(['pkill', '-9', 'fcadefbneo'])
     subprocess.run(['pkill', '-9', 'wine'])
     subprocess.run(['pkill', '-9', 'obs'])
     subprocess.run(['pkill', '-9', '-f', 'system32'])
     subprocess.run(['/usr/bin/pulseaudio', '-k'])
 
 
-def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcreplay_path=None):
+def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
     logging.info('Starting pulseaudio')
     subprocess.run(['pulseaudio', '--daemon'])
 
@@ -61,9 +59,9 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
     begin_time = datetime.datetime.now()
 
     # Start ggpofbneo
-    logging.info("Starting ggpofbneo")
-    ggpo_thread = threading.Thread(target=start_ggpo, args=[
-                                   ggpo_path, fc_challange])
+    logging.info("Starting fcadefbneo")
+    ggpo_thread = threading.Thread(target=start_fcadefbneo, args=[
+                                   fcadefbneo_path, fc_challange_id, game_name])
     ggpo_thread.start()
     logging.info("Started ggpofbneo")
 
@@ -164,16 +162,18 @@ def main(fc_challange=None, fc_time=None, kill_time=None, ggpo_path=None, fcrepl
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Record fightcade replays")
-    parser.add_argument('challenge_id', help="Fightcade challenge id")
+    parser.add_argument('fc_challenge_id', help="Fightcade challenge id")
     parser.add_argument('fc_time', help="Length of time in seconds to record")
     parser.add_argument(
         'kill_timeout', help="How long to wait before killing processing")
-    parser.add_argument('ggpo_path', help='Path to ggpo')
+    parser.add_argument('fcadefbneo_path', help='Path to ggpo')
     parser.add_argument('fcreplay_path', help='Path to fcreplay')
+    parser.add_argument('game_name', help='Game name (Eg: sfiii3nr1)')
     args = parser.parse_args()
     main(
-        fc_challange=args.challenge_id,
+        fc_challange_id=args.fc_challenge_id,
         fc_time=int(args.fc_time),
         kill_time=int(args.kill_timeout),
-        ggpo_path=args.ggpo_path,
-        fcreplay_path=args.fcreplay_path)
+        fcadefbneo_path=args.fcadefbneo_path,
+        fcreplay_path=args.fcreplay_path,
+        game_name=args.game_name)
