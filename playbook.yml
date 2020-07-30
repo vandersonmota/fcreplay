@@ -52,6 +52,7 @@
       firewalld:
         zone: public
         port: 5900/tcp
+        immediate: yes
         permanent: yes
         state: enabled
     
