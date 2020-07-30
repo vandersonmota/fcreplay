@@ -8,12 +8,13 @@ provider "google" {
   zone    = "us-central1-a"
 }
 
+// Create compute service account
 resource "google_service_account" "fcrecorder_compute_account" {
   account_id   = "fcrecorder-compute-account"
   display_name = "FCRecorder compute account"
 }
 
-//Add permissions to fcrecorder-compute-account cloud-functions
+// Add permissions to fcrecorder-compute-account
 resource "google_project_iam_binding" "compute_admin" {
   project = "fcrecorder"
   role    = "roles/compute.admin"
@@ -36,7 +37,8 @@ resource "google_compute_firewall" "incomming-vnc" {
     ports    = ["5900"]
   }
 
-  source_tags = ["incomming-vnc"]
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["incomming-vnc"]
 }
 
 // Create chatbot instance
@@ -83,14 +85,14 @@ resource "google_compute_instance" "default" {
   tags = ["incomming-vnc"]
 }
 
-//Create cloud functions
+// Create cloud functions
 resource "null_resource" "cloud_functions" {
   provisioner "local-exec" {
     command = "cd ./cloud_functions; ./deploy.sh"
   }
 }
 
-//Deploy scheduled tasks
+// Deploy scheduled tasks
 resource "google_cloud_scheduler_job" "check_for_replay" {
   name             = "check_for_replay"
   description      = "Triggers cloud function to look for replays"
