@@ -1,48 +1,81 @@
-# FCREPLAY
-This is sort of a mad scientist project to record and upload [fightcade](https://www.fightcade.com/) replays to archive.org: [Gino Lisignoli - Archive.org](https://archive.org/search.php?query=creator%3A%22Gino+Lisignoli%22)
+<!--ts-->
+   * [About](#about)
+   * [Goal](#goal)
+      * [How it works](#how-it-works)
+      * [Character Detection](#character-detection)
+         * [A few more notes:](#a-few-more-notes)
+      * [Todo](#todo)
+      * [Requirements](#requirements)
+         * [Uploading to archive.org](#uploading-to-archiveorg)
+   * [Installation and setup](#installation-and-setup)
+      * [Configuration](#configuration)
+      * [(Optional) Google cloud](#optional-google-cloud)
+         * [Infrastructure Deployment](#infrastructure-deployment)
+         * [Configure base image](#configure-base-image)
+      * [Deployment](#deployment)
+      * [Post Deployment Setup](#post-deployment-setup)
+   * [Usage](#usage)
+      * [Activating](#activating)
+      * [Getting replays](#getting-replays)
+      * [Recording a replay](#recording-a-replay)
+      * [Running automatically on startup](#running-automatically-on-startup)
+
+<!-- Added by: gino, at: Sun 02 Aug 2020 11:56:02 AM NZST -->
+
+<!--te-->
+
+# About
+This project will upload encoded [fightcade](https://www.fightcade.com/) replays to archive.org: [Gino Lisignoli - Archive.org](https://archive.org/search.php?query=creator%3A%22Gino+Lisignoli%22)
+
+A site the view the replays is here: https://fightcadevids.com
+
+# Goal
+The goal of this is to make fightcade replays accessible to anyone to watch without the need of using an emulator.
 
 ## How it works
-Using some python (and a janky bash) scripts I scrape the fightcade replay urls from the site. Store them in a database with the relevant information.
+fcreplaygetreplay will parse fightcade replay urls, then use the fightcade api details to create a encoding job and store it in a database.
 
-A replay is then selected and the capture script is started. Fightcade is started with wine, and then OBS is started to record the match. After the match is finished (based on the length of the match), OBS is killed the python script takes over again.
+fcreplayloop can then be used to record a replay:
+1. Fightcade is started with wine
+2. OBS is started to record the match
+3. Match is finished
+4. OBS is killed the python script takes over again.
 
-The script then takes over and:
+The script then:
  1. Renames the file to the fightcade id
- 1. Runs ffmpeg to correct it since killing OBS might break the file
- 1. Runs ffmpeg again to generate a thumbnail
- 1. Tries to determine which characters players are using OpenCV
- 1. Uploads the file to archive.org with the relevant metadata
- 1. Uploads the file to youtube.com with the relevant metadata 
- 2. Removes the generated files.
+ 2. Runs ffmpeg to correct it since killing OBS might break the file
+ 3. Runs ffmpeg again to generate a thumbnail
+ 4. Tries to determine which characters players are using OpenCV
+ 5. Uploads the file to archive.org with the relevant metadata
+ 6. Uploads the file to youtube.com with the relevant metadata 
+ 7. Removes the generated files.
 
 ## Character Detection
 OpenCV is used to analise the video and match character names from the health bars. It does this by template matching the included character name images against the video every 60 frames. Depending on your OBS recording settings you might need to regenerate the images.
 
+Currently this is only supported for 3rd strike.
+
 ### A few more notes:
-To trigger OBS I am capturing the screen, looking for a the split windows, then checking for differences in the screen capture. This might seem crude, but without memory inspection it doesn't seem like there is a way to tell when the emulator has started playing the replay.
+To trigger OBS the screen is captured, looking for a the split windows and then checking for differences in the screen capture. Without memory inspection it doesn't seem like there is a way to tell when the emulator has started playing the replay.
 
 Because fightcade doesn't have the ability to record to a video file you need to use some sort of capture software.
 
-For this project I use [Open Broadcaster Software](https://obsproject.com/). While it doesn't have a lot of scripting ability out of the box, it seemed to work fairly well. I did initially try to just use ffmpeg and capture x11 with audio, but for some reason it would always drop to 20fps or less.
+For this project [Open Broadcaster Software](https://obsproject.com/) is used to encode the video.
 
-I use the i3 window manager to ensure that the ggpofba-ng window is always in the same place, and have preconfigured OBS to record that area.
+The i3 window manager is used to ensure that the fcadefbneo window is always in the same place, and have preconfigured OBS to record that area.
 
 This is all done in a headless X11 session
 
 ## Todo
- - Remove a bunch of jank. There is a lot of late night coding just to make things work.
  - Better exception handling.
+ - Better capturing of OBS and Wine output.
  - Support for games other than 3rd strike.
- - Better installation.
  - Find something that might be more lightweight than OBS.
- - Possibly find a way to do multiple recordings at once.
- - Thumbnails are kinda broken
-
-## Goal
-The goal of this was to make fightcade replays accessible to anyone to watch without the need of using an emulator.
+   - ffmpeg with x11 capturing was attempted, but the framerate was unacceptible
+ - Thumbnails are generated but not used
 
 ## Requirements
-To run this yourself you need:
+To run this, you need:
  1. A VM or physical machine.
      1. With at least 4 Cores (Fast ones would be ideal)
      1. With at least 2GB Ram
@@ -51,8 +84,10 @@ To run this yourself you need:
      1. You really want to use a minimal installation
  1. Some familiarity with linux will help
 
-There is also a bunch of code included to run this in a google cloud project. More documentation to come.
+### Uploading to archive.org
+To upload files to archive.org, set the configuration key `upload_to_ia` to `true` and configure the ia section in the configuration file. You will also need to have your `.ia` secrets file in your users home directory. This can be generated by running `ia configure` from the command line once you have setup the python virtual environment.
 
+# Installation and setup
 ## Configuration
 The defaults should work if you follow the guide below.
 
@@ -64,16 +99,36 @@ If you are using the ansible playbook, you will also want to have ready the foll
  - Youtube upload credentials: `.youtube-upload-credentials.json`
  - Archive.org secrets: `.ia`
 
-### Uploading to archive.org
-To upload files to archive.org, set the configuration key `upload_to_ia` to `true` and configure the ia section in the configuration file. You will also need to have your `.ia` secrets file in your users home directory. This can be generated by running `ia configure` from the command line once you have setup the python virtual environment.
+## (Optional) Google cloud
+A terraform script for google cloud is included
 
-# Installation
+### Infrastructure Deployment
+To deploy to google cloud you need to:
+
+1. Create a project
+2. Create a fedora32 image
+   1. This was done by following: https://linuxhint.com/install-fedora-google-compute-engine
+3. Download the project api key as `~/.fcrecorder-api-credentials.json`
+4. Have gcloud command line installed and your project/region set
+5. Run the terraform script
+6. Disable the google cloud scheduled job
+
+### Configure base image
+1. After running the terraform script ssh onto the fcrecorder machine. This is the image recording instances are provisioned from
+   1. Confirm that the root partition has actually resized, mine didn't
+
+## Deployment
 I've include a basic ansible playbook for the installation, you will need to have ssh access and a deployment user with root access.
 
-```
-ansible-playbook -i <host>, -u <deployment_user> --diff playbook.yml
-```
-
+2. Use the ansible script to setup the image.
+   1. Create a deployment user with with sudo access: `adduser deployment`
+   2. Set a password `passwd deployment`
+   3. Add the user to the wheel group: `groupmems -a deployment -g wheel`
+   4. Copy your ssh key with `ssh-copy-id deployment@<host>`
+   5. Disable password login in the `/etc/ssh/sshd_config` and restart sshd: `systemctl restart sshd`
+   6. `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True}' playbook.yml`
+ 
+## Post Deployment Setup
 Login and switch to the fcrecorder user, then create a x11vnc password as the fcrecorder user (It will be stored in ~/.vnc/passwd):
 ```commandline
 x11vnc -storepasswd 
@@ -89,6 +144,14 @@ startx
 x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
 ```
 
+Download and install the linux version of fightcade2:
+```commandline
+cd /home/fcrecorder/
+cd fcreplay
+wget "<url to linux fightcade2>"
+tar xvf <archive>
+```
+
 Start the pulseaudio server
 ```commandline
 pulseaudio --start
@@ -99,173 +162,48 @@ Check that it's working by run pavucontrol
 pavuconrol
 ```
 
-In the i3 session, run ggpofba-ng:
+In the i3 session, run fcadefbneo
 ```commandline
-cd ~/fcreplay/pyqtggpo-master
-wine ggpofba-ng.exe
+cd ~/fcreplay/Fightcade/emulator/fcadefbneo
+wine fcadefbneo.exe
 ```
 
 And configure it with:
- 1. Select blitter: Enhanced.
- 1. Blitter options, mark these:
-     1. Enable Pre-scale
-     1. Pre-scale using SoftFX
-     1. RGB effects
-     1. Advanced settings: Force 16-bit emulation & Use DirectX texture management
- 1. Stretch: Correct aspect ratio
+ 1. Blitter options, disable scanlines
 
 Close ggpofba, and run OBS:
 ```commandline
 obs
 ```
 
-Configure OBS for your systems performance. You want to change the video output directory to `~/fcreplay/videos` with a static filename (set in the advanced section) as `replay`. Make sure to disable recording of the mouse cursor as well
+Configure OBS for your systems performance. The included configuration should work out of the box
 
-Now you need to configure the scene. I found the best way to do this was to have ggpofba running, then switch OBS to a i3 floating window (win+shift+space).
+# Usage
 
- * I'm using a canvas resolution of 512x384 and a output resolutuon of 512.384.
- * For the screen capture I'm using the following crop/pad filter settings:
-   * Left: 514
-   * Top: 204
-   * Right: 2
-   * Bottom: 184
+## Activating
+Before runninf fcreplay, you need to activate the python environment
+```commandline
+cd ~/fcreplay
+source ./venv/bin/activate
+```
 
-# Running automatically on startup
+## Getting replays
+This will download a replay, and place it in the database
+```commandline
+fcreplayget <fightcade profile> <replay url>
+```
+
+
+## Recording a replay
+Within a Xorg session:
+```commandline
+fcreplayloop
+```
+You can also run `fcreplayloop --debug` to only run for a single iteration. Useful for testing.
+
+## Running automatically on startup
 To run fcreplay automatically on startup you need to enable the service, and uncommet the i3 line:
 ```commandline
 systemctl enable fcrecord
 sed -i 's/^# exec "xterm/exec "xterm/' .config/i3/config
-```
-
-# Running only once
-After doing all this you can start recording. Activate the python environment with:
-```commandline
-cd ~/fcreplay
-source ./venv/bin/activate
-```
-
-Now grab some replays:
-```commandline
-fcreplayget <fightcade profile>
-```
-
-This will download quite a few replays, and place them in a sqlite3 database (replays.db).
-Now you can trigger the recording loop, Run:
-```commandline
-fcreplayloop
-````
-
-Once a loop has started you can close the vnc session and leave it running.
-
-You can also run `fcreplayloop --debug` to only run for a single iteration. Useful for testing.
-
-# Manual install
-The manual steps of the anisble script are:
-
-Install the packages:
-```
-dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-dnf install \
-        alsa-utils \
-        firewalld \
-        gcc \
-        git \
-        i3 \
-        jq \
-        libpq-devel \
-        obs-studio \
-        pavucontrol \
-        portaudio \
-        portaudio-devel \
-        pulseaudio \
-        pulseaudio-libs \
-        python3 \
-        python3-devel \
-        rsync \
-        tmux \
-        unzip \
-        vim \
-        wine.i686
-        x11vnc \
-        xinit \
-        xorg-x11-drv-dummy \
-        xterm \
-```
-
-Enable firewalld:
-```commandline
-systemctl enable firewalld
-systemctl start firewalld
-```
-
-Add a firewalld rule to allow x11vnc:
-```commandline
-firewall-cmd --zone=public --permanent --add-port=5900/tcp
-firewall-cmd --zone=public --add-port=5900/tcp
-```
-
-Add the fcrecorder user:
-```commandline
-useradd -m -s /usr/bin/bash fcrecorder
-```
-
-Add user to the pulse, pulse-access and input groups:
-```commandline
-usermod -a -G pulse,pulse-access,input fcrecorder
-```
-
-Switch to the fcrecorder user and install the package in a virtual env:
-```commandline
-su fcrecorder -
-git clone https://github.com/glisignoli/fcreplay.git ~/fcreplay_install
-mkdir ~/fcreplay
-cd ~/fcreplay
-python3 -m venv ./venv
-source ./venv/bin/activate
-cd ~/fcreplay_install
-python3 setup.py install
-```
-
-Install youtube-upload
-```
-cd ~/fcreplay
-source ./venv/bin/activate
-pip install --upgrade google-api-python-client oauth2client progressbar2
-cd ~/
-git clone https://github.com/tokland/youtube-upload.git youtube-upload_install
-cd youtube-upload_install
-python setup.py install
-```
-
-Edit the config file and replace the defaults
-```commandline
-vi ~/fcreplay/config.json
-```
-
-Download pyqtggpo-0.42 and unzip it as the fcrecorder user:
-```commandline
-cd ~/fcreplay
-git clone https://github.com/poliva/pyqtggpo.git pyqtggpo-master
-```
-
-Copy the xorg.conf and Xwrapper.conf file to /etc/X11 as the root user.
-These files are installed in the python package installation directory
-```commandline
-cp /home/fcrecorder/fcreplay/venv/lib/python3.8/site-packages/fcreplay-*-py*.egg/fcreplay/data/{Xwrapper.config,xorg.conf} /etc/X11/
-```
-
-Create the default .xinitrc file
-```commandline
-cat << EOF > ~/.xinitrc
-exec i3
-EOF
-```
-
-Using a vnc client, connect to your server. Once you have authenticated you will be prompted to generate the default i3
-config. Hit win+return to spawn a terminal. 
-
-Add the following line to the fcrecorder users i3 config:
-```
-# Add the following to ~/.config/i3/config
-exec --no-startup-id "/usr/bin/xterm"
 ```

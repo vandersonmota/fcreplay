@@ -1,7 +1,8 @@
-from sqlalchemy import Column, String, Integer, DateTime, Float, Boolean, Text
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
 
 class Job(Base):
     __tablename__ = 'job'
@@ -34,6 +35,8 @@ class Replays(Base):
     status = Column(String)
     date_added = Column(DateTime)
     player_requested = Column(Boolean)
+    game = Column(String)
+    emulator = Column(String)
 
 
 class Youtube_day_log(Base):
@@ -42,8 +45,8 @@ class Youtube_day_log(Base):
     id = Column(String, primary_key=True)
     date = Column(DateTime)
     count = Column(Integer)
-
     # Need to init count somehow
+
 
 class Character_detect(Base):
     __tablename__ = 'character_detect'

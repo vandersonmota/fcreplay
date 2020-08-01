@@ -44,7 +44,9 @@ class Database:
             failed=kwargs['failed'],
             status=kwargs['status'],
             date_added=kwargs['date_added'],
-            player_requested=kwargs['player_requested']
+            player_requested=kwargs['player_requested'],
+            game=kwargs['game'],
+            emulator=kwargs['emulator']
         ))
         session.commit()
         session.close()
@@ -94,9 +96,9 @@ class Database:
 
     def remove_job(self, **kwargs):
         session = self.Session()
-        session.delete(Job.query.filter_by(
+        session.query(Job).filter_by(
             challenge_id=kwargs['challenge_id']
-        ))
+        ).delete()
         session.commit()
         session.close()
 

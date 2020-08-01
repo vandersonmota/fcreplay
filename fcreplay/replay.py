@@ -20,13 +20,13 @@ class Replay:
     """
 
     def __init__(self):
-        self.replay = self.get_replay()
-        self.db = Database()
-        self.detected_characters = []
-        self.description_text = ""
-
         with open("config.json", 'r') as json_data_file:
             self.config = json.load(json_data_file)
+
+        self.db = Database()
+        self.replay = self.get_replay()
+        self.detected_characters = []
+        self.description_text = ""
 
         logging.basicConfig(
             format='%(asctime)s %(levelname)s: %(message)s',
@@ -35,23 +35,22 @@ class Replay:
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    def handle_fail(self, func):
+    def handle_fail(func):
         """Handle Failure decorator
         """
-
-        def failed(self):
+        def failed(self, *args, **kwargs):
             try:
-                func()
-            except:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                logging.error(f"Excption: {e}, shutting down")
                 logging.info(f"Setting {self.replay.id} to failed")
                 self.db.update_failed_replay(challenge_id=self.replay.id)
-                self.update_status(self.replay, "FAILED")
-
-                logging.error(f"Excption: {Exception}, shutting down")
+                self.update_status("FAILED")
 
                 if self.config['gcloud_destroy_on_fail']:
                     destroy_fcreplay()
                 sys.exit(1)
+        
         return failed
 
     @handle_fail
@@ -89,14 +88,12 @@ class Replay:
             length=self.replay.length
         )
 
-
     @handle_fail
     def remove_job(self):
         """Remove job from database
         """
         self.db.remove_job(challenge_id=self.replay.id)
         self.update_status("FINISHED")
-
 
     @handle_fail
     def update_status(self, status):
@@ -120,11 +117,20 @@ class Replay:
         self.update_status('RECORDING')
 
         # Star a recording store recording status
-        record_status = fc_record.main(fc_challange=self.replay.id,
+        logging.debug(
+            f"""Starting record.main with argumens:
+            fc_challange_id={self.replay.id},
+            fc_time={self.replay.length},
+            kill_time={self.config['record_timeout']},
+            fcadefbneo_path={self.config['fcadefbneo_path']},
+            fcreplay_path={self.config['fcreplay_dir']},
+            game_name={self.replay.game}""")
+        record_status = fc_record.main(fc_challange_id=self.replay.id,
                                        fc_time=self.replay.length,
                                        kill_time=self.config['record_timeout'],
-                                       ggpo_path=self.config['pyqtggpo_dir'],
-                                       fcreplay_path=self.config['fcreplay_dir']
+                                       fcadefbneo_path=self.config['fcadefbneo_path'],
+                                       fcreplay_path=self.config['fcreplay_dir'],
+                                       game_name=self.replay.game
                                        )
 
         # Check recording status
@@ -176,6 +182,8 @@ class Replay:
 
     @handle_fail
     def detect_characters(self):
+        """Detect characters
+        """
         self.detected_characters = character_detect.character_detect(
             f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv")
 
@@ -185,21 +193,30 @@ class Replay:
         logging.info(f"Data is: {self.detected_characters}")
         for i in self.detected_characters:
             self.db.add_detected_characters(
-                challenge_id=self.replay.id, p1_char=i[0], p2_char=i[1], vid_time=i[2]
+                challenge_id=self.replay.id,
+                p1_char=i[0],
+                p2_char=i[1],
+                vid_time=i[2]
             )
 
     @handle_fail
     def set_description(self):
-        # Create description
+        """Set the description of the video
+
+        Returns:
+            Boolean: Success or failure
+        """
         logging.info("Creating description")
-        if self.detected_characters is not None:
+
+        # Added detected characters
+        if self.detected_characters is not None and self.replay.game in self.config['supported_character_detect']:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
                 "({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
                 "\nFightcade replay id: {self.replay.id}"
 
             for match in self.detected_characters:
-                description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
-                                    f"\n{match[0]} vs {match[1]}"
+                self.description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
+                    f"\n{match[0]} vs {match[1]}"
         else:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
                                     f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
@@ -226,6 +243,7 @@ class Replay:
 
         logging.debug(
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
+        return True
 
     @handle_fail
     def create_thumbnail(self):
@@ -261,15 +279,16 @@ class Replay:
         ident = str(self.replay.id).replace("@", "-")
         fc_video = get_item(ident)
 
-        metadata = {'title': title,
-              'mediatype': self.config['ia_settings']['mediatype'],
-              'collection': self.config['ia_settings']['collection'],
-              'date': date_short,
-              'description': self.description_text,
-              'subject': self.config['ia_settings']['subject'],
-              'creator': self.config['ia_settings']['creator'],
-              'language': self.config['ia_settings']['language'],
-              'licenseurl': self.config['ia_settings']['license_url']}
+        metadata = {
+            'title': title,
+            'mediatype': self.config['ia_settings']['mediatype'],
+            'collection': self.config['ia_settings']['collection'],
+            'date': date_short,
+            'description': self.description_text,
+            'subject': self.config['ia_settings']['subject'],
+            'creator': self.config['ia_settings']['creator'],
+            'language': self.config['ia_settings']['language'],
+            'licenseurl': self.config['ia_settings']['license_url']}
 
         logging.info("Starting upload to archive.org")
         fc_video.upload(f"{self.config['fcreplay_dir']}/finished/{filename}",

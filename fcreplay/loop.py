@@ -37,7 +37,7 @@ def main(Debug, Gcloud):
         Debug (bool): Exit after one loop
         Gcloud (bool): Cloud shutdown after processing
     """
-    ## TODO Capture kill signal and handle within 30 secods
+    ## TODO Capture kill signal and handle within 30 secods for google cloud shutdown
     while True:
         replay = Replay()
         if replay.replay is not None:
@@ -46,7 +46,7 @@ def main(Debug, Gcloud):
             replay.move()
             replay.broken_fix()
 
-            if  config['detect_chars']:
+            if config['detect_chars'] and replay.replay.game in config['supported_character_detect']:
                 replay.detect_characters()
                 replay.set_detected_characters()
 
@@ -63,6 +63,8 @@ def main(Debug, Gcloud):
                 replay.remove_generated_files()
 
             replay.remove_job()
+            
+            replay.db.update_created_replay(challenge_id=replay.replay.id)
 
         else:
             if config['auto_add_more']:
@@ -88,6 +90,7 @@ def console():
     parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
     args = parser.parse_args()
     main(args.debug, args.gcloud)
+
 
 # Loop and choose a random replay every time
 if __name__ == "__main__":
