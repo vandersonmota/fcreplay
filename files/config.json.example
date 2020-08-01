@@ -41,7 +41,7 @@
     "sql_baseurl": "postgres://user:pass@address:port",
     "supported_character_detect": [
         "sfiii3nr1"
-    ]
+    ],
     "supported_games": [
         "sfiii3nr1"
     ],

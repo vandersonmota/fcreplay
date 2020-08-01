@@ -20,14 +20,13 @@ class Replay:
     """
 
     def __init__(self):
-        self.replay = self.get_replay()
-        self.db = Database()
-        self.detected_characters = []
-        self.description_text = ""
-        self.game_name = ""
-
         with open("config.json", 'r') as json_data_file:
             self.config = json.load(json_data_file)
+
+        self.db = Database()
+        self.replay = self.get_replay()
+        self.detected_characters = []
+        self.description_text = ""
 
         logging.basicConfig(
             format='%(asctime)s %(levelname)s: %(message)s',
@@ -36,18 +35,17 @@ class Replay:
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    def handle_fail(self, func):
+    def handle_fail(func):
         """Handle Failure decorator
         """
-        def failed(self):
+        def failed(self, *args, **kwargs):
             try:
-                func(self)
-            except:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                logging.error(f"Excption: {e}, shutting down")
                 logging.info(f"Setting {self.replay.id} to failed")
                 self.db.update_failed_replay(challenge_id=self.replay.id)
-                self.update_status(self.replay, "FAILED")
-
-                logging.error(f"Excption: {Exception}, shutting down")
+                self.update_status("FAILED")
 
                 if self.config['gcloud_destroy_on_fail']:
                     destroy_fcreplay()
@@ -119,12 +117,20 @@ class Replay:
         self.update_status('RECORDING')
 
         # Star a recording store recording status
+        logging.debug(
+            f"""Starting record.main with argumens:
+            fc_challange_id={self.replay.id},
+            fc_time={self.replay.length},
+            kill_time={self.config['record_timeout']},
+            fcadefbneo_path={self.config['fcadefbneo_path']},
+            fcreplay_path={self.config['fcreplay_dir']},
+            game_name={self.replay.game}""")
         record_status = fc_record.main(fc_challange_id=self.replay.id,
                                        fc_time=self.replay.length,
                                        kill_time=self.config['record_timeout'],
-                                       fcadefbneo_path=self.config['fcadefbneo_dir'],
+                                       fcadefbneo_path=self.config['fcadefbneo_path'],
                                        fcreplay_path=self.config['fcreplay_dir'],
-                                       game_name=self.game_name
+                                       game_name=self.replay.game
                                        )
 
         # Check recording status
@@ -203,7 +209,7 @@ class Replay:
         logging.info("Creating description")
 
         # Added detected characters
-        if self.detected_characters is not None and self.game_name in self.config['supported_character_detect']:
+        if self.detected_characters is not None and self.replay.game in self.config['supported_character_detect']:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
                 "({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
                 "\nFightcade replay id: {self.replay.id}"

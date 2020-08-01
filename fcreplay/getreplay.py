@@ -50,8 +50,6 @@ def add_replay(replay, emulator, game, player_replay=True):
     status = 'ADDED'
     date_added = datetime.datetime.utcnow()
     player_requested = player_replay
-    emulator = emulator
-    game = game
 
     # Insert into database
     logging.info(f"Looking for {challenge_id}")
@@ -108,6 +106,7 @@ def get_replay(profile, url, player_requested=False):
     emulator = url.split('/')[3]
     game = url.split('/')[4]
     challenge_id = url.split('/')[5]
+    logging.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
 
     # Get play replays
     query = {

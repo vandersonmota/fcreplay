@@ -20,7 +20,7 @@
       * [Recording a replay](#recording-a-replay)
       * [Running automatically on startup](#running-automatically-on-startup)
 
-<!-- Added by: gino, at: Thu 30 Jul 2020 07:54:48 PM NZST -->
+<!-- Added by: gino, at: Sun 02 Aug 2020 11:56:02 AM NZST -->
 
 <!--te-->
 
@@ -62,7 +62,7 @@ Because fightcade doesn't have the ability to record to a video file you need to
 
 For this project [Open Broadcaster Software](https://obsproject.com/) is used to encode the video.
 
-The i3 window manager is used to ensure that the ggpofba-ng window is always in the same place, and have preconfigured OBS to record that area.
+The i3 window manager is used to ensure that the fcadefbneo window is always in the same place, and have preconfigured OBS to record that area.
 
 This is all done in a headless X11 session
 
@@ -144,17 +144,13 @@ startx
 x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
 ```
 
-Download and install fightcade2:
+Download and install the linux version of fightcade2:
 ```commandline
 cd /home/fcrecorder/
 cd fcreplay
-wget --trust-server-names https://www.fightcade.com/download/windows
-wine Fightcade-win32-latest.exe
+wget "<url to linux fightcade2>"
+tar xvf <archive>
 ```
-
-* When prompted by wine, install gecko
-* Change installation path to c:\fc2
-  * Ignore any installation errors
 
 Start the pulseaudio server
 ```commandline
@@ -166,36 +162,21 @@ Check that it's working by run pavucontrol
 pavuconrol
 ```
 
-In the i3 session, run ggpofba-ng:
+In the i3 session, run fcadefbneo
 ```commandline
-cd ~/fcreplay/pyqtggpo-master
-wine ggpofba-ng.exe
+cd ~/fcreplay/Fightcade/emulator/fcadefbneo
+wine fcadefbneo.exe
 ```
 
 And configure it with:
- 1. Select blitter: Enhanced.
- 2. Blitter options, mark these:
-     1. Enable Pre-scale
-     2. Pre-scale using SoftFX
-     3. RGB effects
-     4. Advanced settings: Force 16-bit emulation & Use DirectX texture management
- 3. Stretch: Correct aspect ratio
+ 1. Blitter options, disable scanlines
 
 Close ggpofba, and run OBS:
 ```commandline
 obs
 ```
 
-Configure OBS for your systems performance. You want to change the video output directory to `~/fcreplay/videos` with a static filename (set in the advanced section) as `replay`. Make sure to disable recording of the mouse cursor as well
-
-Now you need to configure the scene. I found the best way to do this was to have ggpofba running, then switch OBS to a i3 floating window (win+shift+space).
-
- * I'm using a canvas resolution of 512x384 and a output resolutuon of 512.384.
- * For the screen capture I'm using the following crop/pad filter settings:
-   * Left: 514
-   * Top: 204
-   * Right: 2
-   * Bottom: 184
+Configure OBS for your systems performance. The included configuration should work out of the box
 
 # Usage
 

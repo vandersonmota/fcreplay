@@ -22,11 +22,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
 
 
 def start_fcadefbneo(fcadefbneo_path=None, fc_challenge_id=None, game_name=None):
+    logging.info(f"/usr/bin/wine {fcadefbneo_path}/fcadefbneo.exe quark:stream,{game_name},{fc_challenge_id}.2,7100 -w")
     fbneo_rc = subprocess.run(
         [
             '/usr/bin/wine',
             f'{fcadefbneo_path}/fcadefbneo.exe',
-            f'quark:stream,{game_name},{fc_challenge_id},7100',
+            f'quark:stream,{game_name},{fc_challenge_id}.2,7100',
             '-w'
         ]
     )
@@ -59,7 +60,9 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
     begin_time = datetime.datetime.now()
 
     # Start ggpofbneo
-    logging.info("Starting fcadefbneo")
+    logging.info("Starting fcadefbneo thread")
+    logging.debug(f"Arguments: {fcadefbneo_path}, {fc_challange_id}, {game_name}")
+
     ggpo_thread = threading.Thread(target=start_fcadefbneo, args=[
                                    fcadefbneo_path, fc_challange_id, game_name])
     ggpo_thread.start()
@@ -87,8 +90,10 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
         running_time = (datetime.datetime.now() - begin_time).seconds
 
         screen_ggpo_capture = ImageGrab.grab(
+            backend='maim',
             bbox=(485, 0, 514, 18)).convert('RGB')
         screen_capture1 = ImageGrab.grab(
+            backend='maim',
             bbox=(800, 100, 950, 650)).convert('RGB')
 
         screen_ggpo_capture.save('screen_ggpo_capture.png')
@@ -108,9 +113,12 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
             if diff.getbbox():
                 logging.info('Detected non-black GGPO screen')
                 # Look for non-static image
-                screen_capture2 = ImageGrab.grab(bbox=(800, 100, 950, 650))
+                screen_capture2 = ImageGrab.grab(
+                    backend='maim',
+                    bbox=(800, 100, 950, 650))
                 screen_capture2.save('screen_capture2.png')
                 screen_capture2 = ImageGrab.grab(
+                    backend='maim',
                     bbox=(800, 100, 950, 650)).convert('RGB')
                 diff = ImageChops.difference(screen_capture1, screen_capture2)
 
