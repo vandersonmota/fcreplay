@@ -5,7 +5,6 @@ import os
 import sys
 import time
 
-from fcreplay import get as fc_get
 from fcreplay.gcloud import destroy_fcreplay
 from fcreplay.replay import Replay
 
@@ -67,12 +66,8 @@ def main(Debug, Gcloud):
             replay.db.update_created_replay(challenge_id=replay.replay.id)
 
         else:
-            if config['auto_add_more']:
-                logging.info('Auto adding more replays')
-                fc_get.get_replays(config['auto_add_search_string'])
-            else:
-                logging.info("No more replays. Waiting for replay submission")
-                time.sleep(5)
+            logging.info("No more replays. Waiting for replay submission")
+            time.sleep(5)
 
         if Gcloud:
             destroy_fcreplay()

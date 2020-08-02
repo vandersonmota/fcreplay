@@ -71,7 +71,7 @@ resource "google_compute_instance" "default" {
   boot_disk {
     initialize_params {
       image = "projects/fcrecorder/global/images/fedora-32"
-      size = "20"
+      size = "40"
     }
   }
 

@@ -78,8 +78,8 @@ This is all done in a headless X11 session
 To run this, you need:
  1. A VM or physical machine.
      1. With at least 4 Cores (Fast ones would be ideal)
-     1. With at least 2GB Ram
-     1. With at least 20GB of storage (Though you probably won't use that much)
+     1. With at least 4GB Ram
+     1. With at least 30GB of storage 
  1. Running Fedora 32 (you can probably make this work in other distributions as well)
      1. You really want to use a minimal installation
  1. Some familiarity with linux will help
