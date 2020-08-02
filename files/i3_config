@@ -15,7 +15,7 @@ set $mod Mod4
 # is used in the bar {} block below.
 font pango:monospace 8
 
-# exec "xterm -e /home/fbarecorder/start.sh"
+# exec "xterm -e /home/fcrecorder/startup.sh"
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).

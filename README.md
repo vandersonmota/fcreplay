@@ -178,6 +178,19 @@ obs
 
 Configure OBS for your systems performance. The included configuration should work out of the box
 
+### Google cloud
+To enable automatic recording with google cloud, you need to uncomment the following line in `~/.config/i3/config`
+```
+# exec "xterm -e /home/fcrecorder/startup.sh"
+```
+
+And enable the fcrecord service with:
+```commandline
+systemctl enable fcrecord
+```
+
+This will cause `fcreplayloop --gcloud` to be automatically run when the instance is started.
+
 # Usage
 
 ## Activating
@@ -193,7 +206,6 @@ This will download a replay, and place it in the database
 fcreplayget <fightcade profile> <replay url>
 ```
 
-
 ## Recording a replay
 Within a Xorg session:
 ```commandline
@@ -207,3 +219,17 @@ To run fcreplay automatically on startup you need to enable the service, and unc
 systemctl enable fcrecord
 sed -i 's/^# exec "xterm/exec "xterm/' .config/i3/config
 ```
+
+## Google cloud
+Once you have setup the base image, you need to make a image called: fcreplay-image:
+```commandline
+gcloud compute images create fcreplay-image \
+  --source-disk fcrecorder\
+  --source-disk-zone us-central1-a \
+  --family fedora32 \
+  --storage-location us-central1
+```
+
+Once you have created a image, you can enable the scheduled job to check for replays to encode. Once a replay to encode has been found, the scheduler will call the google cloud function `check_for_fcreplay`. This will look for a replay in the database with the status 'ADDED'. It will then launch compute engine instance called `fcreplay-image-1` from the `fcreplay-image` instance.
+
+The instance will look for a replay on startup and begin encoding.
