@@ -27,6 +27,12 @@ resource "google_project_iam_binding" "functions_invoker" {
   members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
 }
 
+resource "google_project_iam_binding" "monitoring_editor" {
+  project = "fcrecorder"
+  role = "roles/monitoring.editor"
+  members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
+}
+
 // Add VNC Firewall rule
 resource "google_compute_firewall" "incomming-vnc" {
   name    = "incomming-vnc"

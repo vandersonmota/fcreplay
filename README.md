@@ -232,4 +232,11 @@ gcloud compute images create fcreplay-image \
 
 Once you have created a image, you can enable the scheduled job to check for replays to encode. Once a replay to encode has been found, the scheduler will call the google cloud function `check_for_fcreplay`. This will look for a replay in the database with the status 'ADDED'. It will then launch compute engine instance called `fcreplay-image-1` from the `fcreplay-image` instance.
 
-The instance will look for a replay on startup and begin encoding.
+Once started, the instance will look for a replay on startup and begin encoding.
+
+If you want to see the logs, the following query should work:
+
+```
+(logName="projects/fcrecorder/logs/fcreplay" AND labels."compute.googleapis.com/resource_name" = "fcreplay-image-1") OR
+(resource.type="cloud_function" AND severity=INFO AND labels.execution_id:*)
+```
