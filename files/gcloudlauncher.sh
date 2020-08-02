@@ -11,12 +11,4 @@ if [[ $service_name == 'fcreplay-image-1' ]]; then
     startx
 fi
 
-# Do post processing
-if [[ $service_name == 'fcreplay-postprocessing-1' ]]; then
-    logger "Starting postprocessing as `whoami`"
-    cd ~/fcreplay
-    source ./venv/bin/activate
-    fcreplaycloudpost
-fi
-
 exit 0
