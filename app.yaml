@@ -1,0 +1,2 @@
+runtime: python38
+entrypoint: gunicorn -b :$PORT fcreplay.site.main:app
