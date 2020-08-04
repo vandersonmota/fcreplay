@@ -93,6 +93,7 @@ class Replays(db.Model):
     status = db.Column(db.String)
     date_added = db.Column(db.Integer)
     player_requested = db.Column(db.Boolean)
+    game = db.Column(db.String)
 
 
 class Descriptions(db.Model):
@@ -218,61 +219,43 @@ def search():
     else:
         raise LookupError
 
-    if (char1 == 'Any' and char2 == 'Any'):
-        logging.debug(f'Player Requested: {player_requested}')
+    if char1 == 'Any':
+        char1 = '%'
+    if char2 == 'Any':
+        char2 = '%'
 
-        pagination = Replays.query.filter(
-            Replays.created == 'yes'
-        ).filter(
-            Replays.failed == 'no'
-        ).filter(
-            Replays.player_requested == player_requested
-        ).filter(
-            Replays.id.in_(
-                Descriptions.query.with_entities(Descriptions.id).filter(
-                    Descriptions.description.ilike(f'%{search_query}%')
-                )
+    logging.debug(f'Player Requested: {player_requested}')
+
+    replay_query = Replays.query.filter(
+        Replays.created == 'yes'
+    ).filter(
+        Replays.failed == 'no'
+    ).filter(
+        Replays.game == 'sfiii3nr1'
+    ).filter(
+        Replays.player_requested == player_requested
+    ).filter(
+        Replays.id.in_(
+            Descriptions.query.with_entities(Descriptions.id).filter(
+                Descriptions.description.ilike(f'%{search_query}%')
             )
-        ).order_by(order).paginate(page, per_page=9)
-
-    else:
-        if char1 == 'Any':
-            char1 = '%'
-        if char2 == 'Any':
-            char2 = '%'
-
-        logging.debug(f'Player Requested: {player_requested}')
-
-        replay_query = Replays.query.filter(
-            Replays.created == 'yes'
-        ).filter(
-            Replays.failed == 'no'
-        ).filter(
-            Replays.player_requested == player_requested
-        ).filter(
-            Replays.id.in_(
-                Descriptions.query.with_entities(Descriptions.id).filter(
-                    Descriptions.description.ilike(f'%{search_query}%')
-                )
-            )
-        ).filter(
-            Replays.id.in_(
+        )
+    ).filter(
+        Replays.id.in_(
+            Character_detect.query.with_entities(Character_detect.challenge_id).filter(
+                Character_detect.p1_char.ilike(
+                    f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
+            ).union(
                 Character_detect.query.with_entities(Character_detect.challenge_id).filter(
                     Character_detect.p1_char.ilike(
-                        f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
-                ).union(
-                    Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                        Character_detect.p1_char.ilike(
-                            f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
-                    )
+                        f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
                 )
             )
-        ).order_by(order)
+        )
+    ).order_by(order)
 
-        logging.debug(replay_query)
-
-        pagination = replay_query.paginate(page, per_page=9)
-
+    logging.debug(replay_query)
+    pagination = replay_query.paginate(page, per_page=9)
     replays = pagination.items
 
     return(render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm))

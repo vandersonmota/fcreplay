@@ -227,7 +227,7 @@ class Replay:
             # Check if file exists:
             if not os.path.exists(self.config['description_append_file'][1]):
                 logging.error(
-                    f"Description append file {self.config['description_append_file'][0]} doesn't exist")
+                    f"Description append file {self.config['description_append_file'][1]} doesn't exist")
                 return False
             else:
                 with open(self.config['description_append_file'][1]) as description_append:
