@@ -8,7 +8,7 @@
       </h4>
     </div>
     <div class="card-body">
-      <form action="/submitResult" method="POST" class="form" role="form">
+      <form action="/submitResult" method="POST" class="form" role="form" id="submitForm">
         <ul>
           <div class="input-group top-buffer">
             <div class="row">
@@ -21,9 +21,7 @@
             </div>
           </div>
         </ul>
-        <div class="row">
-          {{ render_field(submitForm.submit) }}
-        </div>
+          {{ render_form_row([submitForm.submit]) }}
       </form>
     </div>
   </div>

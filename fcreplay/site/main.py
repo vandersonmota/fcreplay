@@ -64,11 +64,14 @@ class SearchForm(FlaskForm):
     ]
 
     search = StringField()
-    char1 = SelectField('Character1', choices=characters, render_kw={'class': 'fixed'})
-    char2 = SelectField('Character2', choices=characters, render_kw={'class': 'fixed'})
+    char1 = SelectField('Character1', choices=characters,
+                        render_kw={'class': 'fixed'})
+    char2 = SelectField('Character2', choices=characters,
+                        render_kw={'class': 'fixed'})
     player_requested = BooleanField('Player Submitted')
-    order_by = SelectField('Order by', choices=orderby_list, render_kw={'class': 'fixed'})
-    submit = SubmitField()
+    order_by = SelectField('Order by', choices=orderby_list,
+                           render_kw={'class': 'fixed'})
+    submit = SubmitField('Search')
 
 
 class SubmitForm(FlaskForm):
@@ -118,32 +121,56 @@ def index():
 
     return(render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm))
 
+
 @app.route('/submit')
 def submit():
     searchForm = SearchForm()
     submitForm = SubmitForm()
-    return(render_template('submit.j2.html', form=searchForm, submitForm=submitForm))
+    return(render_template('submit.j2.html', form=searchForm, submitForm=submitForm, submit_active=True))
 
-@app.route('/submitResult')
+
+@app.route('/submitResult', methods=['POST', 'GET'])
 def submitResult():
     logging.debug(f"Session: {session}")
     # I feel like there should be a better way to do this
     if request.method == 'POST':
-        result = SearchForm(request.submitForm)
+        result = SubmitForm(request.form)
 
         player_id = result.player_id.data
         challenge_id = result.challenge_url.data
         session['player_id'] = result.player_id.data
         session['challenge_url'] = result.challenge_url.data
 
+        from fcreplay.getreplay import get_replay
+        replay_result = get_replay(
+            player_id, challenge_id, player_requested=True)
+
+        session['replay_result'] = replay_result
+
         # Add replay and get status here
-        return redirect(url_for('search'))
+        return redirect(url_for('submitResult'))
     else:
-        return(render_template('submitResult.j2.html'))
+        searchForm = SearchForm()
+        result = session['replay_result']
+        return(render_template('submitResult.j2.html', form=searchForm, result=result, submt_active=True))
+
 
 @app.route('/assets/<path:path>')
 def send_js(path):
     return send_from_directory('templates/assets', path)
+
+
+@app.route('/about')
+def about():
+    searchForm = SearchForm()
+    return (render_template('about.j2.html', about_active=True, form=searchForm))
+
+
+# @app.route('/status')
+# def status():
+#     searchForm = SearchForm()
+#     return(render_template('status.j2.html', status_active=True, form=searchForm))
+
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():

@@ -15,6 +15,7 @@ chardet
 click
 dominate
 google-python-cloud-debugger
+gunicorn
 idna
 itsdangerous
 jedi

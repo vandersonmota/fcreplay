@@ -1,0 +1,28 @@
+{% extends 'dashboard.j2.html' %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h4 class="card-title">
+        About
+      </h4>
+    </div>
+    <div class="card-body">
+      <h2>What is this?</h2>
+      <p>
+        FightCade Replays are genereated using
+        <a href="https://github.com/glisignoli/fcreplay">fcreplay</a>
+      </p>
+      <h2>FAQ</h2>
+      <h3>Why are some thumbnails/videos missing?</h3>
+      <p>
+        If the video was recently added, then it is probably still
+        processing. Check back in a little while.
+      </p>
+      <p>
+        <a href="http://twitter.com/glisignoli">@glisignoli</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

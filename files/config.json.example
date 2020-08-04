@@ -39,6 +39,7 @@
     "remove_generated_files": true,
     "replay_pages": "20",
     "sql_baseurl": "postgres://user:pass@address:port",
+    "secret_key": "some_random_data",
     "supported_character_detect": [
         "sfiii3nr1"
     ],

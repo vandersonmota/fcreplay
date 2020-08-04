@@ -4,6 +4,7 @@ from retrying import retry
 import datetime
 import json
 import logging
+import re
 import requests
 import sys
 
@@ -101,12 +102,19 @@ def get_replay(profile, url, player_requested=False):
         profile (String): Players profile name
         url (String): Link to replay
     """
+    # Validate url, this could probably be done better
+    pattern = re.compile('^https://replay.fightcade.com/fbneo/.*/[0-9]*-[0-9]*$')
+    if not pattern.match(url):
+        return('INVALID_URL')
 
     # Parse url
     emulator = url.split('/')[3]
     game = url.split('/')[4]
     challenge_id = url.split('/')[5]
     logging.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
+
+    if game not in config['supported_games']:
+        return('UNSUPPORTED_GAME')
 
     # Get play replays
     query = {
