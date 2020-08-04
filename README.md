@@ -14,13 +14,15 @@
          * [Configure base image](#configure-base-image)
       * [Deployment](#deployment)
       * [Post Deployment Setup](#post-deployment-setup)
+         * [Google cloud](#google-cloud)
    * [Usage](#usage)
       * [Activating](#activating)
       * [Getting replays](#getting-replays)
       * [Recording a replay](#recording-a-replay)
       * [Running automatically on startup](#running-automatically-on-startup)
+      * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Tue 04 Aug 2020 08:37:52 PM NZST -->
+<!-- Added by: gino, at: Tue 04 Aug 2020 08:40:45 PM NZST -->
 
 <!--te-->
 
@@ -78,8 +80,8 @@ This is all done in a headless X11 session
 To run this, you need:
  1. A VM or physical machine.
      1. With at least 4 Cores (Fast ones would be ideal)
-     1. With at least 2GB Ram
-     1. With at least 20GB of storage (Though you probably won't use that much)
+     1. With at least 4GB Ram
+     1. With at least 30GB of storage 
  1. Running Fedora 32 (you can probably make this work in other distributions as well)
      1. You really want to use a minimal installation
  1. Some familiarity with linux will help
@@ -178,6 +180,19 @@ obs
 
 Configure OBS for your systems performance. The included configuration should work out of the box
 
+### Google cloud
+To enable automatic recording with google cloud, you need to uncomment the following line in `~/.config/i3/config`
+```
+# exec "xterm -e /home/fcrecorder/startup.sh"
+```
+
+And enable the fcrecord service with:
+```commandline
+systemctl enable fcrecord
+```
+
+This will cause `fcreplayloop --gcloud` to be automatically run when the instance is started.
+
 # Usage
 
 ## Activating
@@ -193,7 +208,6 @@ This will download a replay, and place it in the database
 fcreplayget <fightcade profile> <replay url>
 ```
 
-
 ## Recording a replay
 Within a Xorg session:
 ```commandline
@@ -206,4 +220,25 @@ To run fcreplay automatically on startup you need to enable the service, and unc
 ```commandline
 systemctl enable fcrecord
 sed -i 's/^# exec "xterm/exec "xterm/' .config/i3/config
+```
+
+## Google cloud
+Once you have setup the base image, you need to make a image called: fcreplay-image:
+```commandline
+gcloud compute images create fcreplay-image \
+  --source-disk fcrecorder\
+  --source-disk-zone us-central1-a \
+  --family fedora32 \
+  --storage-location us-central1
+```
+
+Once you have created a image, you can enable the scheduled job to check for replays to encode. Once a replay to encode has been found, the scheduler will call the google cloud function `check_for_fcreplay`. This will look for a replay in the database with the status 'ADDED'. It will then launch compute engine instance called `fcreplay-image-1` from the `fcreplay-image` instance.
+
+Once started, the instance will look for a replay on startup and begin encoding.
+
+If you want to see the logs, the following query should work:
+
+```
+(logName="projects/fcrecorder/logs/fcreplay" AND labels."compute.googleapis.com/resource_name" = "fcreplay-image-1") OR
+(resource.type="cloud_function" AND severity=INFO AND labels.execution_id:*)
 ```

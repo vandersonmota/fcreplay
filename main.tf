@@ -27,6 +27,20 @@ resource "google_project_iam_binding" "functions_invoker" {
   members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
 }
 
+resource "google_project_iam_binding" "logs_writer" {
+  project = "fcrecorder"
+  role = "roles/logging.logWriter"
+  members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
+}
+
+resource "google_project_iam_binding" "metric_writer
+" {
+  project = "fcrecorder"
+  role = "roles/monitoring.metricWriter"
+  members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
+}
+
+
 // Add VNC Firewall rule
 resource "google_compute_firewall" "incomming-vnc" {
   name    = "incomming-vnc"
@@ -71,7 +85,7 @@ resource "google_compute_instance" "default" {
   boot_disk {
     initialize_params {
       image = "projects/fcrecorder/global/images/fedora-32"
-      size = "20"
+      size = "40"
     }
   }
 

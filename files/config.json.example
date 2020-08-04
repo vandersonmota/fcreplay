@@ -1,6 +1,4 @@
 {
-    "auto_add_more": true,
-    "auto_add_search_string": "sfiii3nr1",
     "channel": "sfiii3nr1",
     "description_append_file": [
         false,
@@ -9,11 +7,11 @@
     "detect_chars": true,
     "fcadefbneo_path": "/home/fcrecorder/fcreplay/Fightcade/emulator/fbneo",
     "fcreplay_dir": "/home/fcrecorder/fcreplay",
-    "gcloud_bucket": "fba-recorder_temp-videos",
     "gcloud_destroy_on_failed": true,
     "gcloud_project": "gcloud project id",
-    "gcloud_region": "gcloud region id",
+    "gcloud_zone": "gcloud zone id",
     "gcloud_storage_creds_path": "/path/to/creds.json",
+    "gcloud_compute_service_account": "gcloud compute service account email",
     "ia_settings": {
         "collection": "opensource_movies",
         "creator": "Your Name",
