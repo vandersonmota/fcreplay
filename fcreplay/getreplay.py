@@ -9,7 +9,7 @@ import re
 import requests
 import sys
 
-if os.environ['REMOTE_DEBUG']:
+if 'REMOTE_DEBUG' in os.environ:
     import debugpy
     debugpy.listen(("0.0.0.0", 5678))
     debugpy.wait_for_client()

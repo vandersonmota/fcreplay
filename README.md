@@ -22,7 +22,7 @@
       * [Running automatically on startup](#running-automatically-on-startup)
       * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Wed 05 Aug 2020 05:15:58 PM NZST -->
+<!-- Added by: gino, at: Wed 05 Aug 2020 08:44:49 PM NZST -->
 
 <!--te-->
 
@@ -128,7 +128,7 @@ I've include a basic ansible playbook for the installation, you will need to hav
    3. Add the user to the wheel group: `groupmems -a deployment -g wheel`
    4. Copy your ssh key with `ssh-copy-id deployment@<host>`
    5. Disable password login in the `/etc/ssh/sshd_config` and restart sshd: `systemctl restart sshd`
-   6. `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True}' playbook.yml`
+   6. `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True, "FC2_PATH": "/path/to/local/FC2" }' playbook.yml`
  
 ## Post Deployment Setup
 Login and switch to the fcrecorder user, then create a x11vnc password as the fcrecorder user (It will be stored in ~/.vnc/passwd):
@@ -146,14 +146,6 @@ startx
 x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
 ```
 
-Download and install the linux version of fightcade2:
-```commandline
-cd /home/fcrecorder/
-cd fcreplay
-wget "<url to linux fightcade2>"
-tar xvf <archive>
-```
-
 Start the pulseaudio server
 ```commandline
 pulseaudio --start
@@ -166,7 +158,7 @@ pavuconrol
 
 In the i3 session, run fcadefbneo
 ```commandline
-cd ~/fcreplay/Fightcade/emulator/fcadefbneo
+cd ~/fcreplay/Fightcade/emulator/fbneo/fcadefbneo
 wine fcadefbneo.exe
 ```
 
