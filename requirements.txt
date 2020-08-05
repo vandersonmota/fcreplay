@@ -1,17 +1,18 @@
-numpy
-requests
-retrying
-internetarchive
-opencv-python
 beautifulsoup4
-sqlalchemy
-sqlalchemy-utils
+debugpy
+google-api-python-client
+google-cloud-storage
+internetarchive
+numpy
+opencv-python
 pillow
 psycopg2
 pyscreenshot
+requests
+retrying
 sqlalchemy
-google-api-python-client
-google-cloud-storage
+sqlalchemy
+sqlalchemy-utils
 
 Bootstrap-Flask
 Flask
@@ -27,8 +28,8 @@ certifi
 chardet
 click
 dominate
-gunicorn
 google-python-cloud-debugger
+gunicorn
 idna
 itsdangerous
 psycopg2

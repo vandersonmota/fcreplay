@@ -8,6 +8,11 @@ import time
 from fcreplay.gcloud import destroy_fcreplay
 from fcreplay.replay import Replay
 
+if os.environ['REMOTE_DEBUG']:
+    import debugpy
+    debugpy.listen(("0.0.0.0", 5678))
+    debugpy.wait_for_client()
+
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
 

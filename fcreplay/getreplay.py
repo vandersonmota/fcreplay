@@ -4,9 +4,15 @@ from retrying import retry
 import datetime
 import json
 import logging
+import os
 import re
 import requests
 import sys
+
+if os.environ['REMOTE_DEBUG']:
+    import debugpy
+    debugpy.listen(("0.0.0.0", 5678))
+    debugpy.wait_for_client()
 
 with open("config.json", "r") as json_data_file:
     config = json.load(json_data_file)
