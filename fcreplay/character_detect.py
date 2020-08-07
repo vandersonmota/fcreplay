@@ -9,6 +9,9 @@ import logging
 with open("config.json", "r") as json_data_file:
     config = json.load(json_data_file)
 
+with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json'), "r") as json_data_file:
+    character_dict = json.load(json_data_file)
+
 # Setup Log
 logging.basicConfig(
         format='%(asctime)s %(levelname)s: %(message)s',
@@ -18,14 +21,14 @@ logging.basicConfig(
 )
 
 
-def process_img(frame_rgb, character_images, count):
+def process_img(frame_rgb, character_images, count, game):
     # We only need a frame ever second
     if not count % 120 == 0:
         return
 
     # We only care about the areas with character names
     x_len = frame_rgb.shape[1]
-    cropped_frame = frame_rgb[35:60, 0:x_len, :]
+    cropped_frame = frame_rgb[character_dict[game]['location']['x1']:character_dict[game]['location']['x2'], 0:x_len, :]
 
     # Convert to grayscale
     frame_gray = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2GRAY)
@@ -42,6 +45,7 @@ def process_img(frame_rgb, character_images, count):
             threshold = 0.85
             loc = np.where(res >= threshold)
             for pt in zip(*loc[::-1]):
+                # Split roughtly the middle of the screen
                 if pt[0] < 200:
                     if character not in p1_character_score:
                         p1_character_score[character] = 1
@@ -58,7 +62,7 @@ def process_img(frame_rgb, character_images, count):
         return False, False
 
 
-def character_detect(videofile):
+def character_detect(game, videofile):
     """Detects characters
 
     Args:
@@ -68,31 +72,12 @@ def character_detect(videofile):
         List: [[p1,p2,time][p1,p2,time]...]
     """
     vidcap = cv2.VideoCapture(videofile)
-    characters = [
-        "alex",
-        "akuma",
-        "chunli",
-        "dudley",
-        "elena",
-        "hugo",
-        "ibuki",
-        "ken",
-        "makoto",
-        "necro",
-        "oro",
-        "q",
-        "remy",
-        "ryu",
-        "sean",
-        "twelve",
-        "urien",
-        "yang",
-        "yun"
-    ]
 
+    characters = character_detect[game]['characters']
+    
     # Load all character images
     character_images = {}
-    charnames_dir = pkg_resources.resource_filename('fcreplay', 'data/charnames')
+    charnames_dir = pkg_resources.resource_filename('fcreplay', f'data/{game}/charnames')
     for character in characters:
         for i in range(1, 10):
             if character not in character_images:
@@ -108,7 +93,7 @@ def character_detect(videofile):
         if not success:
             break         # loop and a half construct is useful
         count += 1
-        match = process_img(image, character_images, count)
+        match = process_img(image, character_images, count, game)
         if match is not None:
             p1 = match[0]
             p2 = match[1]
@@ -127,4 +112,4 @@ def character_detect(videofile):
 
 
 if __name__ == "__main__":
-    character_detect(sys.argv[1])
+    character_detect(sys.argv[1], sys.argv[2])

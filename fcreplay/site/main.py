@@ -35,7 +35,7 @@ logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 
-class SearchForm(FlaskForm):
+class AdvancedSearchForm(FlaskForm):
     characters = [
         ('Any', 'Any'),
         ('alex', 'alex'),
@@ -63,12 +63,49 @@ class SearchForm(FlaskForm):
         ('date_added', 'Date Added')
     ]
 
+    # Generate supported games
+    game_list = []
+    game_list.append(
+        ('Any', 'Any')
+    )
+
+    for game in sorted(config['supported_games']):
+        game_list.append(
+            (game, config['supported_games'][game]['game_name'])
+        )
+
     search = StringField()
+    game = SelectField('Game', choices=game_list,
+                       render_kw={'class': 'fixed'})
     char1 = SelectField('Character1', choices=characters,
                         render_kw={'class': 'fixed'})
     char2 = SelectField('Character2', choices=characters,
                         render_kw={'class': 'fixed'})
     player_requested = BooleanField('Player Submitted')
+    order_by = SelectField('Order by', choices=orderby_list,
+                           render_kw={'class': 'fixed'})
+    submit = SubmitField('Search')
+
+
+class SearchForm(FlaskForm):
+    orderby_list = [
+        ('date_replay', 'Replay Date'),
+        ('date_added', 'Date Added')
+    ]
+
+    # Generate supported games
+    game_list = []
+    game_list.append(
+        ('Any', 'Any')
+    )
+    for game in sorted(config['supported_games']):
+        game_list.append(
+            (game, config['supported_games'][game]['game_name'])
+        )
+
+    search = StringField()
+    game = SelectField('Game', choices=game_list,
+                       render_kw={'class': 'fixed'})
     order_by = SelectField('Order by', choices=orderby_list,
                            render_kw={'class': 'fixed'})
     submit = SubmitField('Search')
@@ -120,14 +157,14 @@ def index():
     ).order_by(Replays.date_added.desc()).paginate(page, per_page=9)
     replays = pagination.items
 
-    return(render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm))
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
 
 
 @app.route('/submit')
 def submit():
     searchForm = SearchForm()
     submitForm = SubmitForm()
-    return(render_template('submit.j2.html', form=searchForm, submitForm=submitForm, submit_active=True))
+    return render_template('submit.j2.html', form=searchForm, submitForm=submitForm, submit_active=True)
 
 
 @app.route('/submitResult', methods=['POST', 'GET'])
@@ -153,7 +190,7 @@ def submitResult():
     else:
         searchForm = SearchForm()
         result = session['replay_result']
-        return(render_template('submitResult.j2.html', form=searchForm, result=result, submt_active=True))
+        return render_template('submitResult.j2.html', form=searchForm, result=result, submt_active=True)
 
 
 @app.route('/assets/<path:path>')
@@ -164,51 +201,53 @@ def send_js(path):
 @app.route('/about')
 def about():
     searchForm = SearchForm()
-    return (render_template('about.j2.html', about_active=True, form=searchForm))
+
+    sortedGames = sorted(config['supported_games'])
+    supportedGames = {}
+    for game in sortedGames:
+        supportedGames[game] = config['supported_games'][game]
+
+    numberOfReplays = db.session.execute('select count(id) from replays').first()[0]
+
+    return render_template('about.j2.html', about_active=True, form=searchForm, supportedGames=supportedGames, numberOfReplays=numberOfReplays)
 
 
-# @app.route('/status')
-# def status():
-#     searchForm = SearchForm()
-#     return(render_template('status.j2.html', status_active=True, form=searchForm))
+@app.route('/advancedSearch')
+def advancedSearch():
+    searchForm = SearchForm()
+    advancedSearchForm = AdvancedSearchForm()
+    return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm)
 
 
-@app.route('/search', methods=['POST', 'GET'])
-def search():
+@app.route('/advancedSearchResult', methods=['POST', 'GET'])
+def advancedSearchResult():
     logging.debug(f"Session: {session}")
     # I feel like there should be a better way to do this
     if request.method == 'POST':
-        result = SearchForm(request.form)
-
-        search_query = result.search.data
-        char1 = result.char1.data
-        char2 = result.char2.data
-        player_requested = result.player_requested.data
-        order_by = result.order_by.data
-
-        searchForm = SearchForm()
+        result = AdvancedSearchForm(request.form)
 
         session['search'] = result.search.data
         session['char1'] = result.char1.data
         session['char2'] = result.char2.data
         session['player_requested'] = result.player_requested.data
         session['order_by'] = result.order_by.data
-        return redirect(url_for('search'))
+        session['game'] = result.game.data
+
+        return redirect(url_for('advancedSearchResult'))
     else:
         search_query = session['search']
         char1 = session['char1']
         char2 = session['char2']
         player_requested = session['player_requested']
         order_by = session['order_by']
+        game = session['game']
 
-        searchForm = SearchForm(request.form, char1=char1,
-                                char2=char2, search=search_query,
-                                player_requested=player_requested)
+    searchForm = SearchForm()
 
     if player_requested:
-        player_requested = 'yes'
+        player_requested = True
     else:
-        player_requested = 'no'
+        player_requested = False
 
     page = request.args.get('page', 1, type=int)
 
@@ -223,15 +262,15 @@ def search():
         char1 = '%'
     if char2 == 'Any':
         char2 = '%'
-
-    logging.debug(f'Player Requested: {player_requested}')
+    if game == 'Any':
+        game = '%'
 
     replay_query = Replays.query.filter(
-        Replays.created == 'yes'
+        Replays.created == True
     ).filter(
-        Replays.failed == 'no'
+        Replays.failed == False
     ).filter(
-        Replays.game == 'sfiii3nr1'
+        Replays.game.ilike(f'{game}')
     ).filter(
         Replays.player_requested == player_requested
     ).filter(
@@ -258,7 +297,61 @@ def search():
     pagination = replay_query.paginate(page, per_page=9)
     replays = pagination.items
 
-    return(render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm))
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
+
+
+@app.route('/search', methods=['POST', 'GET'])
+def search():
+    logging.debug(f"Session: {session}")
+    # I feel like there should be a better way to do this
+    if request.method == 'POST':
+        result = SearchForm(request.form)
+
+        session['search'] = result.search.data
+        session['order_by'] = result.order_by.data
+        session['game'] = result.game.data
+
+        return redirect(url_for('search'))
+    else:
+        search_query = session['search']
+        order_by = session['order_by']
+        game = session['game']
+
+    searchForm = SearchForm(request.form,
+                            search=search_query,
+                            game=game)
+
+    page = request.args.get('page', 1, type=int)
+
+    if order_by == 'date_replay':
+        order = Replays.date_replay.desc()
+    elif order_by == 'date_added':
+        order = Replays.date_added.desc()
+    else:
+        raise LookupError
+
+    if game == 'Any':
+        game = '%'
+
+    replay_query = Replays.query.filter(
+        Replays.created == True
+    ).filter(
+        Replays.failed == False
+    ).filter(
+        Replays.game.ilike(f'{game}')
+    ).filter(
+        Replays.id.in_(
+            Descriptions.query.with_entities(Descriptions.id).filter(
+                Descriptions.description.ilike(f'%{search_query}%')
+            )
+        )
+    ).order_by(order)
+
+    logging.debug(replay_query)
+    pagination = replay_query.paginate(page, per_page=9)
+    replays = pagination.items
+
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
 
 
 @app.route('/video/<challenge_id>',)
@@ -287,7 +380,7 @@ def videopage(challenge_id):
 
     logging.debug(
         f"Video page, replay: {replay}, characters: {characters}, seek: {seek}")
-    return(render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm))
+    return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm)
 
 
 if __name__ == "__main__":
