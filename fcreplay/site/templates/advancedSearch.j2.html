@@ -21,7 +21,7 @@ render_field, render_form_row %}{% block content %}
             {{ render_field(advancedSearchForm.game) }}
           </div>
 
-          <div class="input-group top-buffer">
+          <div class="input-group top-buffer" id="charSelectGroup" style="visibility: hidden;">
             <div class="row">
               <div class="col">
                 {{ render_field(advancedSearchForm.char1) }}
@@ -32,8 +32,40 @@ render_field, render_form_row %}{% block content %}
             </div>
           </div>
 
-          <div class='row'>
-            <small id="CharacterHelp" class="text-muted"></small>
+          <!-- Only show when a supported game is selected -->
+          <script type="text/javascript" language="javascript">
+            //Get Select data
+            function gameSelect(sel) {
+              var game = sel.value;
+              var game_data = JSON.parse(localStorage.getItem("character_detect"));
+              if (game in game_data) {
+                // Populate fields
+                var chars = game_data[game]['characters'];
+                var innerHTML;
+                for (const c of chars) {
+                  innerHTML += '<option value=\'' + c + '\'>' + c + '</option>'
+                }
+                document.getElementById("char1").innerHTML = innerHTML;
+                document.getElementById("char2").innerHTML = innerHTML;
+                
+                // Make Element Visible
+                document.getElementById("charSelectGroup").style.visibility = 'visible';
+              } else {
+                // Hide Element
+                document.getElementById("charSelectGroup").style.visibility = 'hidden';
+              }
+            };
+
+            // Load supported characters
+            let url = './assets/character_detect.json';
+            fetch(url)
+              .then(response => response.json())
+              .then(data => localStorage.setItem('character_detect', JSON.stringify(data)));
+          </script>
+
+
+          <div class="row">
+            <small id="CharacterHelp" class="text-muted">
               Characters will be searched for both players
             </small>
           </div>

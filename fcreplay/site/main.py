@@ -9,7 +9,7 @@ from wtforms import Form, StringField, BooleanField, SubmitField, SelectField
 import os
 import json
 import logging
-
+import pkg_resources
 
 try:
     import googleclouddebugger
@@ -21,6 +21,9 @@ except ImportError:
 
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
+
+with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
+    character_dict = json.load(json_data_file)
 
 app = Flask(__name__)
 
@@ -76,7 +79,7 @@ class AdvancedSearchForm(FlaskForm):
 
     search = StringField()
     game = SelectField('Game', choices=game_list,
-                       render_kw={'class': 'fixed'})
+                       render_kw={'class': 'fixed', 'onChange': 'gameSelect(this)', 'id': 'game'})
     char1 = SelectField('Character1', choices=characters,
                         render_kw={'class': 'fixed'})
     char2 = SelectField('Character2', choices=characters,
@@ -262,39 +265,39 @@ def advancedSearchResult():
         char1 = '%'
     if char2 == 'Any':
         char2 = '%'
+
     if game == 'Any':
         game = '%'
 
-    replay_query = Replays.query.filter(
-        Replays.created == True
-    ).filter(
-        Replays.failed == False
-    ).filter(
-        Replays.game.ilike(f'{game}')
-    ).filter(
-        Replays.player_requested == player_requested
-    ).filter(
+    replay_query = [
+        Replays.created == True,
+        Replays.failed == False,
+        Replays.game.ilike(f'{game}'),
+        Replays.player_requested == player_requested,
         Replays.id.in_(
             Descriptions.query.with_entities(Descriptions.id).filter(
                 Descriptions.description.ilike(f'%{search_query}%')
             )
         )
-    ).filter(
-        Replays.id.in_(
-            Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                Character_detect.p1_char.ilike(
-                    f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
-            ).union(
+    ]
+
+    if game in character_dict:
+        replay_query.append(
+            Replays.id.in_(
                 Character_detect.query.with_entities(Character_detect.challenge_id).filter(
                     Character_detect.p1_char.ilike(
-                        f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
+                        f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
+                ).union(
+                    Character_detect.query.with_entities(Character_detect.challenge_id).filter(
+                        Character_detect.p1_char.ilike(
+                            f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
+                    )
                 )
             )
         )
-    ).order_by(order)
 
-    logging.debug(replay_query)
-    pagination = replay_query.paginate(page, per_page=9)
+    logging.debug(Replays.query.filter(*replay_query))
+    pagination = Replays.query.filter(*replay_query).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
