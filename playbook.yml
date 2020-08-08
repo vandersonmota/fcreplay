@@ -290,6 +290,14 @@
         enabled: yes
       when: gcloud
 
+    - name: Autostart recording for gcloud
+      replace:
+        path: /home/fcrecorder/.config/i3/config
+        regexp: '^# exec "xterm'
+        replace: 'exec "xterm'
+      become: true
+      become_user: fcrecorder
+
     - name: Create config directory
       file:
         path: /home/fcrecorder/.config
