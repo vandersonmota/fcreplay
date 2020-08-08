@@ -305,17 +305,17 @@
       become: True
       become_user: fcrecorder
 
-    - name: Remove deployment user
-      user:
-        name: deployment
-        state: absent
-        force: true
-      ignore_errors: true
-
     - name: Copy fightcade2
       synchronize:
         src: "{{ FC2_PATH }}"
         dest: /home/fcrecorder/fcreplay/
       become: True
       become_user: fcrecorder
+      ignore_errors: true
+
+    - name: Remove deployment user
+      user:
+        name: deployment
+        state: absent
+        force: true
       ignore_errors: true
