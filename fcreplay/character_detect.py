@@ -74,7 +74,7 @@ def character_detect(game, videofile):
     vidcap = cv2.VideoCapture(videofile)
 
     characters = character_detect[game]['characters']
-    
+
     # Load all character images
     character_images = {}
     charnames_dir = pkg_resources.resource_filename('fcreplay', f'data/{game}/charnames')
@@ -82,7 +82,7 @@ def character_detect(game, videofile):
         for i in range(1, 10):
             if character not in character_images:
                 character_images[character] = {'images': []}
-            character_images[character]['images'].append(cv2.imread(f'{charnames_dir}/{character}{i}.png', 0))
+            character_images[character]['images'].append(cv2.imread(f'{charnames_dir}/{game}/{character}{i}.png', 0))
     count = 0
 
     # [ p1, p2, start-time ]

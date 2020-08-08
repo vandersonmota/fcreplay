@@ -50,7 +50,7 @@ def main(Debug, Gcloud):
             replay.move()
             replay.broken_fix()
 
-            if config['detect_chars'] and replay.replay.game in config['supported_character_detect']:
+            if config['detect_chars'] and config['supported_games'][replay.replay.game]['character_detect']:
                 replay.detect_characters()
                 replay.set_detected_characters()
 
@@ -67,7 +67,7 @@ def main(Debug, Gcloud):
                 replay.remove_generated_files()
 
             replay.remove_job()
-            
+
             replay.db.update_created_replay(challenge_id=replay.replay.id)
 
         else:

@@ -50,7 +50,7 @@ class Replay:
                 if self.config['gcloud_destroy_on_fail']:
                     destroy_fcreplay()
                 sys.exit(1)
-        
+
         return failed
 
     @handle_fail
@@ -185,8 +185,8 @@ class Replay:
         """Detect characters
         """
         self.detected_characters = character_detect.character_detect(
-            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv",
-            self.replay.game)
+            self.replay.game,
+            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv")
 
     @handle_fail
     def set_detected_characters(self):
