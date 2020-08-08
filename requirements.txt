@@ -13,6 +13,7 @@ certifi
 chardet
 click
 debugpy
+docopt
 dominate
 google-api-python-client
 google-cloud-storage
