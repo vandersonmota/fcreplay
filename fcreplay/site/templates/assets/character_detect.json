@@ -1,0 +1,29 @@
+{
+  "sfiii3nr1": {
+    "characters": [
+      "alex",
+      "akuma",
+      "chunli",
+      "dudley",
+      "elena",
+      "hugo",
+      "ibuki",
+      "ken",
+      "makoto",
+      "necro",
+      "oro",
+      "q",
+      "remy",
+      "ryu",
+      "sean",
+      "twelve",
+      "urien",
+      "yang",
+      "yun"
+    ],
+    "location": {
+        "x1": 35,
+        "x2": 60
+    }
+  }
+}

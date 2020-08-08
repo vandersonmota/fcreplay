@@ -185,7 +185,8 @@ class Replay:
         """Detect characters
         """
         self.detected_characters = character_detect.character_detect(
-            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv")
+            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv",
+            self.replay.game)
 
     @handle_fail
     def set_detected_characters(self):
@@ -209,7 +210,7 @@ class Replay:
         logging.info("Creating description")
 
         # Added detected characters
-        if self.detected_characters is not None and self.replay.game in self.config['supported_character_detect']:
+        if self.detected_characters is not None and self.config['supported_games'][self.replay.game]['character_detect']:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
                 "({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
                 "\nFightcade replay id: {self.replay.id}"
@@ -270,7 +271,7 @@ class Replay:
         exist. So we decorate the function with the @retry decorator to try
         again in a little bit. Max of 3 tries
         """
-        title = f"Street Fighter III: 3rd Strike: ({self.replay.p1_loc}) {self.replay.p1} vs" \
+        title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mkv"
         date_short = str(self.replay.date_replay)[10]
@@ -301,7 +302,7 @@ class Replay:
     def upload_to_yt(self):
         """Upload video to youtube
         """
-        title = f"Street Fighter III: 3rd Strike: ({self.replay.p1_loc}) {self.replay.p1} vs "\
+        title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mkv"
         import_format = '%Y-%m-%d %H:%M:%S'

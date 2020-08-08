@@ -9,29 +9,7 @@
     </div>
 
     <div class="input-group top-buffer">
-      <div class="row">
-        <div class="col">
-          {{ render_field(form.char1) }}
-        </div>
-        <div class="col">
-          {{ render_field(form.char2) }}
-        </div>
-      </div>
-      <small id="CharacterHelp" class="text-muted">
-        Characters will be searched for both players
-      </small>
-    </div>
-
-    <div class="input-group top-buffer">
-      <div class="form-check">
-        <label class="form-check-label">
-          <input class="form-check-input is-invalid" id="player_requested" name="player_requested" type="checkbox" value="y">
-          Player Submitted
-          <span class="form-check-sign">
-            <span class="check"></span>
-          </span>
-        </label>
-      </div>
+      {{ render_field(form.game) }}
     </div>
 
     <div class="input-group top-buffer">

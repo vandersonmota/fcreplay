@@ -1,0 +1,102 @@
+{% extends 'dashboard.j2.html' %}{% from 'bootstrap/form.html' import
+render_field, render_form_row %}{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h4 class="card-title">
+        About
+      </h4>
+    </div>
+    <div class="card-body">
+      <form action="/advancedSearchResult" method="POST" class="form" role="form">
+        <ul>
+          <div class="input-group top-buffer">
+            <label for="search" class="bmd-label-floating">
+              Search
+            </label>
+            <input type="text" class="form-control" id="search" name="search" />
+          </div>
+
+          <div class="input-group top-buffer">
+            {{ render_field(advancedSearchForm.game) }}
+          </div>
+
+          <div class="input-group top-buffer" id="charSelectGroup" style="visibility: hidden;">
+            <div class="row">
+              <div class="col">
+                {{ render_field(advancedSearchForm.char1) }}
+              </div>
+              <div class="col">
+                {{ render_field(advancedSearchForm.char2) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Only show when a supported game is selected -->
+          <script type="text/javascript" language="javascript">
+            //Get Select data
+            function gameSelect(sel) {
+              var game = sel.value;
+              var game_data = JSON.parse(localStorage.getItem("character_detect"));
+              if (game in game_data) {
+                // Populate fields
+                var chars = game_data[game]['characters'];
+                var innerHTML;
+                for (const c of chars) {
+                  innerHTML += '<option value=\'' + c + '\'>' + c + '</option>'
+                }
+                document.getElementById("char1").innerHTML = innerHTML;
+                document.getElementById("char2").innerHTML = innerHTML;
+                
+                // Make Element Visible
+                document.getElementById("charSelectGroup").style.visibility = 'visible';
+              } else {
+                // Hide Element
+                document.getElementById("charSelectGroup").style.visibility = 'hidden';
+              }
+            };
+
+            // Load supported characters
+            let url = './assets/character_detect.json';
+            fetch(url)
+              .then(response => response.json())
+              .then(data => localStorage.setItem('character_detect', JSON.stringify(data)));
+          </script>
+
+
+          <div class="row">
+            <small id="CharacterHelp" class="text-muted">
+              Characters will be searched for both players
+            </small>
+          </div>
+
+          <div class="input-group top-buffer">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input
+                  class="form-check-input is-invalid"
+                  id="player_requested"
+                  name="player_requested"
+                  type="checkbox"
+                  value="y"
+                />
+                Player Submitted
+                <span class="form-check-sign">
+                  <span class="check"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="input-group top-buffer">
+            {{ render_form_row([advancedSearchForm.order_by]) }}
+          </div>
+          <div class="input-group top-buffer">
+            {{ render_form_row([advancedSearchForm.submit]) }}
+          </div>
+        </ul>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
