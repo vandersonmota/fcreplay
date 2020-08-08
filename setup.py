@@ -21,6 +21,7 @@ setup(name='fcreplay',
       install_requires=[
           'beautifulsoup4',
           'debugpy',
+          'docopt',
           'google-api-python-client',
           'google-cloud-storage',
           'internetarchive',

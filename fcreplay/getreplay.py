@@ -1,4 +1,13 @@
-#!/usr/bin/env python3
+"""getreplay.
+
+Usage:
+  fcreplayget ranked <gameid> [--playerid=<playerid>]
+  fcreplayget profile <playerid> <url> [--playerrequested]
+  fcreplayget (-h | --help)
+
+Options:
+  -h --help         Show this screen.
+"""
 from fcreplay.database import Database
 from retrying import retry
 import datetime
@@ -8,6 +17,7 @@ import os
 import re
 import requests
 import sys
+from docopt import docopt
 
 if 'REMOTE_DEBUG' in os.environ:
     import debugpy
@@ -29,7 +39,7 @@ logging.basicConfig(
 
 
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
-def get_data(query, profile):
+def get_data(query, profile=None):
     r = requests.post(
         "https://www.fightcade.com/api/",
         json=query
@@ -99,6 +109,39 @@ def add_replay(replay, emulator, game, player_replay=True):
                 # Update DB to mark returned replay as player replay
                 db.update_player_requested(challenge_id=challenge_id)
                 return('MARKED_PLAYER')
+        return('ALREADY_EXISTS')
+
+
+def get_ranked_replays(game, username=None):
+    """Get ranked replays
+
+    Args:
+        game (String): Gameid
+        username (String, optional): Player profile name. Defaults to None.
+    """
+    if game not in config['supported_games']:
+        return('UNSUPPORTED_GAME')
+
+    query = {"req": "searchquarks", "best": True, "gameid": game}
+
+    if username is not None:
+        query['username'] = username
+
+    r = get_data(query)
+
+    for i in r.json()['results']['results']:
+        if i['emulator'] == 'fbneo' and i['live'] is False:
+            status = False
+            status = add_replay(
+                replay=i,
+                emulator=i['emulator'],
+                game=game,
+                player_replay=False
+            )
+            if status != 'ADDED':
+                logging.info(f'Not adding game, Status: {status}')
+
+    return("ADDED")
 
 
 def get_replay(profile, url, player_requested=False):
@@ -144,7 +187,12 @@ def get_replay(profile, url, player_requested=False):
 
 
 def console():
-    get_replay(sys.argv[1], sys.argv[2])
+    arguments = docopt(__doc__, version='fcreplayget')
+
+    if arguments['ranked'] is True:
+        get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'])
+    if arguments['profile'] is True:
+        get_replay(profile=arguments['<playerid>'], url=arguments['<url>'], player_requested=arguments['--playerrequested'])
 
 
 if __name__ == "__main__":
