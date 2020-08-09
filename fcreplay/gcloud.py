@@ -23,7 +23,7 @@ def destroy_fcreplay():
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
     metadata_server_url = \
-        'http://metadata/computeMetadata/v1/instance/service-accounts/default/identity?audience='
+        f"http://metadata/computeMetadata/v1/instance/service-accounts/{config['gcloud_compute_service_account']}/identity?audience="
     token_full_url = metadata_server_url + function_url
     token_headers = {'Metadata-Flavor': 'Google'}
 
