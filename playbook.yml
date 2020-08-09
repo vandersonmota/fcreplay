@@ -291,6 +291,7 @@
         replace: 'exec "xterm'
       become: True
       become_user: fcrecorder
+      when: gcloud
 
     - name: Create config directory
       file:
@@ -333,10 +334,9 @@
       become_user: fcrecorder
       ignore_errors: true
 
-
-    - name: Remove deployment user
-      user:
-        name: deployment
-        state: absent
-        force: true
-      ignore_errors: true
+    - name: Enable fcrecord service
+      service:
+        name: fcrecord
+        state: stopped
+        enabled: enabled
+      when: gcloud
