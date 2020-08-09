@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+import traceback
 
 from internetarchive import get_item
 from retrying import retry
@@ -42,7 +43,10 @@ class Replay:
             try:
                 return func(self, *args, **kwargs)
             except Exception as e:
-                logging.error(f"Excption: {e}, shutting down")
+                trace_back = sys.exc_info()[2]
+                line = trace_back.tb_lineno
+                logging.error(traceback.print_tb(trace_back))
+                logging.error(f"Excption: {e} on line: {line},  shutting down")
                 logging.info(f"Setting {self.replay.id} to failed")
                 self.db.update_failed_replay(challenge_id=self.replay.id)
                 self.update_status("FAILED")

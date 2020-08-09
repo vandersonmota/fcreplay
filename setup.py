@@ -1,4 +1,17 @@
 from setuptools import setup
+import os
+
+
+def package_files(directory):
+    paths = []
+    for (path, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            paths.append(os.path.join('..', path, filename))
+    return paths
+
+
+extra_files = package_files('./fcreplay/data')
+
 setup(name='fcreplay',
       version='0.9',
       description='Fcreplay python code',
@@ -7,10 +20,7 @@ setup(name='fcreplay',
       author_email='glisignoli@gmail.com',
       license='GPL3',
       packages=['fcreplay'],
-      package_data={'fcreplay': [
-          'data/*',
-          'data/charnames/*'
-      ]},
+      package_data={'': extra_files},
       entry_points={
           'console_scripts': [
               'fcreplaychat=fcreplay.chat.main:main',
