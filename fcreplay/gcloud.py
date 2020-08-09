@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import requests
+import sys
 
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
@@ -16,6 +17,7 @@ logging.basicConfig(
 
 REGION = config['gcloud_region']
 PROJECT_ID = config['gcloud_project']
+
 
 def destroy_fcreplay():
     logging.info("Starting destroy_fcreplay")
@@ -38,3 +40,15 @@ def destroy_fcreplay():
     logging.info(f"destroy_fcreplay retruned: {function_response.status_code}")
     status = function_response.status_code
     return(status)
+
+
+def safety():
+    print('This will destroy your instance!')
+    foo = input('Y/n: ')
+    if foo == 'Y':
+        destroy_fcreplay()
+    else:
+        sys.exit(1)
+
+if __name__ == "__main__":
+    safety()
