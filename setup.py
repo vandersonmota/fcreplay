@@ -41,7 +41,7 @@ setup(name='fcreplay',
           'pyscreenshot',
           'requests',
           'retrying',
-          'sqlalchemy',
+          'SQLAlchemy>=1.3.18',
           'sqlalchemy-utils',
       ],
       zip_safe=False)
