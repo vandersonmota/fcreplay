@@ -289,7 +289,7 @@
         path: /home/fcrecorder/.config/i3/config
         regexp: '^# exec "xterm'
         replace: 'exec "xterm'
-      become: true
+      become: True
       become_user: fcrecorder
 
     - name: Create config directory
@@ -314,6 +314,25 @@
       become: True
       become_user: fcrecorder
       ignore_errors: true
+
+    - name: Set fbneo scanlines on default config
+      replace:
+        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
+        regexp: '^bVidScanlines 1'
+        replace: 'bVidScanlines 0'
+      become: True
+      become_user: fcrecorder
+
+
+    - name: Set fbneo scanlines on config
+      replace:
+        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.ini
+        regexp: '^bVidScanlines 1'
+        replace: 'bVidScanlines 0'
+      become: True
+      become_user: fcrecorder
+      ignore_errors: true
+
 
     - name: Remove deployment user
       user:
