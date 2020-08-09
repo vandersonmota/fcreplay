@@ -16,7 +16,6 @@ debugpy
 docopt
 dominate
 google-api-python-client
-google-cloud-storage
 google-python-cloud-debugger
 gunicorn
 idna

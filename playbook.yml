@@ -165,12 +165,6 @@
         mode: '0600'
       ignore_errors: yes
    
-    # Install fightcade?
-    #- name: Download pyqtggpo
-    #  command: git clone https://github.com/poliva/pyqtggpo.git /home/fcrecorder/fcreplay/pyqtggpo-master
-    #  become_user: fcrecorder
-    #  become: True
-    
     - name: Copy xorg.conf
       copy:
         src: ./files/xorg.conf

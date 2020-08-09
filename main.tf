@@ -33,8 +33,7 @@ resource "google_project_iam_binding" "logs_writer" {
   members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
 }
 
-resource "google_project_iam_binding" "metric_writer
-" {
+resource "google_project_iam_binding" "metric_writer" {
   project = "fcrecorder"
   role = "roles/monitoring.metricWriter"
   members = ["serviceAccount:fcrecorder-compute-account@fcrecorder.iam.gserviceaccount.com"]
