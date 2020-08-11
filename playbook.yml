@@ -18,6 +18,7 @@
         packages:
           - alsa-utils
           - chkconfig
+          - cmake
           - firewalld
           - gcc
           - git
@@ -43,6 +44,11 @@
           - xinit
           - xorg-x11-drv-dummy
           - xterm
+
+    - name: install the 'Development tools' package group
+      yum:
+        name: "@Development tools"
+        state: present
     
     - name: Enable firewalld
       service:
@@ -114,7 +120,7 @@
       shell: |
         cd /home/fcrecorder/fcreplay
         source ./venv/bin/activate
-        pip install --upgrade google-api-python-client oauth2client progressbar2
+        pip install --upgrade google-api-python-client oauth2client progressbar2 scikit-build
         cd /home/fcrecorder/youtube-upload
         python setup.py install
       become_user: fcrecorder
@@ -242,22 +248,6 @@
         group: root
         mode: '0644'
 
-    - name: Enable cloud logging
-      yum_repository:
-        name: 'google-cloud-logging'
-        description: 'Google cloud logging'
-        baseurl: 'https://packages.cloud.google.com/yum/repos/google-cloud-logging-el8-$basearch-all'
-        gpgkey:
-          - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-          - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-      when: gcloud
-
-    - name: Install google cloud logging
-      yum:
-        name: google-fluentd
-        state: latest
-      when: gcloud
-
     - name: Install cloud logging config
       yum:
         name: google-fluentd-catch-all-config
@@ -273,10 +263,6 @@
         mode: '0640'
       when: gcloud
     
-    - name: Add google cloud logging systemd service
-      command: /usr/lib/systemd/system-generators/systemd-sysv-generator
-      when: gcloud
-
     - name: Enable google cloud logging systemd service
       service:
         name: google-fluentd
