@@ -134,6 +134,7 @@ class Replays(db.Model):
     date_added = db.Column(db.Integer)
     player_requested = db.Column(db.Boolean)
     game = db.Column(db.String)
+    video_processed = db.Column(db.Boolean)
 
 
 class Descriptions(db.Model):

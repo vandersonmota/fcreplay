@@ -37,6 +37,7 @@ class Replays(Base):
     player_requested = Column(Boolean)
     game = Column(String)
     emulator = Column(String)
+    video_processed = Column(Boolean)
 
 
 class Youtube_day_log(Base):
