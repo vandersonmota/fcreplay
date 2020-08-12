@@ -15,8 +15,23 @@
 
 # Python pycache:
 __pycache__/
+
 # Ignored by the build system
-/setup.cfg
-venv
-fcreplay-site.log
+*.egg-info
+.client_secrets.json
+.ia
+.idea
+.storage_creds.json
 .vscode
+.youtube-upload-credentials.json
+/setup.cfg
+__pycache__/
+build
+config.json
+description_append.txt
+dist
+fcreplay-site.log
+fcreplay/__pycache__/
+terraform.tfstate
+terraform.tfstate.backup
+venv
