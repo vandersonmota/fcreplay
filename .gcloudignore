@@ -27,7 +27,6 @@ __pycache__/
 /setup.cfg
 __pycache__/
 build
-config.json
 description_append.txt
 dist
 fcreplay-site.log
