@@ -20,6 +20,9 @@
                 Game
               </th>
               <th>
+                Number of Replays
+              </th>
+              <th>
                 Character Detection
               </th>
             </thread>
@@ -30,6 +33,9 @@
                   {{ game.game_name }}
                 </td>
                 <td>
+                  {{ game.count }}
+                </td>
+                <td>
                   {{ game.character_detect }}
                 </td>
               </tr>
@@ -37,7 +43,13 @@
             </tbody>
           </table>
         <h3>
-          Total number of replays
+          Queued Jobs
+        </h3>
+          <p>
+            {{toProcess}}
+          </p>
+        <h3>
+          Recorded replays
         </h3>
           <p>
             {{ numberOfReplays }}

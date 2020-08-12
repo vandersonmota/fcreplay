@@ -160,7 +160,7 @@ def index():
     ).order_by(Replays.date_added.desc()).paginate(page, per_page=9)
     replays = pagination.items
 
-    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
 @app.route('/submit')
@@ -209,10 +209,13 @@ def about():
     supportedGames = {}
     for game in sortedGames:
         supportedGames[game] = config['supported_games'][game]
+        supportedGames[game]['count'] = db.session.execute(f"select count(id) from replays where created = true and game = '{game}'").first()[0]
 
-    numberOfReplays = db.session.execute('select count(id) from replays').first()[0]
+    numberOfReplays = db.session.execute('select count(id) from replays where created = true').first()[0]
 
-    return render_template('about.j2.html', about_active=True, form=searchForm, supportedGames=supportedGames, numberOfReplays=numberOfReplays)
+    toProcess = db.session.execute('select count(id) from replays where created = false and failed = false').first()[0]
+
+    return render_template('about.j2.html', about_active=True, form=searchForm, supportedGames=supportedGames, numberOfReplays=numberOfReplays, toProcess=toProcess)
 
 
 @app.route('/advancedSearch')
@@ -300,7 +303,7 @@ def advancedSearchResult():
     pagination = Replays.query.filter(*replay_query).paginate(page, per_page=9)
     replays = pagination.items
 
-    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -354,7 +357,7 @@ def search():
     pagination = replay_query.paginate(page, per_page=9)
     replays = pagination.items
 
-    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm)
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
 @app.route('/video/<challenge_id>',)
@@ -383,7 +386,7 @@ def videopage(challenge_id):
 
     logging.debug(
         f"Video page, replay: {replay}, characters: {characters}, seek: {seek}")
-    return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm)
+    return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm, games=config['supported_games'])
 
 
 if __name__ == "__main__":
