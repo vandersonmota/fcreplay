@@ -314,8 +314,8 @@
     - name: Set fbneo scanlines on config
       replace:
         path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.ini
-        regexp: '^bVidScanlines 1'
-        replace: 'bVidScanlines 0'
+        regexp: '^bVidDX9Scanlines 1'
+        replace: 'bVidDX9Scanlines 0'
       become: True
       become_user: fcrecorder
       ignore_errors: true
@@ -324,5 +324,5 @@
       service:
         name: fcrecord
         state: stopped
-        enabled: enabled
+        enabled: true
       when: gcloud
