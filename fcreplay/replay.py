@@ -350,6 +350,7 @@ class Replay:
                     return False
             else:
                 # It's a new day, update the counter
+                logging.ingo("New day for youtube uploads")
                 self.db.update_youtube_day_log_count(count=1, date=today)
 
             # Create description file
