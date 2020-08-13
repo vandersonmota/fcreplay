@@ -50,10 +50,15 @@ def video_status(request):
     for replay in to_check:
         # Check if replay has embeded video link. Easy way to do this is to check
         # if a thumbnail is created
-        r = requests.get(f"https://archive.org/download{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+        print(f"Checking: {replay.id}")
+        r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+
+        print(f"ID: {replay.id}, Status: {r.status_code}")
         if r.status_code == 200:
-            replay.update(video_processed=True)
-    
+            session_loop = Session()
+            session_loop.query(Replays).filter_by(id=replay.id).update({'video_processed': True})
+            session_loop.commit()
+
     return json.dumps({"status": True})
 
 
@@ -226,3 +231,4 @@ def destroy_vm(compute, project, zone, instance_name):
     print(f"Destroying: {instance_name}")
     result = compute.instances().delete(project=project, zone=zone, instance=instance_name).execute()
     wait_for_operation(compute, project, zone, result['name'])
+

@@ -282,7 +282,8 @@ def advancedSearchResult():
             Descriptions.query.with_entities(Descriptions.id).filter(
                 Descriptions.description.ilike(f'%{search_query}%')
             )
-        )
+        ),
+        Replays.video_processed == True
     ]
 
     if game in character_dict:
@@ -352,6 +353,8 @@ def search():
                 Descriptions.description.ilike(f'%{search_query}%')
             )
         )
+    ).filter(
+        Replays.video_processed == True
     ).order_by(order)
 
     logging.debug(replay_query)
