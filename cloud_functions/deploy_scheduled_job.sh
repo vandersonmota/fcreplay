@@ -22,7 +22,7 @@ gcloud scheduler jobs create http 'check-for-replay' --schedule='*/2 * * * *' \
   --oidc-token-audience="https://us-central1-${PROJECT}.cloudfunctions.net/check_for_replay"
 
 gcloud scheduler jobs create http 'video-status-update' --schedule='*/10 * * * *' \
-  --uri="https://us-central1-${PROJECt}.cloudfunctions.net/video_status" \
+  --uri="https://us-central1-${PROJECT}.cloudfunctions.net/video_status" \
   --oidc-service-account-email="$SERVICE_ACCOUNT" \
   --oidc-token-audience="https://us-central1-${PROJECT}.cloudfunctions.net/video_status"
 
