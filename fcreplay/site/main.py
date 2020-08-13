@@ -298,9 +298,9 @@ def advancedSearchResult():
                 )
             )
         )
-
+    
     logging.debug(Replays.query.filter(*replay_query))
-    pagination = Replays.query.filter(*replay_query).paginate(page, per_page=9)
+    pagination = Replays.query.filter(*replay_query).order_by(order).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
