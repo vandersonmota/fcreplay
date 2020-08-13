@@ -343,7 +343,7 @@ class Replay:
             today = datetime.date.today()
 
             # Check the log is for today
-            if day_log.date == today:
+            if day_log.date.date() == today:
                 # Check number of uploads
                 if day_log.count >= int(self.config['youtube_max_daily_uploads']):
                     logging.info("Maximum uploads reached for today")
