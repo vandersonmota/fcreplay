@@ -71,24 +71,6 @@ render_field, render_form_row %}{% block content %}
           </div>
 
           <div class="input-group top-buffer">
-            <div class="form-check">
-              <label class="form-check-label">
-                <input
-                  class="form-check-input is-invalid"
-                  id="player_requested"
-                  name="player_requested"
-                  type="checkbox"
-                  value="y"
-                />
-                Player Submitted
-                <span class="form-check-sign">
-                  <span class="check"></span>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div class="input-group top-buffer">
             {{ render_form_row([advancedSearchForm.order_by]) }}
           </div>
           <div class="input-group top-buffer">

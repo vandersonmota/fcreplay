@@ -84,7 +84,6 @@ class AdvancedSearchForm(FlaskForm):
                         render_kw={'class': 'fixed'})
     char2 = SelectField('Character2', choices=characters,
                         render_kw={'class': 'fixed'})
-    player_requested = BooleanField('Player Submitted')
     order_by = SelectField('Order by', choices=orderby_list,
                            render_kw={'class': 'fixed'})
     submit = SubmitField('Search')
@@ -158,6 +157,8 @@ def index():
         Replays.created == 'yes'
     ).filter(
         Replays.failed == 'no'
+    ).filter(
+        Replays.video_processed == True
     ).order_by(Replays.date_added.desc()).paginate(page, per_page=9)
     replays = pagination.items
 
@@ -236,7 +237,6 @@ def advancedSearchResult():
         session['search'] = result.search.data
         session['char1'] = result.char1.data
         session['char2'] = result.char2.data
-        session['player_requested'] = result.player_requested.data
         session['order_by'] = result.order_by.data
         session['game'] = result.game.data
 
@@ -245,16 +245,10 @@ def advancedSearchResult():
         search_query = session['search']
         char1 = session['char1']
         char2 = session['char2']
-        player_requested = session['player_requested']
         order_by = session['order_by']
         game = session['game']
 
     searchForm = SearchForm()
-
-    if player_requested:
-        player_requested = True
-    else:
-        player_requested = False
 
     page = request.args.get('page', 1, type=int)
 
@@ -277,7 +271,6 @@ def advancedSearchResult():
         Replays.created == True,
         Replays.failed == False,
         Replays.game.ilike(f'{game}'),
-        Replays.player_requested == player_requested,
         Replays.id.in_(
             Descriptions.query.with_entities(Descriptions.id).filter(
                 Descriptions.description.ilike(f'%{search_query}%')
