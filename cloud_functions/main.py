@@ -1,6 +1,7 @@
 import googleapiclient.discovery
 import json
 import time
+import requests
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -28,6 +29,32 @@ class Replays(Base):
     status = Column(String)
     date_added = Column(DateTime)
     player_requested = Column(Boolean)
+    video_processed = Column(Boolean)
+
+
+def video_status(request):
+    print("Check status for completed videos")
+    session = Session()
+
+    # Get all replays that are completed, where video_processed is false
+    to_check = session.query(
+        Replays
+    ).filter_by(
+        failed = False
+    ).filter_by(
+        created = True
+    ).filter_by(
+        video_processed = False
+    ).all()
+
+    for replay in to_check:
+        # Check if replay has embeded video link. Easy way to do this is to check
+        # if a thumbnail is created
+        r = requests.get(f"https://archive.org/download{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+        if r.status_code == 200:
+            replay.update(video_processed=True)
+    
+    return json.dumps({"status": True})
 
 
 def check_for_replay(request):
