@@ -10,7 +10,7 @@ if [ $? -gt 0 ]; then
   exit 1
 fi
 
-project=$(cat config.json | jq -r '.gcloud_projectt')
+PROJECT=$(cat config.json | jq -r '.gcloud_projectt')
 if [ $? -gt 0 ]; then
   echo "Unable to find 'gcloud_project' in config.json"
   exit 1

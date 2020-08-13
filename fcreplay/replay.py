@@ -335,24 +335,22 @@ class Replay:
                 logging.info("Replay is too long. Not uploading to youtube")
                 return False
 
-            # If this isn't a player replay, then check max uploads
-            if not self.replay.player_requested:
-                # Find number of uploads today
-                day_log = self.db.get_youtube_day_log()
+            # Find number of uploads today
+            day_log = self.db.get_youtube_day_log()
 
-                # Check max uploads
-                # Get todays date, dd-mm-yyyy
-                today = datetime.datetime.utcnow().strftime("%d-%m-%Y")
+            # Check max uploads
+            # Get todays date, dd-mm-yyyy
+            today = datetime.date.today()
 
-                # Check the log is for today
-                if day_log.date == today:
-                    # Check number of uploads
-                    if day_log.count >= int(self.config['youtube_max_daily_uploads']):
-                        logging.info("Maximum uploads reached for today")
-                        return False
-                else:
-                    # It's a new day, update the counter
-                    self.db.update_youtube_day_log_count(count=1, date=today)
+            # Check the log is for today
+            if day_log.date == today:
+                # Check number of uploads
+                if day_log.count >= int(self.config['youtube_max_daily_uploads']):
+                    logging.info("Maximum uploads reached for today")
+                    return False
+            else:
+                # It's a new day, update the counter
+                self.db.update_youtube_day_log_count(count=1, date=today)
 
             # Create description file
             with open(f"{self.config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
