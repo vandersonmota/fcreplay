@@ -2,7 +2,7 @@
 """fcreplaydestroy.
 
 Usage:
-  fcreplaydestory destroy
+  fcreplaydestroy destroy
   fcreplaydestroy (-h | --help)
 
 Options:
