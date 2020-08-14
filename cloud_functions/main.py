@@ -165,7 +165,7 @@ def launch_fcreplay(request):
             "items": [
                 {
                     "key": "shutdown-script",
-                    "value": "#!/bin/bash\n\n/usr/bin/su - fcrecorder -c /usr/bin/bash -c 'cd /home/fcrecorder/fcreplay;source ./venv/bin/activate;fcreplaydestroy destroy'"
+                    "value": "#!/bin/bash\n\n/usr/bin/systemctl stop destroyfcrecord"
                 }
             ]
         },

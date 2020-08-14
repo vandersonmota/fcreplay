@@ -1,18 +1,22 @@
 <!--ts-->
    * [About](#about)
    * [Goal](#goal)
-      * [How it works](#how-it-works)
+   * [Features](#features)
       * [Character Detection](#character-detection)
+      * [Description generation](#description-generation)
+   * [Requirements](#requirements)
+      * [Database](#database)
+      * [Optional: Google cloud](#optional-google-cloud)
          * [A few more notes:](#a-few-more-notes)
       * [Todo](#todo)
-      * [Requirements](#requirements)
+      * [Requirements](#requirements-1)
          * [Uploading to youtube.com](#uploading-to-youtubecom)
          * [Uploading to archive.org](#uploading-to-archiveorg)
    * [Installation and setup](#installation-and-setup)
       * [Configuration](#configuration)
          * [Infrastructure Deployment](#infrastructure-deployment)
       * [Deployment](#deployment)
-      * [Post Deployment Setup](#post-deployment-setup)
+      * [Monitoring Recording](#monitoring-recording)
          * [Google cloud](#google-cloud)
    * [Usage](#usage)
       * [Activating](#activating)
@@ -21,40 +25,52 @@
       * [Running automatically on startup](#running-automatically-on-startup)
       * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Fri 14 Aug 2020 10:03:30 PM NZST -->
+<!-- Added by: gino, at: Sat 15 Aug 2020 01:01:16 AM NZST -->
 
 <!--te-->
 
 # About
-This project will upload encoded [fightcade](https://www.fightcade.com/) replays to archive.org: [Gino Lisignoli - Archive.org](https://archive.org/search.php?query=creator%3A%22Gino+Lisignoli%22)
+This project will automatically encoded [fightcade](https://www.fightcade.com/) replays and upload them to archive.org: [Gino Lisignoli - Archive.org](https://archive.org/search.php?query=creator%3A%22Gino+Lisignoli%22) or youtube: [fightcade archive](https://www.youtube.com/channel/UCrYudzO9Nceu6mVBnFN6haA)
 
-A site the view the replays is here: https://fightcadevids.com
+A web site the view the archive.org replays is here: https://fightcadevids.com
+
+fcreplay is primarly a python application used to automate the generation of fightcade replays as video files.
 
 # Goal
-The goal of this is to make fightcade replays accessible to anyone to watch without the need of using an emulator.
+The goal of this is to make fightcade replays accessible to anyone to watch without using an emulator.
 
-## How it works
-fcreplaygetreplay will parse fightcade replay urls, then use the fightcade api details to create a encoding job and store it in a database.
-
-fcreplayloop can then be used to record a replay:
-1. Fightcade is started with wine
-2. OBS is started to record the match
-3. Match is finished
-4. OBS is killed the python script takes over again.
-
-The script then:
- 1. Renames the file to the fightcade id
- 2. Runs ffmpeg to correct it since killing OBS might break the file
- 3. Runs ffmpeg again to generate a thumbnail
- 4. Tries to determine which characters players are using OpenCV
- 5. Uploads the file to archive.org with the relevant metadata
- 6. Uploads the file to youtube.com with the relevant metadata 
- 7. Removes the generated files.
+# Features
+fcreplay has several features to automate the encoding process and add aditional data to the generated videos
 
 ## Character Detection
-OpenCV is used to analise the video and match character names from the health bars. It does this by template matching the included character name images against the video every 60 frames. Depending on your OBS recording settings you might need to regenerate the images.
+OpenCV is used to analise the video and match character names from the health bars. This is done by matching the included character name images against the encoded video every 60 frames. Depending on your OBS recording settings you might need to regenerate the images.
 
-Currently this is only supported for 3rd strike.
+This can be done for any 4:3 rendered game.
+
+You can enable character detection by:
+1. Adding `"character_detect": true,` to the game in your `config.json` file
+1. Placing your images in: `./fcreplay/data/charnames/<gamename>`
+  * Images need to be smaller than the area being checked
+  * Images are matched against the encoded file. This mean you need to generate your images from a already recorded video to account for encoding artifacts
+  * You need at least 10 different images per character
+1. Editing `./fcreplay/data/character_detect.json` and adding a new game, characters and detection location (Currently a fixed Y axis, to be fixed)
+
+## Description generation
+A desctiption is generated that contains:
+1. The fightcade replay id
+2. The fightcade player ids
+3. The fightcade player locations
+4. The game being played
+5. The date the game was played
+6. (Optional) A appended description
+7. (Supported) What characters are being played
+
+# Requirements
+## Database
+Fcreplay uses sqlalchemy and has been tested with postgres and is used store any replay metadata
+
+## Optional: Google cloud
+
 
 ### A few more notes:
 To trigger OBS the screen is captured, looking for a the split windows and then checking for differences in the screen capture. Without memory inspection it doesn't seem like there is a way to tell when the emulator has started playing the replay.
@@ -70,7 +86,6 @@ This is all done in a headless X11 session
 ## Todo
  - Better exception handling.
  - Better capturing of OBS and Wine output.
- - Support for games other than 3rd strike.
  - Find something that might be more lightweight than OBS.
    - ffmpeg with x11 capturing was attempted, but the framerate was unacceptible
  - Thumbnails are generated but not used
@@ -81,8 +96,7 @@ To run this, you need:
      1. With at least 4 Cores (Fast ones would be ideal)
      1. With at least 4GB Ram
      1. With at least 30GB of storage 
- 1. Running Fedora 32 (you can probably make this work in other distributions as well)
-     1. You really want to use a minimal installation
+ 1. Running Fedora 32
  1. Some familiarity with linux will help
 
 ### Uploading to youtube.com
@@ -111,7 +125,7 @@ To deploy to google cloud you need to:
 2. Create a fedora32 image
    1. This was done by following: https://linuxhint.com/install-fedora-google-compute-engine
    2. Install google-fluentd
-3. Create the base instance from the fedora32 image
+3. Create the base instance from the fedora32 image called fcreplay-image
 4. Create a service account "fcrecorder-compute-admin"
    1. Give it the folowing roles:
       - Cloud Functions Invoker
@@ -124,7 +138,7 @@ To deploy to google cloud you need to:
 5. Deploy the cloud functions
 
 ## Deployment
-I've include a basic ansible playbook for the installation, you will need to have ssh access and a deployment user with root access.
+I've include a basic ansible playbook for the installation, you will need to have ssh access to the `fcreplay-image` and a deployment user with root access.
 
 2. Use the ansible script to setup the base instance.
    1. Create a deployment user with with sudo access: `adduser deployment`
@@ -132,30 +146,27 @@ I've include a basic ansible playbook for the installation, you will need to hav
    3. Add the user to the wheel group: `groupmems -a deployment -g wheel`
    4. Copy your ssh key with `ssh-copy-id deployment@<host>`
    5. Disable password login in the `/etc/ssh/sshd_config` and restart sshd: `systemctl restart sshd`
-   6. `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True, "FC2_PATH": "/path/to/local/FC2" }' playbook.yml`
+   6. Launch the ansible script:
+      1. Development: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"FC2_PATH": "/path/to/local/FC2" }' playbook.yml`
+      2. Google Cloud: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True, "FC2_PATH": "/path/to/local/FC2" }' playbook.yml`
+      3. Google Cloud auto destroy: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"destroy": True, "gcloud": True, "FC2_PATH": "/path/to/local/FC2" }' playbook.yml`
  
-## Post Deployment Setup
-Login and switch to the fcrecorder user, then create a x11vnc password as the fcrecorder user (It will be stored in ~/.vnc/passwd):
-```commandline
-x11vnc -storepasswd 
-```
+## Monitoring Recording
+If you want to watch recording happening, you need to:
+1. Login and switch to the fcrecorder user
+2. Create a x11vnc password as the fcrecorder user `x11vnc -storepasswd`
+3. Add a firewalld rule to allow connections `firewall-cmd '--add-port 5900/tcp`
 
-Now you need to start the dummy X server, configure fightcade and configure OBS.
-As the fcrecorder user:
-```commandline
-# Run tmux, and split so you have two panes
-# In the first pane, run startx
-startx
-# In the second pane, run x11vnc
-x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord
-```
+When recording is happening, you can then run `x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord` as the fcrecord user. This will start a vnc server allowing you to connect to your instance on port 5900
+
 
 ### Google cloud
-When deploying with the ansible playbook, and `"gcloud": True`, the fcrecord service is automaticall set to start when the hostname is fcreplay-image-1
+When deploying with the ansible playbook, and the ansible variable `"gcloud": True`, the fcrecord service is automatically set to start when the hostname is fcreplay-image-1
 
-This will cause `fcreplayloop --gcloud` to be automatically run when the instance is started.
+This will cause `fcreplayloop --gcloud` to be automatically run when the instance is started. See `loop.py` for more info
 
 # Usage
+The typical useage of fcreplay is to run this in google cloud, where the service
 
 ## Activating
 Before running fcreplay, you need to activate the python environment
@@ -185,7 +196,7 @@ sed -i 's/^# exec "xterm/exec "xterm/' .config/i3/config
 ```
 
 ## Google cloud
-Once you have setup the base image, you need to make a image called: fcreplay-image:
+Once you have setup the base image, you need to make a image called: fcrecord:
 ```commandline
 gcloud compute images create fcreplay-image \
   --source-disk fcrecorder\
@@ -194,7 +205,6 @@ gcloud compute images create fcreplay-image \
   --storage-location us-central1
 ```
 
-Once you have created a image, you should create a scheduled job to check for replays to encode. Once a replay to encode has been found, the scheduler will call the google cloud function `check_for_fcreplay`. This will look for a replay in the database with the status 'ADDED'. It will then launch compute engine instance called `fcreplay-image-1` from the `fcreplay-image` instance.
 
 Once started, the instance will look for a replay on startup and begin encoding.
 

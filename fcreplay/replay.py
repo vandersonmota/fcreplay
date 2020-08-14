@@ -222,6 +222,7 @@ class Replay:
             for match in self.detected_characters:
                 self.description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
                     f"\n{match[0]} vs {match[1]}"
+        
         else:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
                                     f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \

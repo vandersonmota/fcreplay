@@ -216,7 +216,7 @@
         group: fcrecorder
         mode: '0750'
     
-    - name: Copy the service file
+    - name: Copy the startup service file
       copy:
         src: ./files/fcrecord.service
         dest: /usr/lib/systemd/system/fcrecord.service
@@ -231,6 +231,24 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
+    
+    - name: Copy the destroy service file
+      copy:
+        src: ./files/destroyfcrecord.service
+        dest: /usr/lib/systemd/system/destroyfcrecord.service
+        owner: root
+        group: root
+        mode: 0644
+      when: gcloud
+
+    - name: Copy the destroy_gcloud.sh file
+      copy:
+        src: ./files/destroy_gcloud.sh
+        dest: /usr/local/bin/destroy_gcloud.sh
+        owner: fcrecorder
+        group: fcrecorder
+        mode: 0750
+      when: gcloud
 
     - name: Copy fcreplaychat launcher
       copy:
@@ -326,3 +344,10 @@
         state: stopped
         enabled: true
       when: gcloud
+
+    - name: Enable the destoryfcrecord service
+      service:
+        name: destoryfcrecord
+        state: stopped
+        enabled: true
+      when: destroy
