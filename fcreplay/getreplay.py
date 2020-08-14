@@ -16,7 +16,6 @@ import logging
 import os
 import re
 import requests
-import sys
 from docopt import docopt
 
 if 'REMOTE_DEBUG' in os.environ:

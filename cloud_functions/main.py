@@ -161,6 +161,14 @@ def launch_fcreplay(request):
                 "autoDelete": True
             }
         ],
+        "metadata": {
+            "items": [
+                {
+                    "key": "shutdown-script",
+                    "value": "#!/bin/bash\n\n/usr/bin/su - fcrecorder -c /usr/bin/bash -c 'cd /home/fcrecorder/fcreplay;source ./venv/bin/activate;fcreplaydestroy destroy'"
+                }
+            ]
+        },
         'scheduling': {
             'preemptible': True
         },
@@ -231,4 +239,3 @@ def destroy_vm(compute, project, zone, instance_name):
     print(f"Destroying: {instance_name}")
     result = compute.instances().delete(project=project, zone=zone, instance=instance_name).execute()
     wait_for_operation(compute, project, zone, result['name'])
-

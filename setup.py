@@ -26,10 +26,10 @@ setup(name='fcreplay',
               'fcreplaychat=fcreplay.chat.main:main',
               'fcreplayget=fcreplay.getreplay:console',
               'fcreplayloop=fcreplay.loop:console',
+              'fcreplaydestroy=fcreplay.gcloud:console'
           ]
       },
       install_requires=[
-          'beautifulsoup4',
           'debugpy',
           'docopt',
           'google-api-python-client',

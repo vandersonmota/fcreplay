@@ -21,7 +21,7 @@
       * [Running automatically on startup](#running-automatically-on-startup)
       * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Thu 13 Aug 2020 09:12:25 PM NZST -->
+<!-- Added by: gino, at: Fri 14 Aug 2020 09:58:32 PM NZST -->
 
 <!--te-->
 

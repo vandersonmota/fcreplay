@@ -1,8 +1,17 @@
+#!/usr/bin/env python
+"""fcreplaydestroy.
+
+Usage:
+  fcreplaydestory destroy
+  fcreplaydestroy (-h | --help)
+
+Options:
+  -h --help         Show this screen.
+"""
+from docopt import docopt
 import json
 import logging
-import os
 import requests
-import sys
 
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file)
@@ -42,13 +51,12 @@ def destroy_fcreplay():
     return(status)
 
 
-def safety():
-    print('This will destroy your instance!')
-    foo = input('Y/n: ')
-    if foo == 'Y':
+def console():
+    arguments = docopt(__doc__, version='fcreplaydestroy')
+
+    if arguments['destroy'] is True:
         destroy_fcreplay()
-    else:
-        sys.exit(1)
+
 
 if __name__ == "__main__":
-    safety()
+    console()
