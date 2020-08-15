@@ -161,14 +161,6 @@ def launch_fcreplay(request):
                 "autoDelete": True
             }
         ],
-        "metadata": {
-            "items": [
-                {
-                    "key": "shutdown-script",
-                    "value": "#!/bin/bash\n\n/usr/bin/systemctl stop destroyfcrecord"
-                }
-            ]
-        },
         'scheduling': {
             'preemptible': True
         },

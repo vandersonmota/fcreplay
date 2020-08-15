@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, g, session, send_from_directory, redirect, url_for
+from flask import Flask, request, render_template, g, session, send_from_directory, redirect, url_for, abort, jsonify
 from flask import Blueprint
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
@@ -164,6 +164,25 @@ def index():
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
+
+@app.route('/api/videolinks', methods=['GET'])
+def videolinks():
+    if 'ids' not in request.json:
+        abort(404)
+
+    replays = Replays.query.filter(
+        Replays.created == True,
+        Replays.failed == False,
+        Replays.video_processed == True,
+        Replays.id.in_(request.json['ids'])
+    ).all()
+
+    replay_data = {}
+    for i in replays:
+        replay_data[i.id] = f"https://fightcadevids.com/video/{i.id}"
+    
+    return jsonify(replay_data)
+    
 
 @app.route('/submit')
 def submit():

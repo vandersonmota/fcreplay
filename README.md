@@ -25,7 +25,7 @@
       * [Running automatically on startup](#running-automatically-on-startup)
       * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Sat 15 Aug 2020 01:01:16 AM NZST -->
+<!-- Added by: gino, at: Sun 16 Aug 2020 11:59:32 AM NZST -->
 
 <!--te-->
 
@@ -53,7 +53,7 @@ You can enable character detection by:
   * Images need to be smaller than the area being checked
   * Images are matched against the encoded file. This mean you need to generate your images from a already recorded video to account for encoding artifacts
   * You need at least 10 different images per character
-1. Editing `./fcreplay/data/character_detect.json` and adding a new game, characters and detection location (Currently a fixed Y axis, to be fixed)
+1. Editing `./fcreplay/data/character_detect.json` and adding a new game, characters and detection location (Currently a fixed Y axis, to be fixed...)
 
 ## Description generation
 A desctiption is generated that contains:
@@ -70,6 +70,7 @@ A desctiption is generated that contains:
 Fcreplay uses sqlalchemy and has been tested with postgres and is used store any replay metadata
 
 ## Optional: Google cloud
+Fcreplay is designed to run on google cloud
 
 
 ### A few more notes:
