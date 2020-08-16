@@ -122,7 +122,7 @@ def fcreplay_running(request):
                 destroy_fcreplay(True)
                 return(json.dumps({'status': True}))
             elif i['status'] == "RUNNING":
-                print("{instance_name} instance running")
+                print(f"{instance_name} instance running")
                 return(json.dumps({'status': True}))
             else:
                 print(f"{instance_name} status is {i['status']}")

@@ -302,6 +302,9 @@
       become_user: fcrecorder
       ignore_errors: true
 
+    - name: Fix FC2 permissions
+      command: chown -R fcrecorder:fcrecorder /home/fcrecorder
+
     - name: Set fbneo scanlines on default config
       replace:
         path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
@@ -309,7 +312,6 @@
         replace: 'bVidScanlines 0'
       become: True
       become_user: fcrecorder
-
 
     - name: Set fbneo scanlines on config
       replace:
@@ -326,3 +328,8 @@
         state: stopped
         enabled: true
       when: gcloud
+
+    - name: Make sure group wheel is not in the sudoers configuration
+      lineinfile:
+        path: /etc/sudoers
+        line: 'fcrecorder   ALL=NOPASSWD:/usr/bin/systemctl restart google-fluentd'
