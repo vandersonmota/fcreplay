@@ -165,7 +165,7 @@ def index():
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
-@app.route('/api/videolinks', methods=['GET'])
+@app.route('/api/videolinks', methods=['POST'])
 def videolinks():
     if 'ids' not in request.json:
         abort(404)
@@ -180,9 +180,14 @@ def videolinks():
     replay_data = {}
     for i in replays:
         replay_data[i.id] = f"https://fightcadevids.com/video/{i.id}"
-    
+
     return jsonify(replay_data)
-    
+
+
+@app.route('/api/supportedgames')
+def supportedgames():
+    return jsonify(config['supported_games'])
+
 
 @app.route('/submit')
 def submit():

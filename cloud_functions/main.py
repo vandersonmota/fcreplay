@@ -117,10 +117,18 @@ def fcreplay_running(request):
 
     for i in result['items']:
         if instance_name in i['name']:
-            print("Instance running")
-            return(json.dumps({'status': True}))
+            if i['status'] == "TERMINATED" and config['gcloud_destroy_when_stopped']:
+                print(f"Destoying {instance_name}")
+                destroy_fcreplay(True)
+                return(json.dumps({'status': True}))
+            elif i['status'] == "RUNNING":
+                print("{instance_name} instance running")
+                return(json.dumps({'status': True}))
+            else:
+                print(f"{instance_name} status is {i['status']}")
+                return(json.dumps({'status': False}))
 
-    print("Instance running")
+    print(f"{instance_name} instance not running")
     return(json.dumps({'status': False}))
 
 

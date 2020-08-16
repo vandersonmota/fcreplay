@@ -10,7 +10,7 @@
         packages:
           - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_version }}.noarch.rpm 
           - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_distribution_version }}.noarch.rpm
-    
+
     - name: Install packages
       yum:
         name: "{{packages}}"
@@ -49,25 +49,25 @@
       yum:
         name: "@Development tools"
         state: present
-    
+
     - name: Enable firewalld
       service:
         name: firewalld
         state: started
         enabled: yes
-    
+
     - name: VNC Rules
       firewalld:
         port: 5900/tcp
         immediate: yes
         permanent: yes
         state: enabled
-    
+
     - name: Create group
       group:
         name: fcrecorder
         state: present
-    
+
     - name: Create user
       user:
         name: fcrecorder
@@ -77,14 +77,14 @@
         shell: /bin/bash
         group: fcrecorder
         groups: pulse,pulse-access,input
-    
+
     - name: Clone fcreplay
       git:
         repo: https://github.com/glisignoli/fcreplay.git
         dest: /home/fcrecorder/fcreplay_install
       become_user: fcrecorder
       become: True
-    
+
     - name: Make install directory
       file:
         path: /home/fcrecorder/fcreplay
@@ -92,14 +92,14 @@
         mode: '0750'
       become_user: fcrecorder
       become: True
-    
+
     - name: Create venv
       command: python3 -m venv ./venv
       args:
         chdir: /home/fcrecorder/fcreplay
       become_user: fcrecorder
       become: True
-    
+
     - name: Install fcreplay
       shell: |
         cd /home/fcrecorder/fcreplay
@@ -108,14 +108,14 @@
         python setup.py install
       become_user: fcrecorder
       become: True
-   
+
     - name: Clone youtube-upload
       git:
         repo: https://github.com/tokland/youtube-upload.git
         dest: /home/fcrecorder/youtube-upload
       become_user: fcrecorder
       become: True
- 
+
     - name: Install youtube-upload
       shell: |
         cd /home/fcrecorder/fcreplay
@@ -125,7 +125,7 @@
         python setup.py install
       become_user: fcrecorder
       become: True
-    
+
     - name: Copy config.json
       copy:
         src: ./config.json
@@ -134,7 +134,7 @@
         group: fcrecorder
         mode: '0600'
       ignore_errors: yes
-    
+
     - name: Copy description append
       copy:
         src: ./description_append.txt
@@ -143,7 +143,7 @@
         group: fcrecorder
         mode: '0640'
       ignore_errors: yes
-    
+
     - name: Copy youtube upload credentials
       copy:
         src: ./.youtube-upload-credentials.json
@@ -152,7 +152,7 @@
         group: fcrecorder
         mode: '0600'
       ignore_errors: yes
-    
+
     - name: Copy google api client secrets
       copy:
         src: ./.client_secrets.json
@@ -161,7 +161,7 @@
         group: fcrecorder
         mode: '0600'
       ignore_errors: yes
-    
+
     - name: Copy archive.org secrets
       copy:
         src: ./.ia
@@ -170,7 +170,7 @@
         group: fcrecorder
         mode: '0600'
       ignore_errors: yes
-   
+
     - name: Copy xorg.conf
       copy:
         src: ./files/xorg.conf
@@ -178,7 +178,7 @@
         owner: root
         group: root
         mode: '0644'
-    
+
     - name: Copy Xwrapper
       copy:
         src: ./files/Xwrapper.config
@@ -186,7 +186,7 @@
         owner: root
         group: root
         mode: '0644'
-    
+
     - name: Create xinitrc
       copy:
         content: exec i3
@@ -194,12 +194,12 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0640'
-    
+
     - name: Create i3 config directory
       command: mkdir -p /home/fcrecorder/.config/i3
       become_user: fcrecorder
       become: True
-    
+
     - name: Copy i3 config
       copy:
         src: ./files/i3_config
@@ -207,7 +207,7 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0664'
-    
+
     - name: Copy the gcloudlauncher
       copy:
         src: ./files/gcloudlauncher.sh
@@ -215,7 +215,7 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-    
+
     - name: Copy the startup service file
       copy:
         src: ./files/fcrecord.service
@@ -223,7 +223,7 @@
         owner: root
         group: root
         mode: '0664'
-    
+
     - name: Copy the startup file
       copy:
         src: ./files/startup.sh
@@ -231,24 +231,6 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-    
-    - name: Copy the destroy service file
-      copy:
-        src: ./files/destroyfcrecord.service
-        dest: /usr/lib/systemd/system/destroyfcrecord.service
-        owner: root
-        group: root
-        mode: 0644
-      when: gcloud
-
-    - name: Copy the destroy_gcloud.sh file
-      copy:
-        src: ./files/destroy_gcloud.sh
-        dest: /usr/local/bin/destroy_gcloud.sh
-        owner: fcrecorder
-        group: fcrecorder
-        mode: 0750
-      when: gcloud
 
     - name: Copy fcreplaychat launcher
       copy:
@@ -280,7 +262,7 @@
         group: root
         mode: '0640'
       when: gcloud
-    
+
     - name: Enable google cloud logging systemd service
       service:
         name: google-fluentd
@@ -344,10 +326,3 @@
         state: stopped
         enabled: true
       when: gcloud
-
-    - name: Enable the destoryfcrecord service
-      service:
-        name: destoryfcrecord
-        state: stopped
-        enabled: true
-      when: destroy
