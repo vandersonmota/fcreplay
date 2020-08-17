@@ -90,7 +90,8 @@ def add_replay(replay, emulator, game, player_replay=True):
                 date_added=date_added,
                 player_requested=player_requested,
                 game=game,
-                emulator=emulator
+                emulator=emulator,
+                video_processed=False
             )
             return('ADDED')
         else:
