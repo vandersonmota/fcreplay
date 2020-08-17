@@ -99,7 +99,7 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
         screen_ggpo_capture.save('screen_ggpo_capture.png')
         screen_capture1.save('screen_capture1.png')
 
-        time.sleep(0.5)
+        time.sleep(0.2)
 
         # Check if ggpo is running:
         diff = ImageChops.difference(screen_ggpo_capture, ggpo_capture)
