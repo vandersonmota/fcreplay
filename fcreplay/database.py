@@ -46,7 +46,8 @@ class Database:
             date_added=kwargs['date_added'],
             player_requested=kwargs['player_requested'],
             game=kwargs['game'],
-            emulator=kwargs['emulator']
+            emulator=kwargs['emulator'],
+            video_processed=kwargs['video_processed']
         ))
         session.commit()
         session.close()
