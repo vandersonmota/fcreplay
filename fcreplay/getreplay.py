@@ -1,6 +1,7 @@
 """getreplay.
 
 Usage:
+  fcreplayget game <gameid>
   fcreplayget ranked <gameid> [--playerid=<playerid>]
   fcreplayget profile <playerid> <url> [--playerrequested]
   fcreplayget (-h | --help)
@@ -112,6 +113,33 @@ def add_replay(replay, emulator, game, player_replay=True):
         return('ALREADY_EXISTS')
 
 
+def get_game_replays(game):
+    """Get game replays
+
+    Args:
+        game (String): Gameid
+    """
+    if game not in config['supported_games']:
+        return('UNSUPPORTED_GAME')
+
+    query = {'req': 'searchquarks', 'gameid': game}
+
+    r = get_replay(query)
+
+    for i in r.json()['results']['results']:
+        if i['emulator'] == 'fbneo' and i['live'] is False:
+            status = add_replay(
+                replay=i,
+                emaultor=i['emaultor'],
+                game=game,
+                player_replay=False
+            )
+            if status != 'ADDED':
+                logging.info(f'Not adding game, Status: {status}')
+
+    return("ADDED")
+
+
 def get_ranked_replays(game, username=None):
     """Get ranked replays
 
@@ -131,7 +159,6 @@ def get_ranked_replays(game, username=None):
 
     for i in r.json()['results']['results']:
         if i['emulator'] == 'fbneo' and i['live'] is False:
-            status = False
             status = add_replay(
                 replay=i,
                 emulator=i['emulator'],
@@ -188,7 +215,8 @@ def get_replay(profile, url, player_requested=False):
 
 def console():
     arguments = docopt(__doc__, version='fcreplayget')
-
+    if arguments['game'] is True:
+        get_game_replays(game=arguments['<gameid>'])
     if arguments['ranked'] is True:
         get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'])
     if arguments['profile'] is True:
