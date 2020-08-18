@@ -2,7 +2,7 @@
 
 Usage:
   fcreplayget game <gameid>
-  fcreplayget ranked <gameid> [--playerid=<playerid>]
+  fcreplayget ranked <gameid> [--playerid=<playerid>] [--pages=<pages>] 
   fcreplayget profile <playerid> <url> [--playerrequested]
   fcreplayget (-h | --help)
 
@@ -140,7 +140,7 @@ def get_game_replays(game):
     return("ADDED")
 
 
-def get_ranked_replays(game, username=None):
+def get_ranked_replays(game, username=None, pages=1):
     """Get ranked replays
 
     Args:
@@ -155,9 +155,18 @@ def get_ranked_replays(game, username=None):
     if username is not None:
         query['username'] = username
 
-    r = get_data(query)
+    replays = []
+    if pages == 1:
+        query['offset'] = 0
+        r = get_data(query)
+        replays += r.json()['results']['results']
+    else:
+        for page in range(0, pages):
+            query['offset'] = page
+            r = get_data(query)
+            replays += r.json()['results']['results']
 
-    for i in r.json()['results']['results']:
+    for i in replays:
         if i['emulator'] == 'fbneo' and i['live'] is False:
             status = add_replay(
                 replay=i,
@@ -218,7 +227,7 @@ def console():
     if arguments['game'] is True:
         get_game_replays(game=arguments['<gameid>'])
     if arguments['ranked'] is True:
-        get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'])
+        get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
     if arguments['profile'] is True:
         get_replay(profile=arguments['<playerid>'], url=arguments['<url>'], player_requested=arguments['--playerrequested'])
 
