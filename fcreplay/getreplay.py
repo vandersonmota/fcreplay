@@ -2,7 +2,7 @@
 
 Usage:
   fcreplayget game <gameid>
-  fcreplayget ranked <gameid> [--playerid=<playerid>] [--pages=<pages>] 
+  fcreplayget ranked <gameid> [--playerid=<playerid>] [--pages=<pages>]
   fcreplayget profile <playerid> <url> [--playerrequested]
   fcreplayget (-h | --help)
 
@@ -140,7 +140,7 @@ def get_game_replays(game):
     return("ADDED")
 
 
-def get_ranked_replays(game, username=None, pages=1):
+def get_ranked_replays(game, username=None, pages=None):
     """Get ranked replays
 
     Args:
@@ -156,7 +156,7 @@ def get_ranked_replays(game, username=None, pages=1):
         query['username'] = username
 
     replays = []
-    if pages == 1:
+    if pages == None:
         query['offset'] = 0
         r = get_data(query)
         replays += r.json()['results']['results']
