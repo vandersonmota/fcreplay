@@ -1,3 +1,4 @@
+import datetime
 import googleapiclient.discovery
 import json
 import time
@@ -56,7 +57,7 @@ def video_status(request):
         print(f"ID: {replay.id}, Status: {r.status_code}")
         if r.status_code == 200:
             session_loop = Session()
-            session_loop.query(Replays).filter_by(id=replay.id).update({'video_processed': True})
+            session_loop.query(Replays).filter_by(id=replay.id).update({'video_processed': True, "date_added": datetime.datetime.now()})
             session_loop.commit()
 
     return json.dumps({"status": True})
