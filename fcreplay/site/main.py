@@ -62,8 +62,8 @@ class AdvancedSearchForm(FlaskForm):
         ('yun', 'yun')]
 
     orderby_list = [
-        ('date_replay', 'Replay Date'),
-        ('date_added', 'Date Added')
+        ('date_added', 'Date Added'),
+        ('date_replay', 'Replay Date')
     ]
 
     # Generate supported games
