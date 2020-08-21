@@ -333,3 +333,17 @@
       lineinfile:
         path: /etc/sudoers
         line: 'fcrecorder   ALL=NOPASSWD:/usr/bin/systemctl restart google-fluentd'
+
+    - name: Disable makecache
+      service:
+        name: dnf-makecache.service
+        state: stopped
+        enabled: false
+      when: gcloud
+
+    - name: Disable mamkecache timer
+      service:
+        name: dnf-makecache.timer
+        state: stopped
+        enabled: false
+      when: gcloud
