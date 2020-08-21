@@ -100,6 +100,15 @@
       become_user: fcrecorder
       become: True
 
+    - name: Update setuptools and pip
+      shell: |
+        cd /home/fcrecorder/fcreplay
+        source ./venv/bin/activate
+        pip install --upgrade setuptools
+        pip install --upgrade pip
+      become_user: fcrecorder
+      become: True
+
     - name: Install fcreplay
       shell: |
         cd /home/fcrecorder/fcreplay
@@ -315,12 +324,25 @@
 
     - name: Set fbneo scanlines on config
       replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.ini
+        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
         regexp: '^bVidDX9Scanlines 1'
         replace: 'bVidDX9Scanlines 0'
       become: True
       become_user: fcrecorder
       ignore_errors: true
+
+    - name: Set fbneo to write overlays to files
+      replace:
+        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
+        regexp: 'bVidSaveOverlayFiles 0'
+        replace: bVidSaveOverlayFiles 1'
+      become: True
+      become_user: fcrecorder
+
+    - name: Remove generated config file
+      file:
+        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.ini
+        state: absent
 
     - name: Enable fcrecord service
       service:

@@ -5,12 +5,8 @@ import threading
 import subprocess
 import time
 import logging
+import os
 import json
-import pkg_resources
-import pyscreenshot as ImageGrab
-
-from PIL import Image
-from PIL import ImageChops
 
 with open("config.json", "r") as json_data_file:
     config = json.load(json_data_file)
@@ -59,6 +55,10 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
     # Get start time
     begin_time = datetime.datetime.now()
 
+    # Make sure 'started.inf' is missing
+    if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
+        os.remove(f"{fcadefbneo_path}/fightcade/started.inf")
+
     # Start ggpofbneo
     logging.info("Starting fcadefbneo thread")
     logging.debug(f"Arguments: {fcadefbneo_path}, {fc_challange_id}, {game_name}")
@@ -68,67 +68,16 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
     ggpo_thread.start()
     logging.info("Started ggpofbneo")
 
-    # Check to see if ggpofbneo is running. This seems to be quite hard since there arn't
-    # any log files. Wait for wine to load emulator, then check the right portion of the
-    # screen. If it's black, that means the emulator hasn't started playing the replay.
-    # Tried monitoring sound and starting the record when sound plays, but that doesn't
-    # work reliably. So going to grab the screen capture. This requires a few edge cases:
-    # 1. Launch ggpofbneo
-    #   1. Check to see if ggpofbneo is loaded
-    #     1. Check to see if there are screen updates
-
-    empty_capture = Image.open(pkg_resources.resource_filename(
-        'fcreplay', 'data/empty_capture.png')).convert('RGB')
-    ggpo_capture = Image.open(pkg_resources.resource_filename(
-        'fcreplay', 'data/ggpo_capture.png')).convert('RGB')
-
-    empty_capture.save('empty_capture.png')
-    ggpo_capture.save('ggpo_capture.png')
-
-    logging.info('Starting image capture loop')
+    # Check to see if fcadefbneo has started playing
+    logging.info('Checking to see if replay has started')
     while True:
         running_time = (datetime.datetime.now() - begin_time).seconds
 
-        screen_ggpo_capture = ImageGrab.grab(
-            backend='maim',
-            bbox=(485, 0, 514, 18)).convert('RGB')
-        screen_capture1 = ImageGrab.grab(
-            backend='maim',
-            bbox=(800, 100, 950, 650)).convert('RGB')
+        if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
+            logging.info('First frame displayed. Starting OBS')
+            break
 
-        screen_ggpo_capture.save('screen_ggpo_capture.png')
-        screen_capture1.save('screen_capture1.png')
-
-        time.sleep(0.2)
-
-        # Check if ggpo is running:
-        diff = ImageChops.difference(screen_ggpo_capture, ggpo_capture)
-        if not diff.getbbox():
-            logging.info('Detected GGPO')
-
-            # Check if screen is empty
-            diff = ImageChops.difference(empty_capture, screen_capture1)
-
-            # Something on screen
-            if diff.getbbox():
-                logging.info('Detected non-black GGPO screen')
-                # Look for non-static image
-                screen_capture2 = ImageGrab.grab(
-                    backend='maim',
-                    bbox=(800, 100, 950, 650))
-                screen_capture2.save('screen_capture2.png')
-                screen_capture2 = ImageGrab.grab(
-                    backend='maim',
-                    bbox=(800, 100, 950, 650)).convert('RGB')
-                diff = ImageChops.difference(screen_capture1, screen_capture2)
-
-                # Something has changes
-                if diff.getbbox():
-                    logging.info('Detected screen updates')
-                    break
-            else:
-                logging.info('Detected black GGPO screen')
-
+        # Check if file exiss
         if running_time > kill_time:
             logging.info('Match never started, exiting')
             cleanup_tasks()
