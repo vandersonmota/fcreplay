@@ -72,8 +72,8 @@ def add_replay(replay, emulator, game, player_replay=True):
         p1_rank = replay['players'][0]['rank']
         p2_rank = replay['players'][1]['rank']
     else:
-        p1_rank = None
-        p2_rank = None
+        p1_rank = '0'
+        p2_rank = '0'
 
     # Insert into database
     logging.info(f"Looking for {challenge_id}")

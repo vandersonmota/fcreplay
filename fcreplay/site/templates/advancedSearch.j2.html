@@ -21,6 +21,17 @@ render_field, render_form_row %}{% block content %}
             {{ render_field(advancedSearchForm.game) }}
           </div>
 
+          <div class="input-group top-buffer">
+            <div class="row">
+              <div class="col">
+                {{ render_field(advancedSearchForm.p1_rank) }}
+              </div>
+              <div class="col">
+                {{ render_field(advancedSearchForm.p2_rank) }}
+              </div>
+            </div>
+          </div>
+
           <div class="input-group top-buffer" id="charSelectGroup" style="visibility: hidden;">
             <div class="row">
               <div class="col">
@@ -50,9 +61,11 @@ render_field, render_form_row %}{% block content %}
                 
                 // Make Element Visible
                 document.getElementById("charSelectGroup").style.visibility = 'visible';
+                document.getElementById("CharacterHelp").style.visibility = 'visible';
               } else {
                 // Hide Element
                 document.getElementById("charSelectGroup").style.visibility = 'hidden';
+                document.getElementById("CharacterHelp").style.visibility = 'hidden';
               }
             };
 
@@ -63,9 +76,8 @@ render_field, render_form_row %}{% block content %}
               .then(data => localStorage.setItem('character_detect', JSON.stringify(data)));
           </script>
 
-
           <div class="row">
-            <small id="CharacterHelp" class="text-muted">
+            <small id="CharacterHelp" class="text-muted" style="visibility: hidden;">
               Characters will be searched for both players
             </small>
           </div>

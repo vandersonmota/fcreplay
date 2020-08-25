@@ -67,6 +67,17 @@ class AdvancedSearchForm(FlaskForm):
         ('date_replay', 'Replay Date')
     ]
 
+    rank_list = [
+        ('any', 'Any'),
+        ('0', '?'),
+        ('1', 'E'),
+        ('2', 'D'),
+        ('3', 'C'),
+        ('4', 'B'),
+        ('5', 'A'),
+        ('6', 'S')
+    ]
+
     # Generate supported games
     game_list = []
     game_list.append(
@@ -81,6 +92,10 @@ class AdvancedSearchForm(FlaskForm):
     search = StringField()
     game = SelectField('Game', choices=game_list,
                        render_kw={'class': 'fixed', 'onChange': 'gameSelect(this)', 'id': 'game'})
+    p1_rank = SelectField('P1 Rank', choices=rank_list,
+                          render_kw={'class': 'fixed', 'style': 'width:75px'})
+    p2_rank = SelectField('P2 Rank', choices=rank_list,
+                          render_kw={'class': 'fixed', 'style': 'width:75px'})
     char1 = SelectField('Character1', choices=characters,
                         render_kw={'class': 'fixed'})
     char2 = SelectField('Character2', choices=characters,
@@ -124,6 +139,8 @@ class Replays(db.Model):
     id = db.Column(db.Text, primary_key=True)
     p1_loc = db.Column(db.String)
     p2_loc = db.Column(db.String)
+    p1_rank = db.Column(db.String)
+    p2_rank = db.Column(db.String)
     p1 = db.Column(db.String)
     p2 = db.Column(db.String)
     date_replay = db.Column(db.DateTime)
@@ -262,6 +279,8 @@ def advancedSearchResult():
         session['search'] = result.search.data
         session['char1'] = result.char1.data
         session['char2'] = result.char2.data
+        session['p1_rank'] = result.p1_rank.data
+        session['p2_rank'] = result.p1_rank.data
         session['order_by'] = result.order_by.data
         session['game'] = result.game.data
 
@@ -270,6 +289,8 @@ def advancedSearchResult():
         search_query = session['search']
         char1 = session['char1']
         char2 = session['char2']
+        p1_rank = session['p1_rank']
+        p2_rank = session['p2_rank']
         order_by = session['order_by']
         game = session['game']
 
@@ -292,10 +313,17 @@ def advancedSearchResult():
     if game == 'Any':
         game = '%'
 
+    if p1_rank == 'any':
+        p1_rank = '%'
+    if p2_rank == 'any':
+        p2_rank = '%'
+
     replay_query = [
         Replays.created == True,
         Replays.failed == False,
         Replays.game.ilike(f'{game}'),
+        Replays.p1_rank.ilike(f'{p1_rank}'),
+        Replays.p2_rank.ilike(f'{p2_rank}'),
         Replays.id.in_(
             Descriptions.query.with_entities(Descriptions.id).filter(
                 Descriptions.description.ilike(f'%{search_query}%')
