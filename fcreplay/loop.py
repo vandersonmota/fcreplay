@@ -5,6 +5,7 @@ import os
 import sys
 import time
 
+from fcreplay.config import Config
 from fcreplay.gcloud import destroy_fcreplay
 from fcreplay.replay import Replay
 
@@ -13,8 +14,7 @@ if 'REMOTE_DEBUG' in os.environ:
     debugpy.listen(("0.0.0.0", 5678))
     debugpy.wait_for_client()
 
-with open("config.json", 'r') as json_data_file:
-    config = json.load(json_data_file)
+config = Config().config
 
 # Setup Log
 logging.basicConfig(

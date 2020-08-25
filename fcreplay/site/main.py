@@ -4,6 +4,8 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 
+from fcreplay.config import Config
+
 from wtforms import Form, StringField, BooleanField, SubmitField, SelectField
 
 import os
@@ -19,8 +21,7 @@ try:
 except ImportError:
     pass
 
-with open("config.json", 'r') as json_data_file:
-    config = json.load(json_data_file)
+config = Config().config
 
 with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
     character_dict = json.load(json_data_file)

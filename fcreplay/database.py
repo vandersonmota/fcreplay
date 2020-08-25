@@ -5,14 +5,14 @@ import json
 
 from fcreplay.models import Base
 from fcreplay.models import Job, Replays, Character_detect, Descriptions, Youtube_day_log
+from fcreplay.config import Config
 from sqlalchemy.orm import sessionmaker
 from os import environ
 
 
 class Database:
     def __init__(self):
-        with open("config.json", 'r') as json_data_file:
-            config = json.load(json_data_file)
+        config = Config().config
 
         logging.basicConfig(
             format='%(asctime)s %(levelname)s: %(message)s',
@@ -36,6 +36,8 @@ class Database:
             id=kwargs['challenge_id'],
             p1_loc=kwargs['p1_loc'],
             p2_loc=kwargs['p2_loc'],
+            p1_rank=kwargs['p1_rank'],
+            p2_rank=kwargs['p2_rank'],
             p1=kwargs['p1'],
             p2=kwargs['p2'],
             date_replay=kwargs['date_replay'],

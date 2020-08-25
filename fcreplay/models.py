@@ -26,6 +26,8 @@ class Replays(Base):
     id = Column(String, primary_key=True)
     p1_loc = Column(String)
     p2_loc = Column(String)
+    p1_rank = Column(String)
+    p2_rank = Column(String)
     p1 = Column(String)
     p2 = Column(String)
     date_replay = Column(DateTime)

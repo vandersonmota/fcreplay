@@ -6,8 +6,9 @@ import pkg_resources
 import json
 import logging
 
-with open("config.json", "r") as json_data_file:
-    config = json.load(json_data_file)
+from fcreplay.config import Config
+
+config = Config().config
 
 with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json'), "r") as json_data_file:
     character_dict = json.load(json_data_file)

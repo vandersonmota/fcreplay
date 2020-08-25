@@ -2,10 +2,10 @@ import logging
 import datetime
 import json
 
+from fcreplay.config import Config
 from fcreplay.database import Database
 
-with open("config.json", "r") as json_data_file:
-    config = json.load(json_data_file)
+config = Config().config
 
 # Setup Log
 logging.basicConfig(

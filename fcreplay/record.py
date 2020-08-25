@@ -8,8 +8,9 @@ import logging
 import os
 import json
 
-with open("config.json", "r") as json_data_file:
-    config = json.load(json_data_file)
+from fcreplay.config import Config
+
+config = Config().config
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     filename=config['logfile'],

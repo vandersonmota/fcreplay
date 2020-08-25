@@ -12,6 +12,7 @@ from retrying import retry
 
 from fcreplay import character_detect
 from fcreplay import record as fc_record
+from fcreplay.config import Config
 from fcreplay.database import Database
 from fcreplay.gcloud import destroy_fcreplay
 
@@ -21,8 +22,7 @@ class Replay:
     """
 
     def __init__(self):
-        with open("config.json", 'r') as json_data_file:
-            self.config = json.load(json_data_file)
+        self.config = Config().config
 
         self.db = Database()
         self.replay = self.get_replay()

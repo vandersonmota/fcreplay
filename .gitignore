@@ -18,6 +18,7 @@ venv
 .storage_creds.json
 .youtube-upload-credentials.json
 config.json
+config_dev.json
 description_append.txt
 
 # Log file

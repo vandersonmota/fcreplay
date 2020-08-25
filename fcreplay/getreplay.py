@@ -9,6 +9,7 @@ Usage:
 Options:
   -h --help         Show this screen.
 """
+from fcreplay.config import Config
 from fcreplay.database import Database
 from retrying import retry
 import datetime
@@ -24,8 +25,7 @@ if 'REMOTE_DEBUG' in os.environ:
     debugpy.listen(("0.0.0.0", 5678))
     debugpy.wait_for_client()
 
-with open("config.json", "r") as json_data_file:
-    config = json.load(json_data_file)
+config = Config().config
 
 db = Database()
 
@@ -68,6 +68,13 @@ def add_replay(replay, emulator, game, player_replay=True):
     date_added = datetime.datetime.utcnow()
     player_requested = player_replay
 
+    if 'rank' in replay['players'] or 'rank' in replay['players'][1]:
+        p1_rank = replay['players'][0]['rank']
+        p2_rank = replay['players'][1]['rank']
+    else:
+        p1_rank = None
+        p2_rank = None
+
     # Insert into database
     logging.info(f"Looking for {challenge_id}")
 
@@ -81,6 +88,8 @@ def add_replay(replay, emulator, game, player_replay=True):
                 challenge_id=challenge_id,
                 p1_loc=p1_loc,
                 p2_loc=p2_loc,
+                p1_rank=p1_rank,
+                p2_rank=p2_rank,
                 p1=p1,
                 p2=p2,
                 date_replay=date_replay,

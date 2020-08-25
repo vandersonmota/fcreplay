@@ -9,12 +9,12 @@ Options:
   -h --help         Show this screen.
 """
 from docopt import docopt
+from fcreplay.config import Config
 import json
 import logging
 import requests
 
-with open("config.json", 'r') as json_data_file:
-    config = json.load(json_data_file)
+config = Config().config
 
 # Setup Log
 logging.basicConfig(

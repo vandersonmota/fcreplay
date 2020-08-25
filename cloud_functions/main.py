@@ -1,14 +1,19 @@
 import datetime
 import googleapiclient.discovery
 import json
+import os
 import time
 import requests
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-with open("config.json", 'r') as json_data_file:
-    config = json.load(json_data_file)
+if 'FCREPLAY_CONFIG' in os.environ:
+    with open(os.environ['FCREPLAY_CONFIG'], 'r') as json_data_file:
+        config = json.load(json_data_file)
+else:
+    with open("config.json", 'r') as json_data_file:
+        config = json.load(json_data_file)
 
 Base = declarative_base()
 engine = create_engine(config['sql_baseurl'], echo=False)
