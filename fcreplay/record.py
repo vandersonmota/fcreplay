@@ -40,10 +40,6 @@ def cleanup_tasks():
     subprocess.run(['/usr/bin/pulseaudio', '-k'])
 
 
-def find_recording_dialog():
-
-
-
 def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
     logging.info('Starting pulseaudio')
     subprocess.run(['pulseaudio', '--daemon'])

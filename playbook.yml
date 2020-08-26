@@ -40,6 +40,7 @@
           - vim
           - wget
           - wine.i686
+          - winetricks
           - x11vnc
           - xinit
           - xorg-x11-drv-dummy
@@ -82,6 +83,7 @@
       git:
         repo: https://github.com/glisignoli/fcreplay.git
         dest: /home/fcrecorder/fcreplay_install
+        version: "{{ gitbranch }}"
       become_user: fcrecorder
       become: True
 
