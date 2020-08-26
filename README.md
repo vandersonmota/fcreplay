@@ -2,7 +2,6 @@
    * [About](#about)
    * [Goal](#goal)
    * [Features](#features)
-      * [Character Detection](#character-detection)
       * [Description generation](#description-generation)
    * [Requirements](#requirements)
       * [Database](#database)
@@ -25,7 +24,7 @@
       * [Running automatically on startup](#running-automatically-on-startup)
       * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Wed 26 Aug 2020 07:19:16 PM NZST -->
+<!-- Added by: gino, at: Wed 26 Aug 2020 09:51:52 PM NZST -->
 
 <!--te-->
 
@@ -42,19 +41,6 @@ The goal of this is to make fightcade replays accessible to anyone to watch with
 # Features
 fcreplay has several features to automate the encoding process and add aditional data to the generated videos
 
-## Character Detection
-OpenCV is used to analise the video and match character names from the health bars. This is done by matching the included character name images against the encoded video every 60 frames. Depending on your OBS recording settings you might need to regenerate the images.
-
-This can be done for any 4:3 rendered game.
-
-You can enable character detection by:
-1. Adding `"character_detect": true,` to the game in your `config.json` file
-1. Placing your images in: `./fcreplay/data/charnames/<gamename>`
-  * Images need to be smaller than the area being checked
-  * Images are matched against the encoded file. This mean you need to generate your images from a already recorded video to account for encoding artifacts
-  * You need at least 10 different images per character
-1. Editing `./fcreplay/data/character_detect.json` and adding a new game, characters and detection location (Currently a fixed Y axis, to be fixed...)
-
 ## Description generation
 A desctiption is generated that contains:
 1. The fightcade replay id
@@ -63,7 +49,6 @@ A desctiption is generated that contains:
 4. The game being played
 5. The date the game was played
 6. (Optional) A appended description
-7. (Supported) What characters are being played
 
 # Requirements
 ## Database
@@ -72,23 +57,15 @@ Fcreplay uses sqlalchemy and has been tested with postgres and is used store any
 ## Optional: Google cloud
 Fcreplay is designed to run on google cloud
 
-
 ### A few more notes:
-To trigger OBS the screen is captured, looking for a the split windows and then checking for differences in the screen capture. Without memory inspection it doesn't seem like there is a way to tell when the emulator has started playing the replay.
+To trigger recording the file `started.inf` is checked. If the file exists then pyautogui is used to start recording the avi file(s)
 
-Because fightcade doesn't have the ability to record to a video file you need to use some sort of capture software.
-
-For this project [Open Broadcaster Software](https://obsproject.com/) is used to encode the video.
-
-The i3 window manager is used to ensure that the fcadefbneo window is always in the same place, and have preconfigured OBS to record that area.
+The i3 window manager is used to ensure that the fcadefbneo window is always in the same place.
 
 This is all done in a headless X11 session
 
 ## Todo
  - Better exception handling.
- - Better capturing of OBS and Wine output.
- - Find something that might be more lightweight than OBS.
-   - ffmpeg with x11 capturing was attempted, but the framerate was unacceptible
  - Thumbnails are generated but not used
 
 ## Requirements
@@ -96,9 +73,10 @@ To run this, you need:
  1. A VM or physical machine.
      1. With at least 4 Cores (Fast ones would be ideal)
      1. With at least 4GB Ram
-     1. With at least 30GB of storage 
- 1. Running Fedora 32
- 1. Some familiarity with linux will help
+     1. With at least 250GB of storage 
+        1. This is the amount of temporary storage required to encode a replay of up to 3 hours long. Replay recording requires ~20MB/sec
+ 2. Running Fedora 32
+ 3. Some familiarity with linux will help
 
 ### Uploading to youtube.com
 To upload files to youtube.com you need to setup a youtube api endpoint. See here: https://github.com/tokland/youtube-upload

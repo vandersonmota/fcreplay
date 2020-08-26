@@ -4,7 +4,6 @@
         false,
         "/path/to/file.txt"
     ],
-    "detect_chars": true,
     "fcadefbneo_path": "/home/fcrecorder/fcreplay/Fightcade/emulator/fbneo",
     "fcreplay_dir": "/home/fcrecorder/fcreplay",
     "gcloud_destroy_on_failed": true,
@@ -29,7 +28,6 @@
     "loglevel": "DEBUG",
     "max_replay_length": 10800,
     "min_replay_length": 60,
-    "obs_video_filename": "replay.mkv",
     "password": "CHAT_PASSWORD",
     "player_replay": true,
     "random_replay": true,

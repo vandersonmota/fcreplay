@@ -3,7 +3,7 @@
   hosts: all
   become: True
   tasks:
-    - name: Install obs-repo
+    - name: Install rpmfusion repos
       yum:
         name: "{{packages}}"
       vars:
@@ -20,13 +20,13 @@
           - chkconfig
           - cmake
           - firewalld
+          - ffmpeg
           - gcc
           - git
           - i3
           - jq
           - libpq-devel
           - maim
-          - obs-studio
           - pavucontrol
           - portaudio
           - portaudio-devel
@@ -293,13 +293,6 @@
         path: /home/fcrecorder/.config
         state: directory
         mode: 0750
-      become: True
-      become_user: fcrecorder
-
-    - name: Copy obs config
-      copy:
-        src: ./files/obs-studio
-        dest: /home/fcrecorder/.config/
       become: True
       become_user: fcrecorder
 

@@ -10,7 +10,6 @@ import traceback
 from internetarchive import get_item
 from retrying import retry
 
-from fcreplay import character_detect
 from fcreplay import record as fc_record
 from fcreplay.config import Config
 from fcreplay.database import Database
@@ -26,7 +25,6 @@ class Replay:
 
         self.db = Database()
         self.replay = self.get_replay()
-        self.detected_characters = []
         self.description_text = ""
 
         logging.basicConfig(
@@ -155,9 +153,10 @@ class Replay:
 
     @handle_fail
     def move(self):
-        filename = f"{self.replay.id}.mkv"
-        shutil.move(f"{self.config['fcreplay_dir']}/videos/{self.config['obs_video_filename']}",
-                    f"{self.config['fcreplay_dir']}/finished/dirty_{filename}")
+        """Move files to finished area
+        """
+        shutil.move(f"{self.config['fcadefbneo_path']}/avi/*.avi",
+                    f"{self.config['fcreplay_dir']}/finished/")
 
         self.update_status('MOVED')
 
@@ -165,44 +164,44 @@ class Replay:
     def broken_fix(self):
         """Fix broken video
 
-        When OBS is terminated, it potentially leaves the video in
-        a broken state. To fix this ffmpeg is used to fix any
-        errors in the video.
+        When fcadefbneo recording is terminated, it potentially leaves the video in
+        a broken state. To fix this ffmpeg is used to fix any errors in the video.
         """
-
-        filename = f"{self.replay.id}.mkv"
         logging.info("Running ffmpeg to fix dirty video")
+
+        avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
+        avi_files_list.sorted()
+
         subprocess.run([
             "ffmpeg", "-err_detect", "ignore_err",
-            "-i", f"{self.config['fcreplay_dir']}/finished/dirty_{filename}",
+            "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
             "-c", "copy",
-            f"{self.config['fcreplay_dir']}/finished/{filename}"])
+            f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}.fixed"])
 
         logging.info("Removing dirty file")
-        os.remove(f"{self.config['fcreplay_dir']}/finished/dirty_{filename}")
+        os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}")
+        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}.fixed",
+                  f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}")
 
         self.update_status('BROKEN_CHECK')
         logging.info("Removed dirty file and fixed file")
 
     @handle_fail
-    def detect_characters(self):
-        """Detect characters
-        """
-        self.detected_characters = character_detect.character_detect(
-            self.replay.game,
-            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv")
+    def encode(self):
+        logging.info("Encoding file")
+        avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
+        avi_files_list.sorted()
+        avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in '|'.join(avi_files_list)]
 
-    @handle_fail
-    def set_detected_characters(self):
-        logging.info("Adding detected characters to DB")
-        logging.info(f"Data is: {self.detected_characters}")
-        for i in self.detected_characters:
-            self.db.add_detected_characters(
-                challenge_id=self.replay.id,
-                p1_char=i[0],
-                p2_char=i[1],
-                vid_time=i[2]
-            )
+        subprocess.run(['ffmpeg',
+                        '-i', f'"concat:{avi_files}"',
+                        '-vf',  'scale=800x600',
+                        '-c:v', 'libx264',
+                        '-preset', 'slow',
+                        '-crf', '23',
+                        '-c:a', 'libmp3lame',
+                        '-q:a', '128',
+                        f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"])
 
     @handle_fail
     def set_description(self):
@@ -213,20 +212,9 @@ class Replay:
         """
         logging.info("Creating description")
 
-        # Added detected characters
-        if self.detected_characters is not None and self.config['supported_games'][self.replay.game]['character_detect']:
-            self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
-                "({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
-                "\nFightcade replay id: {self.replay.id}"
-
-            for match in self.detected_characters:
-                self.description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
-                    f"\n{match[0]} vs {match[1]}"
-        
-        else:
-            self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
-                                    f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
-                                    f"\nFightcade replay id: {self.replay.id}"
+        self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
+                                f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
+                                f"\nFightcade replay id: {self.replay.id}"
 
         # Read the append file:
         if self.config['description_append_file'][0] is True:
