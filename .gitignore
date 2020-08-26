@@ -11,6 +11,7 @@ fcreplay/__pycache__/
 terraform.tfstate
 terraform.tfstate.backup
 venv
+*.ipynb
 
 # Config files
 .client_secrets.json
