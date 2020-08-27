@@ -172,7 +172,7 @@ class Replay:
         logging.info("Running ffmpeg to fix dirty video")
 
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
-        avi_files_list.sorted()
+        avi_files_list.sort()
 
         subprocess.run([
             "ffmpeg", "-err_detect", "ignore_err",
@@ -192,7 +192,7 @@ class Replay:
     def encode(self):
         logging.info("Encoding file")
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
-        avi_files_list.sorted()
+        avi_files_list.sort()
         avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in '|'.join(avi_files_list)]
 
         subprocess.run(['ffmpeg',
