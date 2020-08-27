@@ -178,12 +178,12 @@ class Replay:
             "ffmpeg", "-err_detect", "ignore_err",
             "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
             "-c", "copy",
-            f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}.fixed"])
+            f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed"])
 
         logging.info("Removing dirty file")
-        os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}")
-        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}.fixed",
-                  f"{self.config['fcreplay_dir']}/finished/{avi_files_list['-1']}")
+        os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
+        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed",
+                  f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
 
         self.update_status('BROKEN_CHECK')
         logging.info("Removed dirty file and fixed file")
