@@ -199,7 +199,7 @@ class Replay:
         avi_files = '|'.join([f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files_list])
 
         subprocess.run(['ffmpeg',
-                        '-i', f'"concat:{avi_files}"',
+                        '-i', f'concat:{avi_files}',
                         '-vf',  'scale=800x600',
                         '-c:v', 'libx264',
                         '-preset', 'slow',
