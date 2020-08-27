@@ -196,7 +196,7 @@ class Replay:
         logging.info("Encoding file")
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
         avi_files_list.sort()
-        avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in '|'.join(avi_files_list)]
+        avi_files = '|'.join([f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files_list])
 
         subprocess.run(['ffmpeg',
                         '-i', f'"concat:{avi_files}"',
