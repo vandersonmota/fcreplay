@@ -155,8 +155,10 @@ class Replay:
     def move(self):
         """Move files to finished area
         """
-        shutil.move(f"{self.config['fcadefbneo_path']}/avi/*.avi",
-                    f"{self.config['fcreplay_dir']}/finished/")
+        avi_files_list = os.listdir(f"{self.config['fcadefbneo_path']}/avi")
+        for f in avi_files_list:
+            shutil.move(f"{self.config['fcadefbneo_path']}/avi/{f}",
+                        f"{self.config['fcreplay_dir']}/finished/{f}")
 
         self.update_status('MOVED')
 
