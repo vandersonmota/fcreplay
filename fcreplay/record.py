@@ -91,6 +91,7 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
             logging.info('Match never started, exiting')
             cleanup_tasks()
             return "FailTimeout"
+        time.sleep(0.1)
 
     begin_time = datetime.datetime.now()
     while True:
