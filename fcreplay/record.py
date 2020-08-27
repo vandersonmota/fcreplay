@@ -27,7 +27,7 @@ def start_fcadefbneo(fcadefbneo_path=None, fc_challenge_id=None, game_name=None)
             '/usr/bin/wine',
             f'{fcadefbneo_path}/fcadefbneo.exe',
             f'quark:stream,{game_name},{fc_challenge_id}.2,7100',
-            '-w'
+            '-q'
         ]
     )
 
