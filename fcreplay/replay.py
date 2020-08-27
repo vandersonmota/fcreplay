@@ -174,15 +174,18 @@ class Replay:
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
         avi_files_list.sort()
 
-        subprocess.run([
-            "ffmpeg", "-err_detect", "ignore_err",
-            "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
-            "-c", "copy",
-            f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed"])
+        brokenfix_rc = subprocess.run(
+            [
+                "ffmpeg", "-err_detect", "ignore_err",
+                "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
+                "-c", "copy",
+                f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi"
+            ]
+        )
 
         logging.info("Removing dirty file")
         os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
-        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed",
+        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi",
                   f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
 
         self.update_status('BROKEN_CHECK')
