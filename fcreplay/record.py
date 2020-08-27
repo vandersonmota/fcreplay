@@ -113,7 +113,7 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
             time.sleep(1)
             cleanup_tasks()
             return "Pass"
-        
+
         # Kill Timeout reached
         if running_time > (running_time + kill_time):
             return "FailTimeout"
