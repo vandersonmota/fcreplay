@@ -49,11 +49,7 @@ def main(Debug, Gcloud):
             replay.record()
             replay.move()
             replay.broken_fix()
-
-            if config['detect_chars'] and config['supported_games'][replay.replay.game]['character_detect']:
-                replay.detect_characters()
-                replay.set_detected_characters()
-
+            replay.encode()
             replay.set_description()
             replay.create_thumbnail()
 

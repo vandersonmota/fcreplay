@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 import argparse
 import datetime
-import threading
-import subprocess
-import time
+import i3ipc
+import json
 import logging
 import os
-import json
+import pyautogui
+import subprocess
+import threading
+import time
 
 from fcreplay.config import Config
 
@@ -19,23 +21,13 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
 
 
 def start_fcadefbneo(fcadefbneo_path=None, fc_challenge_id=None, game_name=None):
-    logging.info(f"/usr/bin/wine {fcadefbneo_path}/fcadefbneo.exe quark:stream,{game_name},{fc_challenge_id}.2,7100 -w")
+    logging.info(f"/usr/bin/wine {fcadefbneo_path}/fcadefbneo.exe quark:stream,{game_name},{fc_challenge_id}.2,7100 -q")
     fbneo_rc = subprocess.run(
         [
             '/usr/bin/wine',
             f'{fcadefbneo_path}/fcadefbneo.exe',
             f'quark:stream,{game_name},{fc_challenge_id}.2,7100',
-            '-w'
-        ]
-    )
-
-
-def start_obs():
-    obs_rc = subprocess.run(
-        [
-            '/usr/bin/obs',
-            '--minimize-to-tray',
-            '--startrecording'
+            '-q'
         ]
     )
 
@@ -44,9 +36,24 @@ def cleanup_tasks():
     # Need to kill a bunch of processes and restart pulseaudio
     subprocess.run(['pkill', '-9', 'fcadefbneo'])
     subprocess.run(['pkill', '-9', 'wine'])
-    subprocess.run(['pkill', '-9', 'obs'])
     subprocess.run(['pkill', '-9', '-f', 'system32'])
     subprocess.run(['/usr/bin/pulseaudio', '-k'])
+
+
+def find_record_dialog():
+    # Look for recording dialog
+    i3 = i3ipc.Connection()
+    root = i3.get_tree()
+    for con in root:
+        if isinstance(con.name, str):
+            if 'Set video compression option' in con.name:
+                # Found dialog. Click on ok
+                mouse_x = con.rect.x + 300
+                mouse_y = con.rect.y + 10
+                pyautogui.moveTo(mouse_x, mouse_y)
+                pyautogui.click()
+                return True
+    return False
 
 
 def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
@@ -75,47 +82,43 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
         running_time = (datetime.datetime.now() - begin_time).seconds
 
         if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
-            logging.info('First frame displayed. Starting OBS')
-            break
+            logging.info('First frame displayed. Looking for recording dialog')
+            if find_record_dialog():
+                break
 
-        # Check if file exiss
+        # Timeout reached, exiting
         if running_time > kill_time:
             logging.info('Match never started, exiting')
             cleanup_tasks()
             return "FailTimeout"
-
-    logging.info("Starting obs")
-    obs_thread = threading.Thread(target=start_obs)
-    obs_thread.start()
-    logging.info("Started obs")
+        time.sleep(0.1)
 
     begin_time = datetime.datetime.now()
     while True:
         running_time = (datetime.datetime.now() - begin_time).seconds
-        obs_running = '/usr/bin/obs' in str(subprocess.run(
-            ['ps', '-ef'], stdout=subprocess.PIPE, stderr=subprocess.PIPE))
 
+        # Log what minute we are on
         if (running_time % 60) == 0:
             logging.info(
                 f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
 
+        # Finished recording video
         if running_time > fc_time:
-            # We have reached the end of the video. Killing processes
-            if obs_running:
-                cleanup_tasks()
-                return "Pass"
-            else:
-                logging.error(
-                    "Timeout reached but obs isn't running. Something was broken")
-                cleanup_tasks()
-                return "FailNoOBS"
-        if running_time > kill_time:
-            # Check if OBS is running, if it isn't then we are broken :(
-            if not obs_running:
-                logging.error("Kill timeout reached killing processes")
-                cleanup_tasks()
-                return "FailTimeout"
-        time.sleep(1)
+            # We need to manually stop the recording. Move the mouse into the
+            # fcadefbneo window, press alt, then down*6, then enter/return
+            pyautogui.moveTo(700, 384)
+            pyautogui.press('alt')
+            pyautogui.press(['down','down','down','down','down','down'])
+            pyautogui.keyDown('enter')
+            pyautogui.keyUp('enter')
+            time.sleep(1)
+            cleanup_tasks()
+            return "Pass"
+
+        # Kill Timeout reached
+        if running_time > (running_time + kill_time):
+            return "FailTimeout"
+        time.sleep(0.2)
 
 
 if __name__ == "__main__":

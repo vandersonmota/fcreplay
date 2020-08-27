@@ -3,7 +3,7 @@
   hosts: all
   become: True
   tasks:
-    - name: Install obs-repo
+    - name: Install rpmfusion repos
       yum:
         name: "{{packages}}"
       vars:
@@ -17,16 +17,19 @@
       vars:
         packages:
           - alsa-utils
+          - cabextract
           - chkconfig
           - cmake
           - firewalld
+          - ffmpeg
           - gcc
           - git
           - i3
           - jq
           - libpq-devel
           - maim
-          - obs-studio
+          - p7zip
+          - p7zip-plugins
           - pavucontrol
           - portaudio
           - portaudio-devel
@@ -40,6 +43,7 @@
           - vim
           - wget
           - wine.i686
+          - winetricks
           - x11vnc
           - xinit
           - xorg-x11-drv-dummy
@@ -82,6 +86,7 @@
       git:
         repo: https://github.com/glisignoli/fcreplay.git
         dest: /home/fcrecorder/fcreplay_install
+        version: "{{ gitbranch }}"
       become_user: fcrecorder
       become: True
 
@@ -296,13 +301,6 @@
       become: True
       become_user: fcrecorder
 
-    - name: Copy obs config
-      copy:
-        src: ./files/obs-studio
-        dest: /home/fcrecorder/.config/
-      become: True
-      become_user: fcrecorder
-
     - name: Copy fightcade2
       synchronize:
         src: "{{ FC2_PATH }}"
@@ -314,35 +312,19 @@
     - name: Fix FC2 permissions
       command: chown -R fcrecorder:fcrecorder /home/fcrecorder
 
-    - name: Set fbneo scanlines on default config
-      replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
-        regexp: '^bVidScanlines 1'
-        replace: 'bVidScanlines 0'
+    - name: Copy default config
+      copy:
+        src: ./files/fcadefbneo.default.ini
+        dest: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/
       become: True
       become_user: fcrecorder
 
-    - name: Set fbneo scanlines on config
-      replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
-        regexp: '^bVidDX9Scanlines 1'
-        replace: 'bVidDX9Scanlines 0'
+    - name: Copy config
+      copy:
+        src: ./files/fcadefbneo.ini
+        dest: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/
       become: True
       become_user: fcrecorder
-      ignore_errors: true
-
-    - name: Set fbneo to write overlays to files
-      replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
-        regexp: 'bVidSaveOverlayFiles 0'
-        replace: bVidSaveOverlayFiles 1'
-      become: True
-      become_user: fcrecorder
-
-    - name: Remove generated config file
-      file:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.ini
-        state: absent
 
     - name: Enable fcrecord service
       service:
