@@ -40,6 +40,22 @@ def cleanup_tasks():
     subprocess.run(['/usr/bin/pulseaudio', '-k'])
 
 
+def find_record_dialog():
+    # Look for recording dialog
+    i3 = i3ipc.Connection()
+    root = i3.get_tree()
+    for con in root:
+        if isinstance(con.name, str):
+            if 'Set video compression option' in con.name:
+                # Found dialog. Click on ok
+                mouse_x = con.rect.x + 300
+                mouse_y = con.rect.y + 10
+                pyautogui.moveTo(mouse_x, mouse_y)
+                pyautogui.click()
+                return True
+    return False
+
+
 def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
     logging.info('Starting pulseaudio')
     subprocess.run(['pulseaudio', '--daemon'])
@@ -67,18 +83,8 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
 
         if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
             logging.info('First frame displayed. Looking for recording dialog')
-
-            # Look for recording dialog
-            i3 = i3ipc.Connection()
-            root = i3.get_tree()
-            for con in root:
-                if 'Set video compression option' in con.name:
-                    # Found dialog. Click on ok
-                    mouse_x = con.rect.x + 300
-                    mouse_y = con.rect.y + 10
-                    pyautogui.moveTo(mouse_x, mouse_y)
-                    pyautogui.click()
-                    break
+            if find_record_dialog():
+                break
 
         # Timeout reached, exiting
         if running_time > kill_time:
