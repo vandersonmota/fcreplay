@@ -17,6 +17,7 @@
       vars:
         packages:
           - alsa-utils
+          - cabextract
           - chkconfig
           - cmake
           - firewalld
@@ -27,6 +28,8 @@
           - jq
           - libpq-devel
           - maim
+          - p7zip
+          - p7zip-plugins
           - pavucontrol
           - portaudio
           - portaudio-devel
@@ -309,35 +312,19 @@
     - name: Fix FC2 permissions
       command: chown -R fcrecorder:fcrecorder /home/fcrecorder
 
-    - name: Set fbneo scanlines on default config
-      replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
-        regexp: '^bVidScanlines 1'
-        replace: 'bVidScanlines 0'
+    - name: Copy default config
+      copy:
+        src: ./files/fcadefbneo.default.ini
+        dest: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/
       become: True
       become_user: fcrecorder
 
-    - name: Set fbneo scanlines on config
-      replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
-        regexp: '^bVidDX9Scanlines 1'
-        replace: 'bVidDX9Scanlines 0'
+    - name: Copy config
+      copy:
+        src: ./files/fcadefbneo.ini
+        dest: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/
       become: True
       become_user: fcrecorder
-      ignore_errors: true
-
-    - name: Set fbneo to write overlays to files
-      replace:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
-        regexp: 'bVidSaveOverlayFiles 0'
-        replace: bVidSaveOverlayFiles 1'
-      become: True
-      become_user: fcrecorder
-
-    - name: Remove generated config file
-      file:
-        path: /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/config/fcadefbneo.ini
-        state: absent
 
     - name: Enable fcrecord service
       service:

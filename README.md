@@ -24,7 +24,7 @@
       * [Running automatically on startup](#running-automatically-on-startup)
       * [Google cloud](#google-cloud-1)
 
-<!-- Added by: gino, at: Thu 27 Aug 2020 07:37:17 PM NZST -->
+<!-- Added by: gino, at: Thu 27 Aug 2020 10:20:11 PM NZST -->
 
 <!--te-->
 
@@ -130,14 +130,10 @@ I've include a basic ansible playbook for the installation, you will need to hav
       2. Google Cloud: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True, "FC2_PATH": "/path/to/local/FC2", "gitbranch": "master" }' playbook.yml`
       3. Google Cloud auto destroy: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"destroy": True, "gcloud": True, "FC2_PATH": "/path/to/local/FC2", "gitbranch": "master" }' playbook.yml`
    7. After running the ansible script, you will need to start a xorg session and run `wine /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/fcadefbneo.exe` once to initialise wine
-   8. Then run in a xorg session, run winetricks and install: 
+   8. Then run in a xorg session, run winetricks and install:
+      * allcodecs
       * avifil32
       * cinepack
-      * dirac
-      * ffdshow
-      * l3codecx
-      * vcrun2008
-      * vcrun6
       * xvid
  
 ## Monitoring Recording
