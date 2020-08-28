@@ -215,7 +215,7 @@ class Replay:
         try:
             mencoder_rc.check_returncode()
         except subprocess.CalledProcessError as e:
-            logging.error(f"Unable to process avi files. Return code: {e.returncode}, Output: {e.output})
+            logging.error(f"Unable to process avi files. Return code: {e.returncode}, Output: {e.output}")
             raise e
 
     @handle_fail
