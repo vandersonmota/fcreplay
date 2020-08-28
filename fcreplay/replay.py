@@ -198,6 +198,13 @@ class Replay:
         avi_files_list.sort()
         avi_files = ' '.join([f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files_list])
 
+        logging.info("Running mencoder with:" + " ".join[
+            'mencoder',
+            '-oac', 'mp3lame', '-lameopts', 'abr:br=128',
+            '-ovc', 'x264', '-x264encopts', 'preset=fast:crf=23:subq=1:threads=8', '-vf', 'flip,scale=800:600',
+            avi_files,
+            '-o', f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"])        
+
         subprocess.run(['mencoder',
                         '-oac', 'mp3lame', '-lameopts', 'abr:br=128',
                         '-ovc', 'x264', '-x264encopts', 'preset=fast:crf=23:subq=1:threads=8', '-vf', 'flip,scale=800:600',
