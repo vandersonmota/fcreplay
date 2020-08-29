@@ -25,6 +25,9 @@
         allowfullscreen>
       </iframe>
       <p class="card-description">
+        <p>
+          Length: {{ replay.length|convertlength }}
+        </p>
        {% for c in characters %}
         <p>
           {{ c.p1_char }} vs {{ c.p2_char }} -

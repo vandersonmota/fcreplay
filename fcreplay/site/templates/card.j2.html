@@ -14,6 +14,9 @@
         Replay Date: {{replay.date_replay}}
       </h6>
       <h6 class="font-weight-bold mb-1">
+        Length: {{replay.length|convertlength}}
+      </h6>
+      <h6 class="font-weight-bold mb-1">
         <img src='assets/img/flags/{{ replay.p1_loc.lower() }}.png' alt='{{ replay.p1_loc.lower() }}' title='{{ replay.p1_loc.lower() }}'>
         <img src='assets/img/ranks/rank{{ replay.p1_rank }}-small.png' alt='{{ replay.p1_rank }}' title='{{ replay.p1_rank }}'>
         {{ replay.p1 }} vs

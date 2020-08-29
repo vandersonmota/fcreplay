@@ -11,7 +11,14 @@ from wtforms import Form, StringField, BooleanField, SubmitField, SelectField
 import os
 import json
 import logging
+import time
 import pkg_resources
+
+
+if 'REMOTE_DEBUG' in os.environ:
+    import debugpy
+    debugpy.listen(("0.0.0.0", 5678))
+    debugpy.wait_for_client()
 
 try:
     import googleclouddebugger
@@ -64,7 +71,8 @@ class AdvancedSearchForm(FlaskForm):
 
     orderby_list = [
         ('date_added', 'Date Added'),
-        ('date_replay', 'Replay Date')
+        ('date_replay', 'Replay Date'),
+        ('length', 'Length')
     ]
 
     rank_list = [
@@ -108,7 +116,8 @@ class AdvancedSearchForm(FlaskForm):
 class SearchForm(FlaskForm):
     orderby_list = [
         ('date_replay', 'Replay Date'),
-        ('date_added', 'Date Added')
+        ('date_added', 'Date Added'),
+        ('length', 'Length')
     ]
 
     # Generate supported games
@@ -165,6 +174,13 @@ class Character_detect(db.Model):
     p1_char = db.Column(db.String)
     p2_char = db.Column(db.String)
     vid_time = db.Column(db.String)
+
+
+@app.template_filter()
+def convertlength(length):
+    time_res = time.gmtime(length)
+    res = time.strftime("%H:%M:%S",time_res)
+    return(res)
 
 
 @app.route('/')
@@ -236,6 +252,8 @@ def submitResult():
         return redirect(url_for('submitResult'))
     else:
         searchForm = SearchForm()
+        if 'replay_result' not in session:
+            return index()
         result = session['replay_result']
         return render_template('submitResult.j2.html', form=searchForm, result=result, submt_active=True)
 
@@ -286,6 +304,8 @@ def advancedSearchResult():
 
         return redirect(url_for('advancedSearchResult'))
     else:
+        if 'search' not in session:
+            return index()
         search_query = session['search']
         char1 = session['char1']
         char2 = session['char2']
@@ -302,6 +322,8 @@ def advancedSearchResult():
         order = Replays.date_replay.desc()
     elif order_by == 'date_added':
         order = Replays.date_added.desc()
+    elif order_by == 'length':
+        order = Replays.length.desc()
     else:
         raise LookupError
 
@@ -346,7 +368,7 @@ def advancedSearchResult():
                 )
             )
         )
-    
+
     logging.debug(Replays.query.filter(*replay_query))
     pagination = Replays.query.filter(*replay_query).order_by(order).paginate(page, per_page=9)
     replays = pagination.items
@@ -367,6 +389,8 @@ def search():
 
         return redirect(url_for('search'))
     else:
+        if 'search' not in session:
+            return index()
         search_query = session['search']
         order_by = session['order_by']
         game = session['game']
@@ -381,6 +405,8 @@ def search():
         order = Replays.date_replay.desc()
     elif order_by == 'date_added':
         order = Replays.date_added.desc()
+    elif order_by == 'length':
+        order = Replays.length.desc()
     else:
         raise LookupError
 
