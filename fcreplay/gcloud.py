@@ -36,7 +36,7 @@ def destroy_fcreplay():
     RECEIVING_FUNCTION = 'destroy_fcreplay_instance'
     HOSTNAME = socket.gethostname()
 
-    if 'fcreplay-instance-' not in HOSTNAME:
+    if 'fcreplay-image-' not in HOSTNAME:
         logging.info(f"Not destroying {HOSTNAME}")
         return(False)
 

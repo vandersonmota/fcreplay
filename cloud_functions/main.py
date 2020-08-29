@@ -175,7 +175,7 @@ def launch_fcreplay(request):
         return(json.dumps({"status": False}))
 
     # Generate instance name uuid
-    instance_name = 'fcreplay-instance-' + str(uuid.uuid1())
+    instance_name = 'fcreplay-image-' + str(uuid.uuid1())
 
     # Starting compute engine
     compute = googleapiclient.discovery.build('compute', 'v1')
@@ -233,9 +233,12 @@ def launch_fcreplay(request):
 
 def destroy_fcreplay_instance(request=None, instance_name=None):
     request_json = request.get_json(silent=True)
-    if (request_json is not None and 'instance' in request_json) or instance_name is not None:
+    print(f"request_json: {request_json}")
+    print(f"instance_name: {instance_name}")
+    if (request_json is not None and 'instance_name' in request_json) or instance_name is not None:
         if request_json is not None:
-            instance_name = request_json['instance']
+            print("Setting instance name from json")
+            instance_name = request_json['instance_name']
 
         if 'fcreplay-image-' not in instance_name:
             print(f"Not deleting {instance_name}")
@@ -261,6 +264,8 @@ def destroy_fcreplay_instance(request=None, instance_name=None):
             config['gcloud_zone'],
             instance_name)
         return json.dumps({"status": True})
+
+    print('No instance_name found')
     return json.dumps({"status": False})
 
 
