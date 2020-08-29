@@ -13,6 +13,7 @@ from fcreplay.config import Config
 import json
 import logging
 import requests
+import socket
 
 config = Config().config
 
@@ -29,8 +30,15 @@ PROJECT_ID = config['gcloud_project']
 
 
 def destroy_fcreplay():
+    """This function will destroy the current google cloud instance
+    """
     logging.info("Starting destroy_fcreplay")
-    RECEIVING_FUNCTION = 'destroy_fcreplay'
+    RECEIVING_FUNCTION = 'destroy_fcreplay_instance'
+    HOSTNAME = socket.gethostanme()
+
+    if 'fcreplay-instance-' not in HOSTNAME:
+        logging.info(f"Not destroying {HOSTNAME}")
+        return(False)
 
     function_url = f'https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
     metadata_server_url = \
@@ -44,7 +52,7 @@ def destroy_fcreplay():
 
     # Provide the token in the request to the receiving function
     function_headers = {'Authorization': f'bearer {jwt}'}
-    function_response = requests.get(function_url, headers=function_headers)
+    function_response = requests.post(function_url, headers=function_headers, json={'instance_name': HOSTNAME})
 
     logging.info(f"destroy_fcreplay retruned: {function_response.status_code}")
     status = function_response.status_code

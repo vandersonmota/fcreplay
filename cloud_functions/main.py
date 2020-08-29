@@ -4,6 +4,7 @@ import json
 import os
 import time
 import requests
+import uuid
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -36,6 +37,14 @@ class Replays(Base):
     date_added = Column(DateTime)
     player_requested = Column(Boolean)
     video_processed = Column(Boolean)
+
+
+class Job(Base):
+    __tablename__ = 'job'
+
+    id = Column(String, primary_key=True)
+    start_time = Column(DateTime)
+    instance = Column(String)
 
 
 def video_status(request):
@@ -114,38 +123,59 @@ def check_for_replay(request):
 
 
 def fcreplay_running(request):
-    print("Checking if instance running")
-    instance_name = "fcreplay-image-1"
+    print("Checking if there are instances running")
+    instance_name = "fcreplay-image-"
     compute = googleapiclient.discovery.build('compute', 'v1')
     result = compute.instances().list(
         project=config['gcloud_project'],
         zone=config['gcloud_zone']).execute()
 
+    # Destroy any stopped instances and exit
     for i in result['items']:
         if instance_name in i['name']:
+            # Destroy stopped instances
             if i['status'] == "TERMINATED" and config['gcloud_destroy_when_stopped']:
                 print(f"Destoying {instance_name}")
-                destroy_fcreplay(True)
+                destroy_fcreplay_instance(instance_name=instance_name)
                 return(json.dumps({'status': True}))
-            elif i['status'] == "RUNNING":
-                print(f"{instance_name} instance running")
-                return(json.dumps({'status': True}))
-            else:
-                print(f"{instance_name} status is {i['status']}")
-                return(json.dumps({'status': False}))
 
-    print(f"{instance_name} instance not running")
+    instance_count = 0
+    for i in result['items']:
+        if instance_name in i['name']:
+            # Destroy stopped instances
+            if i['status'] == "TERMINATED" and config['gcloud_destroy_when_stopped']:
+                print(f"Destoying {instance_name}")
+                destroy_fcreplay_instance(instance_name=i['name'])
+                instance_count += 1
+
+            # Count number of running instances
+            elif i['status'] == "RUNNING":
+                print(f"{instance_name} instance running adding to count")
+                instance_count += 1
+
+            # Count number of 'other' instances
+            else:
+                print(f"{instance_name} status is {i['status']}, adding to count")
+                instance_count += 1
+
+    if instance_count >= config['gcloud_instance_max']:
+        print(f"There are {instance_count}/{config['gcloud_instance_max']} running")
+        return(json.dumps({'status': True}))
+
+    print(f"There are {instance_count}/{config['gcloud_instance_max']} running")
     return(json.dumps({'status': False}))
 
 
 def launch_fcreplay(request):
     print("Running: launch_fcreplay")
-    instance_name = "fcreplay-image-1"
 
     # Check if instance is running
     running = json.loads(fcreplay_running(None))
     if running['status']:
         return(json.dumps({"status": False}))
+
+    # Generate instance name uuid
+    instance_name = 'fcreplay-instance-' + str(uuid.uuid1())
 
     # Starting compute engine
     compute = googleapiclient.discovery.build('compute', 'v1')
@@ -201,28 +231,32 @@ def launch_fcreplay(request):
     return(json.dumps({"status": True}))
 
 
-def destroy_fcreplay(request):
-    print("Deleting fcreaplay-image-1 compute instance")
-    instance_name = "fcreplay-image-1"
+def destroy_fcreplay_instance(request=None, instance_name=None):
+    request_json = request.get_json(silent=True)
+    if (request_json is not None and 'instance' in request_json) or instance_name is not None:
+        if request_json is not None:
+            instance_name = request_json['instance']
+        print(f"Deleting {instance_name} compute instance")
 
-    compute = googleapiclient.discovery.build('compute', 'v1')
-    result = compute.instances().stop(
-        project=config['gcloud_project'],
-        zone=config['gcloud_zone'],
-        instance=instance_name).execute()
+        compute = googleapiclient.discovery.build('compute', 'v1')
+        result = compute.instances().stop(
+            project=config['gcloud_project'],
+            zone=config['gcloud_zone'],
+            instance=instance_name).execute()
 
-    wait_for_operation(
-        compute,
-        config['gcloud_project'],
-        config['gcloud_zone'],
-        result['name'])
+        wait_for_operation(
+            compute,
+            config['gcloud_project'],
+            config['gcloud_zone'],
+            result['name'])
 
-    destroy_vm(
-        compute,
-        config['gcloud_project'],
-        config['gcloud_zone'],
-        instance_name)
-    return json.dumps({"status": True})
+        destroy_vm(
+            compute,
+            config['gcloud_project'],
+            config['gcloud_zone'],
+            instance_name)
+        return json.dumps({"status": True})
+    return json.dumps({"status": False})
 
 
 def wait_for_operation(compute, project, zone, operation):
