@@ -196,17 +196,27 @@ class Replay:
         logging.info("Encoding file")
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
         avi_files_list.sort()
-        avi_files = '|'.join([f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files_list])
+        avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files_list]
 
-        subprocess.run(['ffmpeg',
-                        '-i', f'concat:{avi_files}',
-                        '-vf',  'scale=800x600',
-                        '-c:v', 'libx264',
-                        '-preset', 'slow',
-                        '-crf', '23',
-                        '-c:a', 'libmp3lame',
-                        '-q:a', '128',
-                        f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"])
+        logging.info("Running mencoder with:" + " ".join([
+            'mencoder',
+            '-oac', 'mp3lame', '-lameopts', 'abr:br=128',
+            '-ovc', 'x264', '-x264encopts', 'preset=fast:crf=23:subq=1:threads=8', '-vf', 'flip,scale=800:600',
+            *avi_files,
+            '-o', f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"]))
+
+        mencoder_rc = subprocess.run([
+            'mencoder',
+            '-oac', 'mp3lame', '-lameopts', 'abr:br=128',
+            '-ovc', 'x264', '-x264encopts', 'preset=slow:crf=23:subq=1:threads=8', '-vf', 'flip,scale=800:600',
+            *avi_files,
+            '-o', f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"])
+
+        try:
+            mencoder_rc.check_returncode()
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Unable to process avi files. Return code: {e.returncode}, Output: {e.output}")
+            raise e
 
     @handle_fail
     def set_description(self):
