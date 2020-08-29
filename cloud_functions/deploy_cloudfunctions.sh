@@ -1,5 +1,9 @@
 #!/bin/bash
-functions="check_for_replay destroy_fcreplay video_status"
+if [ $# -eq 0 ]; then
+  functions="check_for_replay destroy_fcreplay_instance video_status"
+else
+  functions=$1
+fi
 
 # Get config
 cp ../config.json ./

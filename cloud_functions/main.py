@@ -236,6 +236,11 @@ def destroy_fcreplay_instance(request=None, instance_name=None):
     if (request_json is not None and 'instance' in request_json) or instance_name is not None:
         if request_json is not None:
             instance_name = request_json['instance']
+
+        if 'fcreplay-image-' not in instance_name:
+            print(f"Not deleting {instance_name}")
+            return json.dumps({"status": False})
+
         print(f"Deleting {instance_name} compute instance")
 
         compute = googleapiclient.discovery.build('compute', 'v1')
