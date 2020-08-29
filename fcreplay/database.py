@@ -73,7 +73,6 @@ class Database:
         session.commit()
         session.close()
 
-
     def add_detected_characters(self, **kwargs):
         session = self.Session()
         session.add(Character_detect(
@@ -108,7 +107,7 @@ class Database:
         job = session.query(
             Job
         ).filter_by(
-            Job.id = challenge_id
+            id=challenge_id
         ).first()
         session.close()
         return job
@@ -171,11 +170,12 @@ class Database:
             created=False
         ).filter_by(
             failed=False
+        ).filter_by(
+            status='ADDED'
         ).order_by(
             Replays.date_added.desc()
         ).first()
         session.close()
-        
         return replay
 
     def get_random_replay(self):
@@ -186,6 +186,8 @@ class Database:
             failed=False
         ).filter_by(
             created=False
+        ).filter_by(
+            status='ADDED'
         ).order_by(
             func.random()
         ).first()
@@ -201,6 +203,8 @@ class Database:
             failed=False
         ).filter_by(
             created=False
+        ).filter_by(
+            status='ADDED'
         ).order_by(
             Replays.date_added.desc()
         ).first()
@@ -237,11 +241,11 @@ class Database:
         replays = session.query(
             Replays
         ).filter_by(
-            player_requested = True
+            player_requested=True
         ).filter_by(
-            failed = False
+            failed=False
         ).filter_by(
-            created = False
+            created=False
         ).order_by(
             Replays.date_added.asc()
         ).all()

@@ -55,11 +55,11 @@ def video_status(request):
     to_check = session.query(
         Replays
     ).filter_by(
-        failed = False
+        failed=False
     ).filter_by(
-        created = True
+        created=True
     ).filter_by(
-        video_processed = False
+        video_processed=False
     ).all()
 
     for replay in to_check:
@@ -83,13 +83,13 @@ def check_for_replay(request):
     player_replay = session.query(
         Replays
     ).filter_by(
-        player_requested = True
+        player_requested=True
     ).filter_by(
-        failed = False
+        failed=False
     ).filter_by(
-        created = False
+        created=False
     ).filter_by(
-        status = "ADDED"
+        status="ADDED"
     ).order_by(
         Replays.date_added.asc()
     ).first()
@@ -107,7 +107,7 @@ def check_for_replay(request):
     ).filter_by(
         created=False
     ).filter_by(
-        status = "ADDED"
+        status="ADDED"
     ).order_by(
         func.random()
     ).first()
