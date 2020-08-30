@@ -7,10 +7,9 @@ Base = declarative_base()
 class Job(Base):
     __tablename__ = 'job'
 
-    id = Column(Integer, primary_key=True)
-    challenge_id = Column(String)
+    id = Column(String, primary_key=True)
     start_time = Column(DateTime)
-    length = Column(Integer)
+    instance = Column(String)
 
 
 class Descriptions(Base):

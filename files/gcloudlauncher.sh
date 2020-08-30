@@ -6,7 +6,7 @@
 service_name=$(curl http://metadata.google.internal/computeMetadata/v1/instance/name --header 'Metadata-Flavor: Google')
 
 # Do recording
-if [[ $service_name == 'fcreplay-image-1' ]]; then
+if [[ $service_name =~ 'fcreplay-image-' ]]; then
     logger "restarting google-fluentd"
     sudo /usr/bin/systemctl restart google-fluentd
     logger "Starting recording Xorg as `whoami`"

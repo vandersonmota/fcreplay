@@ -73,7 +73,6 @@ class Database:
         session.commit()
         session.close()
 
-
     def add_detected_characters(self, **kwargs):
         session = self.Session()
         session.add(Character_detect(
@@ -85,25 +84,38 @@ class Database:
         session.commit()
         session.close()
 
-
     def add_job(self, **kwargs):
         session = self.Session()
         session.add(Job(
-            challenge_id=kwargs['challenge_id'],
+            id=kwargs['challenge_id'],
             start_time=kwargs['start_time'],
-            length=kwargs['length']
+            instance=kwargs['length']
         ))
         session.commit()
         session.close()
 
-
     def remove_job(self, **kwargs):
         session = self.Session()
         session.query(Job).filter_by(
-            challenge_id=kwargs['challenge_id']
+            id=kwargs['challenge_id']
         ).delete()
         session.commit()
         session.close()
+
+    def get_job(self, challenge_id):
+        session = self.Session()
+        job = session.query(
+            Job
+        ).filter_by(
+            id=challenge_id
+        ).first()
+        session.close()
+        return job
+
+    def get_job_count(self):
+        session = self.Session()
+        count = session.execute('select count(id) from job').first()[0]
+        return count
 
     def update_status(self, **kwargs):
         session = self.Session()
@@ -146,7 +158,7 @@ class Database:
         ).first()
         session.close()
 
-        return(day_log)
+        return day_log
 
     def get_oldest_player_replay(self):
         session = self.Session()
@@ -158,12 +170,13 @@ class Database:
             created=False
         ).filter_by(
             failed=False
+        ).filter_by(
+            status='ADDED'
         ).order_by(
             Replays.date_added.desc()
         ).first()
         session.close()
-        
-        return(replay)
+        return replay
 
     def get_random_replay(self):
         session = self.Session()
@@ -173,12 +186,14 @@ class Database:
             failed=False
         ).filter_by(
             created=False
+        ).filter_by(
+            status='ADDED'
         ).order_by(
             func.random()
         ).first()
         session.close()
 
-        return(replay)
+        return replay
 
     def get_oldest_replay(self):
         session = self.Session()
@@ -188,12 +203,14 @@ class Database:
             failed=False
         ).filter_by(
             created=False
+        ).filter_by(
+            status='ADDED'
         ).order_by(
             Replays.date_added.desc()
         ).first()
         session.close()
 
-        return(replay)
+        return replay
 
     def update_failed_replay(self, **kwargs):
         session = self.Session()
@@ -219,28 +236,18 @@ class Database:
         session.commit()
         session.close()
 
-    def get_current_job(self):
-        session = self.Session()
-        job = session.query(
-            Job
-        ).order_by(
-            Job.id.desc()
-        ).first()
-        session.close()
-        return(job)
-
     def get_all_queued_player_replays(self):
         session = self.Session()
         replays = session.query(
             Replays
         ).filter_by(
-            player_requested = True
+            player_requested=True
         ).filter_by(
-            failed = False
+            failed=False
         ).filter_by(
-            created = False
+            created=False
         ).order_by(
             Replays.date_added.asc()
         ).all()
         session.close()
-        return(replays)
+        return replays

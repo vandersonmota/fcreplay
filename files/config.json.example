@@ -7,6 +7,7 @@
     "fcadefbneo_path": "/home/fcrecorder/fcreplay/Fightcade/emulator/fbneo",
     "fcreplay_dir": "/home/fcrecorder/fcreplay",
     "gcloud_destroy_on_failed": true,
+    "gcloud_instance_max": 5,
     "gcloud_project": "gcloud project id",
     "gcloud_zone": "gcloud zone id",
     "gcloud_storage_creds_path": "/path/to/creds.json",

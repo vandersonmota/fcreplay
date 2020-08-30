@@ -1,6 +1,0 @@
-{
-    "sql_baseurl": "postgres://username:password@db.url/database_name",
-    "gcloud_project": "project_name",
-    "gcloud_zone": "cloud_zone",
-    "gcloud_compute_service_account": "serviceaccountemail@address.com"
-}
