@@ -226,7 +226,8 @@ def launch_fcreplay(request):
 
 
 def destroy_fcreplay_instance(request=None, instance_name=None):
-    request_json = request.get_json(silent=True)
+    if request is not None:
+        request_json = request.get_json(silent=True)
     print(f"request_json: {request_json}")
     print(f"instance_name: {instance_name}")
     if (request_json is not None and 'instance_name' in request_json) or instance_name is not None:
