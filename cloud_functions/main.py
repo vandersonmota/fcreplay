@@ -135,22 +135,16 @@ def fcreplay_running(request):
         if instance_name in i['name']:
             # Destroy stopped instances
             if i['status'] == "TERMINATED" and config['gcloud_destroy_when_stopped']:
-                print(f"Destoying {instance_name}")
-                destroy_fcreplay_instance(instance_name=instance_name)
+                print(f"Destoying {i['name']}")
+                destroy_fcreplay_instance(instance_name=i['name'])
                 return(json.dumps({'status': True}))
 
     instance_count = 0
     for i in result['items']:
         if instance_name in i['name']:
-            # Destroy stopped instances
-            if i['status'] == "TERMINATED" and config['gcloud_destroy_when_stopped']:
-                print(f"Destoying {instance_name}")
-                destroy_fcreplay_instance(instance_name=i['name'])
-                instance_count += 1
-
             # Count number of running instances
             elif i['status'] == "RUNNING":
-                print(f"{instance_name} instance running adding to count")
+                print(f"{i['name']} instance running adding to count")
                 instance_count += 1
 
             # Count number of 'other' instances
