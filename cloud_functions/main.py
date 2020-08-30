@@ -143,7 +143,7 @@ def fcreplay_running(request):
     for i in result['items']:
         if instance_name in i['name']:
             # Count number of running instances
-            elif i['status'] == "RUNNING":
+            if i['status'] == "RUNNING":
                 print(f"{i['name']} instance running adding to count")
                 instance_count += 1
 
