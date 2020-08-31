@@ -8,12 +8,13 @@ from fcreplay.config import Config
 
 from wtforms import Form, StringField, BooleanField, SubmitField, SelectField
 
+import datetime
 import os
+import pytz
 import json
 import logging
 import time
 import pkg_resources
-
 
 if 'REMOTE_DEBUG' in os.environ:
     import debugpy
@@ -33,7 +34,7 @@ config = Config().config
 with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
     character_dict = json.load(json_data_file)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = config['sql_baseurl']
@@ -179,7 +180,7 @@ class Character_detect(db.Model):
 @app.template_filter()
 def convertlength(length):
     time_res = time.gmtime(length)
-    res = time.strftime("%H:%M:%S",time_res)
+    res = time.strftime("%H:%M:%S", time_res)
     return(res)
 
 
@@ -434,6 +435,19 @@ def search():
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
+
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory(app.static_folder, request.path[1:])
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    tz = pytz.timezone("Pacific/Auckland")
+    aware_dt = tz.localize(datetime.datetime.now())
+    update_date = aware_dt.isoformat()
+    return render_template('sitemap.j2.xml', update_date=update_date)
 
 
 @app.route('/video/<challenge_id>',)
