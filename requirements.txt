@@ -15,6 +15,7 @@ click
 debugpy
 docopt
 dominate
+flask-cors
 google-api-python-client
 google-python-cloud-debugger
 gunicorn

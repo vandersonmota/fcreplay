@@ -3,6 +3,7 @@ from flask import Blueprint
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+from flask_cors import CORS
 
 from fcreplay.config import Config
 
@@ -35,6 +36,7 @@ with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.jso
     character_dict = json.load(json_data_file)
 
 app = Flask(__name__, static_folder='static')
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = config['sql_baseurl']
