@@ -1,8 +1,4 @@
 #!/bin/bash
-
-# Get config
-cp ../config.json ./
-
 # Get service account and project
 SERVICE_ACCOUNT=$(cat config.json | jq -r '.gcloud_compute_service_account')
 if [ $? -gt 0 ]; then

@@ -1,25 +1,16 @@
 from sqlalchemy import create_engine, func
-import os
-import logging
-import json
+import datetime
 
+from fcreplay import logging
 from fcreplay.models import Base
 from fcreplay.models import Job, Replays, Character_detect, Descriptions, Youtube_day_log
 from fcreplay.config import Config
 from sqlalchemy.orm import sessionmaker
-from os import environ
 
 
 class Database:
     def __init__(self):
         config = Config().config
-
-        logging.basicConfig(
-            format='%(asctime)s %(levelname)s: %(message)s',
-            filename=config['logfile'],
-            level=config['loglevel'],
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
 
         # Create Engine
         try:
@@ -251,3 +242,26 @@ class Database:
         ).all()
         session.close()
         return replays
+
+    def get_unprocessed_replays(self):
+        session = self.Session()
+        replays = session.query(
+            Replays
+        ).filter_by(
+            failed=False
+        ).filter_by(
+            created=True
+        ).filter_by(
+            video_processed=False
+        ).all()
+        return replays
+
+    def set_replay_processed(self, **kwargs):
+        session = self.Session()
+        session.query(Replays).filter_by(
+            id=kwargs['challenge_id']
+        ).update(
+            {'video_processed': True, "date_added": datetime.datetime.now()}
+        )
+        session.commit()
+        session.close()
