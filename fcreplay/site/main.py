@@ -440,6 +440,7 @@ def search():
 
 
 @app.route('/robots.txt')
+@app.route('/ads.txt')
 def robots():
     return send_from_directory(app.static_folder, request.path[1:])
 
