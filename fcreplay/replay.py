@@ -8,6 +8,7 @@ import sys
 import traceback
 
 from internetarchive import get_item
+from natsort import natsorted
 from retrying import retry
 
 from fcreplay import record as fc_record
@@ -195,8 +196,8 @@ class Replay:
     def encode(self):
         logging.info("Encoding file")
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
-        avi_files_list.sort()
-        avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files_list]
+        sorted_avi_files_list = natsorted(avi_files_list)
+        avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in sorted_avi_files_list]
 
         logging.info("Running mencoder with:" + " ".join([
             'mencoder',

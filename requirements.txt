@@ -23,6 +23,7 @@ i3ipc
 idna
 internetarchive
 itsdangerous
+natsort
 numpy
 opencv-python
 pillow

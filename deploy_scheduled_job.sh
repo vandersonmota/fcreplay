@@ -22,4 +22,9 @@ gcloud scheduler jobs create http 'video-status-update' --schedule='*/10 * * * *
   --oidc-service-account-email="$SERVICE_ACCOUNT" \
   --oidc-token-audience="https://us-central1-${PROJECT}.cloudfunctions.net/video_status"
 
+gcloud scheduler jobs create http 'get-top-weekly' --schedule='0 0 * * *' \
+  --uri="https://us-central1-${PROJECT}.cloudfunctions.net/get_top_weekly" \
+  --oidc-service-account-email="$SERVICE_ACCOUNT" \
+  --oidc-token-audience="https://us-central1-${PROJECT}.cloudfunctions.net/get_top_weekly"
+
 exit 0
