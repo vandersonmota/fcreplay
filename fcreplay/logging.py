@@ -12,6 +12,7 @@ if 'X_GOOGLE_FUNCTION_IDENTITY' not in os.environ:
         level=config['loglevel'],
         datefmt='%Y-%m-%d %H:%M:%S'
     )
+    logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
     GCLOUD_FUNCTION = False
 
 

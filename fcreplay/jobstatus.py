@@ -1,19 +1,11 @@
-import logging
 import datetime
-import json
 
+from fcreplay import logging
 from fcreplay.config import Config
 from fcreplay.database import Database
 
 config = Config().config
 
-# Setup Log
-logging.basicConfig(
-        format='%(asctime)s %(levelname)s: %(message)s',
-        filename=config['logfile'],
-        level=config['loglevel'],
-        datefmt='%Y-%m-%d %H:%M:%S'
-)
 
 def get_current_job_id():
     db = Database()
@@ -43,13 +35,13 @@ def get_current_job_remaining():
     time_left = length - running_time
 
     logging.info(f"Current job status: running_time: {running_time}, time_left: {time_left}")
-    
+
     if time_left <= 0:
         # Time left is less than 0, probably uploading or doing something
         return 0
     else:
         return time_left
-        
+
 
 def get_current_job_details():
     challenge_id = get_current_job_id()
@@ -68,6 +60,7 @@ def challenge_exists(challenge_id):
     else:
         return True
 
+
 def player_replay(challenge_id):
     # Check to see if replay is a player requested one
     db = Database()
@@ -76,6 +69,7 @@ def player_replay(challenge_id):
         return True
     else:
         return False
+
 
 def check_if_finished(challenge_id):
     if challenge_exists(challenge_id):

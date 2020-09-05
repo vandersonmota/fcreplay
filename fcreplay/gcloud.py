@@ -10,20 +10,11 @@ Options:
 """
 from docopt import docopt
 from fcreplay.config import Config
-import json
-import logging
+from fcreplay import logging
 import requests
 import socket
 
 config = Config().config
-
-# Setup Log
-logging.basicConfig(
-        format='%(asctime)s %(levelname)s: %(message)s',
-        filename=config['logfile'],
-        level=config['loglevel'],
-        datefmt='%Y-%m-%d %H:%M:%S'
-)
 
 REGION = config['gcloud_region']
 PROJECT_ID = config['gcloud_project']

@@ -1,6 +1,4 @@
 import datetime
-import json
-import logging
 import os
 import shutil
 import subprocess
@@ -11,6 +9,7 @@ from internetarchive import get_item
 from retrying import retry
 
 from fcreplay import record as fc_record
+from fcreplay import logging
 from fcreplay.config import Config
 from fcreplay.database import Database
 from fcreplay.gcloud import destroy_fcreplay
@@ -26,13 +25,6 @@ class Replay:
         self.db = Database()
         self.replay = self.get_replay()
         self.description_text = ""
-
-        logging.basicConfig(
-            format='%(asctime)s %(levelname)s: %(message)s',
-            filename=self.config['logfile'],
-            level=self.config['loglevel'],
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
 
     def handle_fail(func):
         """Handle Failure decorator

@@ -1,11 +1,11 @@
 import argparse
-import logging
 import os
 import sys
 import time
 
 from fcreplay.config import Config
 from fcreplay.gcloud import destroy_fcreplay
+from fcreplay import logging
 from fcreplay.replay import Replay
 
 if 'REMOTE_DEBUG' in os.environ:
@@ -14,14 +14,6 @@ if 'REMOTE_DEBUG' in os.environ:
     debugpy.wait_for_client()
 
 config = Config().config
-
-# Setup Log
-logging.basicConfig(
-        format='%(asctime)s %(levelname)s: %(message)s',
-        filename=config['logfile'],
-        level=config['loglevel'],
-        datefmt='%Y-%m-%d %H:%M:%S'
-)
 
 
 # Create directories if they don't exist

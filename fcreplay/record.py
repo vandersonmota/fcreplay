@@ -2,8 +2,6 @@
 import argparse
 import datetime
 import i3ipc
-import json
-import logging
 import os
 import pyautogui
 import subprocess
@@ -11,13 +9,9 @@ import threading
 import time
 
 from fcreplay.config import Config
+from fcreplay import logging
 
 config = Config().config
-
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                    filename=config['logfile'],
-                    level=config['loglevel'],
-                    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def start_fcadefbneo(fcadefbneo_path=None, fc_challenge_id=None, game_name=None):
