@@ -1,8 +1,4 @@
 #!/bin/bash
-
-# Get config
-cp ../config.json ./
-
 # Get service account and project
 SERVICE_ACCOUNT=$(cat config.json | jq -r '.gcloud_compute_service_account')
 if [ $? -gt 0 ]; then
@@ -25,5 +21,10 @@ gcloud scheduler jobs create http 'video-status-update' --schedule='*/10 * * * *
   --uri="https://us-central1-${PROJECT}.cloudfunctions.net/video_status" \
   --oidc-service-account-email="$SERVICE_ACCOUNT" \
   --oidc-token-audience="https://us-central1-${PROJECT}.cloudfunctions.net/video_status"
+
+gcloud scheduler jobs create http 'get-top-weekly' --schedule='0 0 * * *' \
+  --uri="https://us-central1-${PROJECT}.cloudfunctions.net/get_top_weekly" \
+  --oidc-service-account-email="$SERVICE_ACCOUNT" \
+  --oidc-token-audience="https://us-central1-${PROJECT}.cloudfunctions.net/get_top_weekly"
 
 exit 0

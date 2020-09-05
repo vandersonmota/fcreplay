@@ -9,15 +9,15 @@ Usage:
 Options:
   -h --help         Show this screen.
 """
+from fcreplay import logging
 from fcreplay.config import Config
 from fcreplay.database import Database
 from retrying import retry
 import datetime
-import json
-import logging
 import os
 import re
 import requests
+from datetime import timedelta
 from docopt import docopt
 
 if 'REMOTE_DEBUG' in os.environ:
@@ -28,14 +28,6 @@ if 'REMOTE_DEBUG' in os.environ:
 config = Config().config
 
 db = Database()
-
-# Setup Log
-logging.basicConfig(
-    format='%(asctime)s %(levelname)s: %(message)s',
-    filename=config['logfile'],
-    level=config['loglevel'],
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
 
 
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
@@ -108,7 +100,6 @@ def add_replay(replay, emulator, game, player_replay=True):
             logging.info(f"{challenge_id} is only {length} not adding")
             if player_replay:
                 return('TOO_SHORT')
-
     else:
         logging.info(f"{challenge_id} already exists")
         if player_replay:
@@ -149,6 +140,36 @@ def get_game_replays(game):
     return("ADDED")
 
 
+def get_top_weekly():
+    """Get the top weekly replays
+    """
+    today = datetime.datetime.today()
+    start_week = today - timedelta(days=today.weekday())
+    start_week_ms = int(start_week.timestamp()*1000)
+    query = {'req': 'searchquarks', 'best': True, 'since': start_week_ms}
+
+    replays = []
+    for i in range(0, 3):
+        query['offset'] = i*15
+        r = get_data(query)
+        replays += r.json()['results']['results']
+
+    for i in replays:
+        if 'gameid' not in config['supported_games']:
+            logging.info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
+            pass
+        status = add_replay(
+            replay=i,
+            emulator=i['emulator'],
+            game=i['gameid'],
+            player_replay=False
+        )
+        if status != 'ADDED':
+            logging.info(f"Not adding replay {i['quarkid']}, Status: {status}")
+
+    return("ADDED")
+
+
 def get_ranked_replays(game, username=None, pages=None):
     """Get ranked replays
 
@@ -165,7 +186,7 @@ def get_ranked_replays(game, username=None, pages=None):
         query['username'] = username
 
     replays = []
-    if pages == None:
+    if pages is None:
         query['offset'] = 0
         r = get_data(query)
         replays += r.json()['results']['results']

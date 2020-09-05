@@ -1,5 +1,0 @@
-venv
-.vscode
-__pycache__/
-creds.json
-config.json
