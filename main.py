@@ -36,6 +36,10 @@ def video_status(request):
 
 
 def check_for_replay(request):
+    destroyed_instance = json.loads(destroy_stopped_instances(True))['status']
+    if destroyed_instance:
+        return json.dumps({'status': False})
+
     logging.info("Looking for replay")
     player_replay = db.get_oldest_player_replay()
     if player_replay is not None:
@@ -53,8 +57,8 @@ def check_for_replay(request):
     return json.dumps({"status": False})
 
 
-def fcreplay_running(request):
-    logging.info("Checking if there are instances running")
+def destroy_stopped_instances(request):
+    logging.info("Checking if there are instances stopped")
     instance_name = "fcreplay-image-"
     compute = googleapiclient.discovery.build('compute', 'v1')
     result = compute.instances().list(
@@ -69,6 +73,15 @@ def fcreplay_running(request):
                 logging.info(f"Destoying {i['name']}")
                 destroy_fcreplay_instance(instance_name=i['name'])
                 return(json.dumps({'status': True}))
+
+
+def fcreplay_running(request):
+    logging.info("Checking if there are instances running")
+    instance_name = "fcreplay-image-"
+    compute = googleapiclient.discovery.build('compute', 'v1')
+    result = compute.instances().list(
+        project=config['gcloud_project'],
+        zone=config['gcloud_zone']).execute()
 
     instance_count = 0
     for i in result['items']:
