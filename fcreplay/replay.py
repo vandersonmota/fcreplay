@@ -34,9 +34,7 @@ class Replay:
                 return func(self, *args, **kwargs)
             except Exception as e:
                 trace_back = sys.exc_info()[2]
-                line = trace_back.tb_lineno
-                logging.error(traceback.print_tb(trace_back))
-                logging.error(f"Excption: {e} on line: {line},  shutting down")
+                logging.error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
                 logging.info(f"Setting {self.replay.id} to failed")
                 self.db.update_failed_replay(challenge_id=self.replay.id)
                 self.update_status("FAILED")
