@@ -55,6 +55,7 @@ def main(Debug, Gcloud):
             replay.remove_job()
 
             replay.db.update_created_replay(challenge_id=replay.replay.id)
+            replay.set_created()
 
         else:
             logging.info("No more replays. Waiting for replay submission")
