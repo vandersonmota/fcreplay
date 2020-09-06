@@ -284,6 +284,12 @@ class Database:
         ).delete()
         session.commit()
 
+        # Remove job if it exists
+        session.query(Job).filter_by(
+            id=kwargs['challenge_id']
+        ).delete()
+        session.commit()
+
         # Remove character detection if it exists
         session.query(Character_detect).filter_by(
             challenge_id=kwargs['challenge_id']

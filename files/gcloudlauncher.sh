@@ -4,6 +4,8 @@
 # This file needs to put in /usr/local/bin, owned by fcrecorder
 
 service_name=$(curl http://metadata.google.internal/computeMetadata/v1/instance/name --header 'Metadata-Flavor: Google')
+echo "Service name found as: ${service_name}" | logger
+echo "Service name found as: ${service_name}"
 
 # Do recording
 if [[ $service_name =~ 'fcreplay-image-' ]]; then

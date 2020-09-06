@@ -12,4 +12,4 @@ Group=fcrecorder
 WorkingDirectory=/home/fcrecorder
 
 [Install]
-WantedBy=network.target
+WantedBy=cloud-init.target
