@@ -231,6 +231,14 @@
         group: fcrecorder
         mode: '0750'
 
+    - name: Copy the gcloudlauncher
+      copy:
+        src: ./files/gcloudshutdown.sh
+        dest: /usr/local/bin/gcloudshutdown.sh
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0750'
+
     - name: Copy the startup service file
       copy:
         src: ./files/fcrecord.service

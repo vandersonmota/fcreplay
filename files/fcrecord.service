@@ -1,13 +1,15 @@
 [Unit]
 Description=FightCade Record
-After=cloud-init.target
+After=network.service
 
 [Service]
 Type=simple
+RemainAfterExit=true
 ExecStart=/usr/local/bin/gcloudlauncher.sh
+ExecStop=/usr/local/bin/gcloudshutdown.sh
 User=fcrecorder
 Group=fcrecorder
 WorkingDirectory=/home/fcrecorder
 
 [Install]
-WantedBy=cloud-init.target
+WantedBy=network.target

@@ -265,3 +265,29 @@ class Database:
         )
         session.commit()
         session.close()
+
+    def rerecord_replay(self, **kwargs):
+        """Sets replay to be rerecorded
+        """
+        session = self.Session()
+        # Set replay to original status
+        session.query(Replays).filter_by(
+            id=kwargs['challenge_id']
+        ).update(
+            {'failed': False, 'created': False, 'status': 'ADDED'}
+        )
+        session.commit()
+
+        # Remove description if it exists
+        session.query(Descriptions).filter_by(
+            id=kwargs['challenge_id']
+        ).delete()
+        session.commit()
+
+        # Remove character detection if it exists
+        session.query(Character_detect).filter_by(
+            challenge_id=kwargs['challenge_id']
+        ).delete()
+        session.commit()
+
+        session.close()

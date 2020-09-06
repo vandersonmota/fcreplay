@@ -21,10 +21,14 @@ class Replay:
 
     def __init__(self):
         self.config = Config().config
-
         self.db = Database()
         self.replay = self.get_replay()
         self.description_text = ""
+
+        # On replay start create a status file in /tmp
+        # This is used to determine shutdown status for a replay
+        with open('/tmp/fcreplay_status', 'w') as f:
+            f.write(f"{self.replay.id} STARTED")
 
     def handle_fail(func):
         """Handle Failure decorator
@@ -84,14 +88,16 @@ class Replay:
     def remove_job(self):
         """Remove job from database
         """
+        self.update_status("REMOVED_JOB")
         self.db.remove_job(challenge_id=self.replay.id)
-        self.update_status("FINISHED")
 
     @handle_fail
     def update_status(self, status):
         """Update the replay status
         """
         logging.info(f"Set status to {status}")
+        with open('/tmp/fcreplay_status') as f:
+            f.write(f"{self.replay.id} {status}")
         self.db.update_status(
             challenge_id=self.replay.id,
             status=status
@@ -103,7 +109,7 @@ class Replay:
         """
         logging.info(
             f"Starting capture with {self.replay.id} and {self.replay.length}")
-        time_min = int(self.replay.length/60)
+        time_min = int(self.replay.length / 60)
         logging.info(f"Capture will take {time_min} minutes")
 
         self.update_status('RECORDING')
@@ -272,6 +278,7 @@ class Replay:
         exist. So we decorate the function with the @retry decorator to try
         again in a little bit. Max of 3 tries
         """
+        self.update_status('UPLOADING_TO_IA')
         title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mkv"
@@ -303,6 +310,7 @@ class Replay:
     def upload_to_yt(self):
         """Upload video to youtube
         """
+        self.update_status('UPLOADING_TO_YOUTUBE')
         title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mkv"
@@ -325,10 +333,10 @@ class Replay:
                 return False
 
             # Check min and max length:
-            if (int(self.replay.length)/60) < int(self.config['yt_min_length']):
+            if (int(self.replay.length) / 60) < int(self.config['yt_min_length']):
                 logging.info("Replay is too short. Not uploading to youtube")
                 return False
-            if (int(self.replay.length)/60) > int(self.config['yt_max_length']):
+            if (int(self.replay.length) / 60) > int(self.config['yt_max_length']):
                 logging.info("Replay is too long. Not uploading to youtube")
                 return False
 
@@ -403,4 +411,5 @@ class Replay:
 
     @handle_fail
     def set_created(self):
+        self.update_status("FINISHED")
         self.db.update_created_replay(challenge_id=self.replay.id)

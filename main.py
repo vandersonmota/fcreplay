@@ -37,6 +37,7 @@ def video_status(request):
 
 def check_for_replay(request):
     destroyed_instance = json.loads(destroy_stopped_instances(True))['status']
+
     if destroyed_instance:
         return json.dumps({'status': False})
 
@@ -73,6 +74,8 @@ def destroy_stopped_instances(request):
                 logging.info(f"Destoying {i['name']}")
                 destroy_fcreplay_instance(instance_name=i['name'])
                 return(json.dumps({'status': True}))
+
+    return(json.dumps({'status': False}))
 
 
 def fcreplay_running(request):
