@@ -96,7 +96,7 @@ class Replay:
         """Update the replay status
         """
         logging.info(f"Set status to {status}")
-        with open('/tmp/fcreplay_status') as f:
+        with open('/tmp/fcreplay_status', 'w') as f:
             f.write(f"{self.replay.id} {status}")
         self.db.update_status(
             challenge_id=self.replay.id,
@@ -238,7 +238,7 @@ class Replay:
                     f"Description append file {self.config['description_append_file'][1]} doesn't exist")
                 return False
             else:
-                with open(self.config['description_append_file'][1]) as description_append:
+                with open(self.config['description_append_file'][1], 'r') as description_append:
                     self.description_text += description_append.read()
 
         self.update_status('DESCRIPTION_CREATED')
