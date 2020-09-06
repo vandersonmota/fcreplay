@@ -1,6 +1,6 @@
 [Unit]
 Description=FightCade Record
-After=network.service
+After=sshd.service
 
 [Service]
 Type=simple
