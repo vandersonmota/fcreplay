@@ -239,7 +239,7 @@ class Replay:
                 return False
             else:
                 with open(self.config['description_append_file'][1], 'r') as description_append:
-                    self.description_text += description_append.read()
+                    self.description_text += "\n" + description_append.read()
 
         self.update_status('DESCRIPTION_CREATED')
         logging.info("Finished creating description")
