@@ -3,7 +3,7 @@
 Usage:
   fcreplayget game <gameid>
   fcreplayget ranked <gameid> [--playerid=<playerid>] [--pages=<pages>]
-  fcreplayget profile <playerid> <url> [--playerrequested]
+  fcreplayget replay <url> [--playerrequested]
   fcreplayget (-h | --help)
 
 Options:
@@ -31,14 +31,11 @@ db = Database()
 
 
 @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
-def get_data(query, profile=None):
+def get_data(query):
     r = requests.post(
         "https://www.fightcade.com/api/",
         json=query
-     )
-    if "user not found" in r.text:
-        logging.error(f"Unable to find profile: {profile}")
-        raise LookupError
+    )
     if r.status_code == 500:
         logging.error("500 Code, trying up to 3 times")
         raise IOError("Unable to get data")
@@ -52,7 +49,7 @@ def add_replay(replay, emulator, game, player_replay=True):
     p2_loc = replay['players'][1]['country']
     p1 = replay['players'][0]['name']
     p2 = replay['players'][1]['name']
-    date_replay = datetime.datetime.fromtimestamp(replay['date']//1000)
+    date_replay = datetime.datetime.fromtimestamp(replay['date'] // 1000)
     length = replay['duration']
     created = False
     failed = False
@@ -124,7 +121,7 @@ def get_game_replays(game):
 
     query = {'req': 'searchquarks', 'gameid': game}
 
-    r = get_replay(query)
+    r = get_data(query)
 
     for i in r.json()['results']['results']:
         if i['emulator'] == 'fbneo' and i['live'] is False:
@@ -145,12 +142,12 @@ def get_top_weekly():
     """
     today = datetime.datetime.today()
     start_week = today - timedelta(days=today.weekday())
-    start_week_ms = int(start_week.timestamp()*1000)
+    start_week_ms = int(start_week.timestamp() * 1000)
     query = {'req': 'searchquarks', 'best': True, 'since': start_week_ms}
 
     replays = []
     for i in range(0, 3):
-        query['offset'] = i*15
+        query['offset'] = i * 15
         r = get_data(query)
         replays += r.json()['results']['results']
 
@@ -210,11 +207,10 @@ def get_ranked_replays(game, username=None, pages=None):
     return("ADDED")
 
 
-def get_replay(profile, url, player_requested=False):
-    """Get a single replay from a players profile
+def get_replay(url, player_requested=False):
+    """Get a single replay
 
     Args:
-        profile (String): Players profile name
         url (String): Link to replay
     """
     # Validate url, this could probably be done better
@@ -234,11 +230,9 @@ def get_replay(profile, url, player_requested=False):
     # Get play replays
     query = {
         "req": "searchquarks",
-        "offset": 0,
-        "limit": 15,
-        "username": profile
+        "quarkid": challenge_id
     }
-    r = get_data(query, profile)
+    r = get_data(query)
 
     # Look for replay in results:
     for i in r.json()['results']['results']:
@@ -258,8 +252,8 @@ def console():
         get_game_replays(game=arguments['<gameid>'])
     if arguments['ranked'] is True:
         get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
-    if arguments['profile'] is True:
-        get_replay(profile=arguments['<playerid>'], url=arguments['<url>'], player_requested=arguments['--playerrequested'])
+    if arguments['replay'] is True:
+        get_replay(url=arguments['<url>'], player_requested=arguments['--playerrequested'])
 
 
 if __name__ == "__main__":

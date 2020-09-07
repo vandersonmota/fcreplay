@@ -142,7 +142,6 @@ class SearchForm(FlaskForm):
 
 
 class SubmitForm(FlaskForm):
-    player_id = StringField()
     challenge_url = StringField()
     submit = SubmitField()
 
@@ -240,14 +239,12 @@ def submitResult():
     if request.method == 'POST':
         result = SubmitForm(request.form)
 
-        player_id = result.player_id.data
         challenge_id = result.challenge_url.data
-        session['player_id'] = result.player_id.data
         session['challenge_url'] = result.challenge_url.data
 
         from fcreplay.getreplay import get_replay
         replay_result = get_replay(
-            player_id, challenge_id, player_requested=True)
+            challenge_id, player_requested=True)
 
         session['replay_result'] = replay_result
 
