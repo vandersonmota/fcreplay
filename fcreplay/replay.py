@@ -182,7 +182,8 @@ class Replay:
             capture_output=True
         )
 
-        logging.debug(f"broken_fix ffmpeg output: {brokenfix_rc.stdout.decode()}")
+        logging.debug(f"broken_fix ffmpeg stdout: {brokenfix_rc.stdout.decode()}")
+        logging.debug(f"broken_fix ffmpeg stderr: {brokenfix_rc.stderr.decode()}")
 
         logging.info("Removing dirty file")
         os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
