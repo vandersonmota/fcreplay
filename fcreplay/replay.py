@@ -44,7 +44,7 @@ class Replay:
                 self.update_status("FAILED")
 
                 if self.config['gcloud_destroy_on_fail']:
-                    destroy_fcreplay()
+                    destroy_fcreplay(failed=True)
                 sys.exit(1)
 
         return failed
