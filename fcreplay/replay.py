@@ -178,8 +178,11 @@ class Replay:
                 "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
                 "-c", "copy",
                 f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi"
-            ]
+            ],
+            capture_output=True
         )
+
+        logging.debug(f"broken_fix ffmpeg output: {brokenfix_rc.stdout.decode()}")
 
         logging.info("Removing dirty file")
         os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
