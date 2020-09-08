@@ -170,6 +170,8 @@ class Replay:
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
         avi_files_list.sort()
 
+        logging.info(f"avi_file_list is: {avi_files_list}")
+
         brokenfix_rc = subprocess.run(
             [
                 "ffmpeg", "-err_detect", "ignore_err",

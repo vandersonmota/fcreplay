@@ -45,6 +45,7 @@ def find_record_dialog():
                 mouse_x = con.rect.x + 300
                 mouse_y = con.rect.y + 10
                 pyautogui.moveTo(mouse_x, mouse_y)
+                time.sleep(0.1)
                 pyautogui.click()
                 return True
     return False
@@ -101,11 +102,25 @@ def main(fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=Non
             # We need to manually stop the recording. Move the mouse into the
             # fcadefbneo window, press alt, then down*6, then enter/return
             pyautogui.moveTo(700, 384)
+            time.sleep('0.05')
             pyautogui.press('alt')
-            pyautogui.press(['down','down','down','down','down','down'])
+            time.sleep('0.05')
+            pyautogui.press('down')
+            time.sleep('0.05')
+            pyautogui.press('down')
+            time.sleep('0.05')
+            pyautogui.press('down')
+            time.sleep('0.05')
+            pyautogui.press('down')
+            time.sleep('0.05')
+            pyautogui.press('down')
+            time.sleep('0.05')
+            pyautogui.press('down')
+            time.sleep('0.05')
             pyautogui.keyDown('enter')
+            time.sleep('0.05')
             pyautogui.keyUp('enter')
-            time.sleep(1)
+            time.sleep(2)
             cleanup_tasks()
             return "Pass"
 
