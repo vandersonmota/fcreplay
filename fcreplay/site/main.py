@@ -247,6 +247,7 @@ def submitResult():
             challenge_id, player_requested=True)
 
         session['replay_result'] = replay_result
+        logging.info(f"Submit replay: {challenge_id} status is: {replay_result}")
 
         # Add replay and get status here
         return redirect(url_for('submitResult'))
