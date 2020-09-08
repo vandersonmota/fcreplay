@@ -9,6 +9,7 @@ from internetarchive import get_item
 from retrying import retry
 
 from fcreplay import record as fc_record
+from fcreplay.status import status
 from fcreplay import logging
 from fcreplay.config import Config
 from fcreplay.database import Database
@@ -41,7 +42,7 @@ class Replay:
                 logging.error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
                 logging.info(f"Setting {self.replay.id} to failed")
                 self.db.update_failed_replay(challenge_id=self.replay.id)
-                self.update_status("FAILED")
+                self.update_status(status.FAILED)
 
                 if self.config['gcloud_destroy_on_fail']:
                     destroy_fcreplay(failed=True)
@@ -77,7 +78,7 @@ class Replay:
         """Update jobs database table with the current replay
         """
         start_time = datetime.datetime.utcnow()
-        self.update_status("JOB_ADDED")
+        self.update_status(status.JOB_ADDED)
         self.db.add_job(
             challenge_id=self.replay.id,
             start_time=start_time,
@@ -88,7 +89,7 @@ class Replay:
     def remove_job(self):
         """Remove job from database
         """
-        self.update_status("REMOVED_JOB")
+        self.update_status(status.REMOVED_JOB)
         self.db.remove_job(challenge_id=self.replay.id)
 
     @handle_fail
@@ -112,7 +113,7 @@ class Replay:
         time_min = int(self.replay.length / 60)
         logging.info(f"Capture will take {time_min} minutes")
 
-        self.update_status('RECORDING')
+        self.update_status(status.RECORDING)
 
         # Star a recording store recording status
         logging.debug(
@@ -143,7 +144,7 @@ class Replay:
                 raise ValueError
 
         logging.info("Capture finished")
-        self.update_status('RECORDED')
+        self.update_status(status.RECORDED)
 
         return True
 
@@ -156,7 +157,7 @@ class Replay:
             shutil.move(f"{self.config['fcadefbneo_path']}/avi/{f}",
                         f"{self.config['fcreplay_dir']}/finished/{f}")
 
-        self.update_status('MOVED')
+        self.update_status(status.MOVED)
 
     @handle_fail
     def broken_fix(self):
@@ -186,7 +187,7 @@ class Replay:
         os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi",
                   f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
 
-        self.update_status('BROKEN_CHECK')
+        self.update_status(status.BROKEN_CHECK)
         logging.info("Removed dirty file and fixed file")
 
     @handle_fail
@@ -243,7 +244,7 @@ class Replay:
                 with open(self.config['description_append_file'][1], 'r') as description_append:
                     self.description_text += "\n" + description_append.read()
 
-        self.update_status('DESCRIPTION_CREATED')
+        self.update_status(status.DESCRIPTION_CREATED)
         logging.info("Finished creating description")
 
         # Add description to database
@@ -268,7 +269,7 @@ class Replay:
             "-vframes:v", "1",
             f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg"])
 
-        self.update_status('THUMBNAIL_CREATED')
+        self.update_status(status.THUMBNAIL_CREATED)
         logging.info("Finished making thumbnail")
 
     @handle_fail
@@ -280,7 +281,7 @@ class Replay:
         exist. So we decorate the function with the @retry decorator to try
         again in a little bit. Max of 3 tries
         """
-        self.update_status('UPLOADING_TO_IA')
+        self.update_status(status.UPLOADING_TO_IA)
         title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mkv"
@@ -305,14 +306,14 @@ class Replay:
         fc_video.upload(f"{self.config['fcreplay_dir']}/finished/{filename}",
                         metadata=metadata, verbose=True)
 
-        self.update_status('UPLOADED_TO_IA')
+        self.update_status(status.UPLOADED_TO_IA)
         logging.info("Finished upload to archive.org")
 
     @handle_fail
     def upload_to_yt(self):
         """Upload video to youtube
         """
-        self.update_status('UPLOADING_TO_YOUTUBE')
+        self.update_status(status.UPLOADING_TO_YOUTUBE)
         title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mkv"
@@ -387,12 +388,12 @@ class Replay:
                 logging.info('Updating day_log')
                 logging.info("Updating counter")
                 self.db.update_youtube_day_log_count(
-                    count=day_log.count+1, date=today)
+                    count=day_log.count + 1, date=today)
 
             # Remove description file
             os.remove(f"{self.config['fcreplay_dir']}/tmp/description.txt")
 
-            self.update_status('UPLOADED_TO_YOUTUBE')
+            self.update_status(status.UPLOADED_TO_YOUTUBE)
             logging.info('Finished uploading to Youtube')
         else:
             raise ModuleNotFoundError
@@ -408,10 +409,10 @@ class Replay:
         os.remove(f"{self.config['fcreplay_dir']}/finished/{filename}")
         os.remove(f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg")
 
-        self.update_status("REMOVED_GENERATED_FILES")
+        self.update_status(status.REMOVED_GENERATED_FILES)
         logging.info("Finished removing files")
 
     @handle_fail
     def set_created(self):
-        self.update_status("FINISHED")
+        self.update_status(status.FINISHED)
         self.db.update_created_replay(challenge_id=self.replay.id)
