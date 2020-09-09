@@ -38,7 +38,6 @@ def main(Debug, Gcloud):
             replay.add_job()
             replay.record()
             replay.move()
-            replay.broken_fix()
             replay.encode()
             replay.set_description()
             replay.create_thumbnail()

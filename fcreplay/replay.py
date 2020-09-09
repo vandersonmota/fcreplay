@@ -159,41 +159,6 @@ class Replay:
         self.update_status('MOVED')
 
     @handle_fail
-    def broken_fix(self):
-        """Fix broken video
-
-        When fcadefbneo recording is terminated, it potentially leaves the video in
-        a broken state. To fix this ffmpeg is used to fix any errors in the video.
-        """
-        logging.info("Running ffmpeg to fix dirty video")
-
-        avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
-        avi_files_list.sort()
-
-        logging.info(f"avi_file_list is: {avi_files_list}")
-
-        brokenfix_rc = subprocess.run(
-            [
-                "ffmpeg", "-err_detect", "ignore_err",
-                "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
-                "-c", "copy",
-                f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi"
-            ],
-            capture_output=True
-        )
-
-        logging.debug(f"broken_fix ffmpeg stdout: {brokenfix_rc.stdout.decode()}")
-        logging.debug(f"broken_fix ffmpeg stderr: {brokenfix_rc.stderr.decode()}")
-
-        logging.info("Removing dirty file")
-        os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
-        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi",
-                  f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
-
-        self.update_status('BROKEN_CHECK')
-        logging.info("Removed dirty file and fixed file")
-
-    @handle_fail
     def encode(self):
         logging.info("Encoding file")
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
