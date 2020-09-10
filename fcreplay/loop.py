@@ -33,7 +33,7 @@ def main(Debug, Gcloud):
         Gcloud (bool): Cloud shutdown after processing
     """
     # If this is google cloud, and the 'destroying' file exists, remove it
-    if Gcloud and os.path.exist('/tmp/destroying'):
+    if Gcloud and os.path.exists('/tmp/destroying'):
         os.remove('/tmp/destroying')
 
     while True:
