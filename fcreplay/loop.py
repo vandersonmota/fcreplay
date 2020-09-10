@@ -32,6 +32,10 @@ def main(Debug, Gcloud):
         Debug (bool): Exit after one loop
         Gcloud (bool): Cloud shutdown after processing
     """
+    # If this is google cloud, and the 'destroying' file exists, remove it
+    if Gcloud and os.path.exist('/tmp/destroying'):
+        os.remove('/tmp/destroying')
+
     while True:
         replay = Replay()
         if replay.replay is not None:

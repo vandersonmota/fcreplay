@@ -12,8 +12,10 @@ from docopt import docopt
 from fcreplay.database import Database
 from fcreplay.config import Config
 from fcreplay import logging
+from pathlib import Path
 import requests
 import socket
+import sys
 
 config = Config().config
 
@@ -22,8 +24,21 @@ PROJECT_ID = config['gcloud_project']
 
 
 def destroy_fcreplay(failed=False):
-    """This function will destroy the current google cloud instance
+    """Destry the current compute engine
+
+    Checks for the existance of /tmp/destroying. If it exists then
+    don't try and destroy fcreplay
+
+    Args:
+        failed (bool, optional): Updates the replay to failed. Defaults to False.
     """
+    # Create destroying file
+    try:
+        Path('/tmp/destroying').touch(0o644, exist_ok=False)
+    except FileExistsError:
+        # File already exists, not running
+        sys.exit(0)
+
     logging.info("Starting destroy_fcreplay")
     RECEIVING_FUNCTION = 'destroy_fcreplay_instance'
     HOSTNAME = socket.gethostname()
@@ -35,7 +50,7 @@ def destroy_fcreplay(failed=False):
     # Only retry if failed is false, by default this is false, but sometimes recording
     # fails. So we don't want to try and re-record them until we work out why they
     # have failed.
-    if not failed:
+    if failed is False:
         try:
             with open('/tmp/fcreplay_status', 'r') as f:
                 line = f.readline()
