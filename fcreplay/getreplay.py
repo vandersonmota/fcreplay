@@ -58,8 +58,14 @@ def add_replay(replay, emulator, game, player_replay=True):
     player_requested = player_replay
 
     if 'rank' in replay['players'] or 'rank' in replay['players'][1]:
-        p1_rank = replay['players'][0]['rank']
-        p2_rank = replay['players'][1]['rank']
+        if replay['players'][0]['rank'] is None:
+            p1_rank = '0'
+        else:
+            p1_rank = replay['players'][0]['rank']
+        if replay['players'][1]['rank'] is None:
+            p2_rank = '0'
+        else:
+            p2_rank = replay['players'][1]['rank']
     else:
         p1_rank = '0'
         p2_rank = '0'
