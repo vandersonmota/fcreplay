@@ -6,6 +6,7 @@
     - name: Install rpmfusion repos
       yum:
         name: "{{packages}}"
+        disable_gpg_check: True
       vars:
         packages:
           - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_version }}.noarch.rpm 
@@ -14,6 +15,7 @@
     - name: Install packages
       yum:
         name: "{{packages}}"
+        disable_gpg_check: True
       vars:
         packages:
           - alsa-utils
@@ -53,6 +55,7 @@
     - name: install the 'Development tools' package group
       yum:
         name: "@Development tools"
+        disable_gpg_check: True
         state: present
 
     - name: Enable firewalld
@@ -274,6 +277,7 @@
     - name: Install cloud logging config
       yum:
         name: google-fluentd-catch-all-config
+        disable_gpg_check: True
         state: latest
       when: gcloud
 
