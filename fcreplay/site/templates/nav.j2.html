@@ -1,18 +1,18 @@
 <ul class="nav">
   <li class="nav-item  {% if advancedsearch_active -%}active{% endif -%}">
-    <a class="nav-link" href="./advancedSearch">
+    <a class="nav-link" href="{{ './advancedSearch'|linkPath }}">
       <i class="material-icons">search</i>
       <p>Advanced Search</p>
     </a>
   </li>
   <li class="nav-item  {% if submit_active -%}active{% endif -%}">
-    <a class="nav-link" href="./submit">
+    <a class="nav-link" href="{{ './submit'|linkPath }}">
       <i class="material-icons">add</i>
       <p>Submit Replay</p>
     </a>
   </li>
   <li class="nav-item {% if about_active -%}active{% endif -%}">
-    <a class="nav-link" href="./about">
+    <a class="nav-link" href="{{ './about'|linkPath }}">
       <i class="material-icons">info</i>
       <p>About</p>
     </a>

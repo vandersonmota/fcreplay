@@ -185,6 +185,14 @@ def convertlength(length):
     return(res)
 
 
+@app.template_filter()
+def linkPath(url):
+    if request.path != '/':
+        return '../' + url
+    else:
+        return url
+
+
 @app.route('/')
 def index():
     searchForm = SearchForm()

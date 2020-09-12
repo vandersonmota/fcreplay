@@ -160,37 +160,6 @@ class Replay:
         self.update_status(status.MOVED)
 
     @handle_fail
-    def broken_fix(self):
-        """Fix broken video
-
-        When fcadefbneo recording is terminated, it potentially leaves the video in
-        a broken state. To fix this ffmpeg is used to fix any errors in the video.
-        """
-        logging.info("Running ffmpeg to fix dirty video")
-
-        avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
-        avi_files_list.sort()
-
-        logging.info(f"avi_file_list is: {avi_files_list}")
-
-        brokenfix_rc = subprocess.run(
-            [
-                "ffmpeg", "-err_detect", "ignore_err",
-                "-i", f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}",
-                "-c", "copy",
-                f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi"
-            ]
-        )
-
-        logging.info("Removing dirty file")
-        os.remove(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
-        os.rename(f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}.fixed.avi",
-                  f"{self.config['fcreplay_dir']}/finished/{avi_files_list[-1]}")
-
-        self.update_status(status.BROKEN_CHECK)
-        logging.info("Removed dirty file and fixed file")
-
-    @handle_fail
     def encode(self):
         logging.info("Encoding file")
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
@@ -212,12 +181,13 @@ class Replay:
             '-oac', 'mp3lame', '-lameopts', 'abr:br=128',
             '-ovc', 'x264', '-x264encopts', 'preset=slow:crf=23:subq=1:threads=8', '-vf', 'flip,scale=800:600,dsize=4/3',
             *avi_files,
-            '-o', f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"])
+            '-o', f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"],
+            capture_output=True)
 
         try:
             mencoder_rc.check_returncode()
         except subprocess.CalledProcessError as e:
-            logging.error(f"Unable to process avi files. Return code: {e.returncode}, Output: {e.output}")
+            logging.error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {mencoder_rc.stdout}, stderr: {mencoder_rc.stderr}")
             raise e
 
     @handle_fail
