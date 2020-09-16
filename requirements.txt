@@ -10,6 +10,7 @@ Werkzeug
 appdirs
 beautifulsoup4
 certifi
+cerberus
 chardet
 click
 debugpy

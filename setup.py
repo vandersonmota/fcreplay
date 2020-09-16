@@ -32,6 +32,7 @@ setup(name='fcreplay',
       install_requires=[
           'Flask',
           'SQLAlchemy>=1.3.18',
+          'cerberus',
           'debugpy',
           'docopt',
           'flask-cors',
