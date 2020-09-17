@@ -10,6 +10,7 @@ import os
 def test_validjson(request):
     os.environ['FCREPLAY_CONFIG'] = datadir(request, 'config_good.json')
     config = Config().config
+    assert type(config) is dict, "Should be dict"
 
 
 def test_invalidjson(request):
