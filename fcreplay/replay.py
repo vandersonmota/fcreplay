@@ -62,6 +62,7 @@ class Replay:
                 return replay
             else:
                 logging.info('No more player replays')
+                return None
 
         if self.config['random_replay']:
             logging.info('Getting random replay')

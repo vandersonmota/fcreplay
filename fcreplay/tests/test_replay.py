@@ -1,19 +1,28 @@
 from unittest.mock import MagicMock
-import mock
+from mock import mock, patch
+import os
 import sys
 
-from fcreplay.tests.datadir import datadir
 
-# Set Config
-import os
+class TestReplay:
+    def setUp(self, request):
+        from fcreplay.tests.datadir import datadir
+        os.environ['FCREPLAY_CONFIG'] = str(datadir(request, 'config_good.json'))
+        sys.modules['fcreplay.database'] = MagicMock()
+        sys.modules['pyautogui'] = MagicMock()
 
+    def test_init(self, request):
+        self.setUp(request)
+        from fcreplay.replay import Replay
 
-def test_init(request):
-    os.environ['FCREPLAY_CONFIG'] = str(datadir(request, 'config_good.json'))
-    sys.modules['pyautogui'] = MagicMock()
-    sys.modules['fcreplay.database'] = MagicMock()
+        with mock.patch('fcreplay.replay.Replay.get_replay') as mock_get_replay:
+            replay = Replay()
+            mock_get_replay.assert_called()
 
-    from fcreplay.replay import Replay
-    with mock.patch('fcreplay.replay.Replay.get_replay') as mock_get_replay:
+    def test_get_replay(self, request):
+        self.setUp(request)
+        from fcreplay.replay import Replay
         replay = Replay()
-        mock_get_replay.assert_called()
+
+        #Assert return replay
+        #Assert return none when no replays
