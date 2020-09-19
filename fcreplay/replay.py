@@ -8,12 +8,12 @@ import traceback
 from internetarchive import get_item
 from retrying import retry
 
-from fcreplay import record as fc_record
+from fcreplay.record import Record
 from fcreplay.status import status
 from fcreplay import logging
 from fcreplay.config import Config
 from fcreplay.database import Database
-from fcreplay.gcloud import destroy_fcreplay
+from fcreplay.gcloud import Gcloud
 
 
 class Replay:
@@ -45,7 +45,7 @@ class Replay:
                 self.update_status(status.FAILED)
 
                 if self.config['gcloud_destroy_on_fail']:
-                    destroy_fcreplay(failed=True)
+                    Gcloud().destroy_fcreplay(failed=True)
                 sys.exit(1)
 
         return failed
@@ -125,13 +125,13 @@ class Replay:
             fcadefbneo_path={self.config['fcadefbneo_path']},
             fcreplay_path={self.config['fcreplay_dir']},
             game_name={self.replay.game}""")
-        record_status = fc_record.main(fc_challange_id=self.replay.id,
-                                       fc_time=self.replay.length,
-                                       kill_time=self.config['record_timeout'],
-                                       fcadefbneo_path=self.config['fcadefbneo_path'],
-                                       fcreplay_path=self.config['fcreplay_dir'],
-                                       game_name=self.replay.game
-                                       )
+        record_status = Record().main(fc_challange_id=self.replay.id,
+                                      fc_time=self.replay.length,
+                                      kill_time=self.config['record_timeout'],
+                                      fcadefbneo_path=self.config['fcadefbneo_path'],
+                                      fcreplay_path=self.config['fcreplay_dir'],
+                                      game_name=self.replay.game
+                                      )
 
         # Check recording status
         if not record_status == "Pass":
