@@ -70,7 +70,7 @@ class Loop:
                 replay.set_created()
 
             else:
-                logging.info("No more replays. Waiting for replay submission")
+                Logging().info("No more replays. Waiting for replay submission")
                 time.sleep(5)
 
             if self.gcloud:

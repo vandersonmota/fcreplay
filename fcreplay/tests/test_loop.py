@@ -10,7 +10,7 @@ class TestLoop:
     @patch('fcreplay.loop.Logging')
     @patch('debugpy.wait_for_client')
     @patch('debugpy.listen')
-    def test_debug(self, mock_debugpy_listen, mock_debugpy_wait_for_client, mock_logging, mock_config):
+    def test_debugpy(self, mock_debugpy_listen, mock_debugpy_wait_for_client, mock_logging, mock_config):
         with patch.dict('os.environ', {'REMOTE_DEBUG': 'True'}):
             Loop()
             assert mock_debugpy_listen.called
@@ -36,18 +36,18 @@ class TestLoop:
     @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Replay', )
     @patch('os.path')
-    def test_noreplay(self, mock_os, mock_replay, mock_logging, mock_gcloud, mock_config):
+    def test_noreplay(self, mock_os_path, mock_replay, mock_logging, mock_gcloud, mock_config):
         with pytest.raises(SystemExit) as e:
             mock_replay.replay.return_value = None
             loop = Loop()
             loop.debug = True
             loop.main()
 
-            assert mock_replay.add_job.not_called, "Shouldn't add a replay"
-            assert e.type == SystemExit, "Should exit"
+            assert mock_replay.add_job.not_called, "Shouldn't process a replay when none is returned"
+            assert e.type == SystemExit, "Should exit no errors"
 
-        with pytest.raises(SystemExit) as e, patch('os.path.exists', return_value=False):
-            mock_os.path.exists.return_value = False
+        with pytest.raises(SystemExit) as e:
+            mock_os_path.exists.return_value = False
 
             loop = Loop()
             loop.debug = True
@@ -55,4 +55,68 @@ class TestLoop:
             loop.main()
 
             assert mock_gcloud.destroy_replay.called, "Should destroy replay when gcloud is true"
-            assert e.type == SystemExit, "Should exit"
+            assert e.type == SystemExit, "Should exit no errors"
+
+        with pytest.raises(SystemExit) as e, patch('os.remove') as mock_os_remove:
+            mock_os_path.exists.return_value = True
+
+            loop = Loop()
+            loop.debug = True
+            loop.gcloud = True
+            loop.main()
+
+            assert mock_gcloud.destroy_replay.called, "Should destroy replay when gcloud is true"
+            assert mock_os_remove.called, "Should try and remove destroying file when it exists"
+            assert e.type == SystemExit, "Should exit no errors"
+
+    @patch('fcreplay.loop.Config')
+    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.loop.Replay', )
+    def test_ia(self, mock_replay, mock_logging, mock_config):
+        with pytest.raises(SystemExit) as e:
+            loop = Loop()
+            loop.config = {'upload_to_ia': True, 'upload_to_yt': False, 'remove_generated_files': False}
+            loop.debug = True
+            loop.main()
+
+            assert mock_replay.upload_to_ia.called, "Should upload to IA when upload_to_ia is true"
+            assert e.type == SystemExit, "Should exit no errors"
+
+    @patch('fcreplay.loop.Config')
+    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.loop.Replay', )
+    def test_youtube(self, mock_replay, mock_logging, mock_config):
+        with pytest.raises(SystemExit) as e:
+            loop = Loop()
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': True, 'remove_generated_files': False}
+            loop.debug = True
+            loop.main()
+
+            assert mock_replay.upload_to_yt.called, "Should upload to YT when upload_to_yt is true"
+            assert e.type == SystemExit, "Should exit with no errors"
+
+    @patch('fcreplay.loop.Config')
+    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.loop.Replay', )
+    def test_remove_files(self, mock_replay, mock_logging, mock_config):
+        with pytest.raises(SystemExit) as e:
+            loop = Loop()
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': True}
+            loop.debug = True
+            loop.main()
+
+            assert mock_replay.remove_generated_files.called, "Should remove generated files when remove_generated_files is true"
+            assert e.type == SystemExit, "Should exit with no errors"
+
+    @patch('fcreplay.loop.Config')
+    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.loop.Replay')
+    def test_loop(self, mock_replay, mock_logging, mock_config):
+        with pytest.raises(SystemExit) as e:
+            loop = Loop()
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': False}
+            loop.debug = True
+            loop.main()
+
+            assert mock_replay.add_job.called
+            assert e.type == SystemExit, "Should exit with no errors"
