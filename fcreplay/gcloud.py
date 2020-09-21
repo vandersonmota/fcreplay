@@ -11,7 +11,7 @@ Options:
 from docopt import docopt
 from fcreplay.database import Database
 from fcreplay.config import Config
-from fcreplay import logging
+from fcreplay.logging import Logging
 from pathlib import Path
 import requests
 import socket
@@ -41,12 +41,12 @@ class Gcloud:
             # File already exists, not running
             sys.exit(0)
 
-        logging.info("Starting destroy_fcreplay")
+        Logging().info("Starting destroy_fcreplay")
         RECEIVING_FUNCTION = 'destroy_fcreplay_instance'
         HOSTNAME = socket.gethostname()
 
         if 'fcreplay-image-' not in HOSTNAME:
-            logging.info(f"Not destroying {HOSTNAME}")
+            Logging().info(f"Not destroying {HOSTNAME}")
             return(False)
 
         # Only retry if failed is false, by default this is false, but sometimes recording
@@ -60,13 +60,13 @@ class Gcloud:
                     local_replay_status = line.split()[1].strip()
 
                 if local_replay_status in ['UPLOADING_TO_IA', 'UPLOADING_TO_YOUTUBE', 'UPLOADED_TO_IA', 'UPLOADED_TO_YOUTUBE']:
-                    logging.error(f"Not able to safely recover replay {local_replay_id}")
+                    Logging().error(f"Not able to safely recover replay {local_replay_id}")
                 elif local_replay_status not in ['FINISHED', 'REMOVED_GENERATED_FILES']:
                     # Replay was in the middle of processing, going to set replay to be re-recorded
                     db = Database()
                     db.rerecord_replay(challenge_id=local_replay_id)
             except FileNotFoundError:
-                logging.error('/tmp/fcreplay_status not found')
+                Logging().error('/tmp/fcreplay_status not found')
 
         function_url = f'https://{self.REGION}-{self.PROJECT_ID}.cloudfunctions.net/{RECEIVING_FUNCTION}'
         metadata_server_url = \
@@ -82,7 +82,7 @@ class Gcloud:
         function_headers = {'Authorization': f'bearer {jwt}'}
         function_response = requests.post(function_url, headers=function_headers, json={'instance_name': HOSTNAME})
 
-        logging.info(f"destroy_fcreplay retruned: {function_response.status_code}")
+        Logging().info(f"destroy_fcreplay retruned: {function_response.status_code}")
         status = function_response.status_code
         return(status)
 

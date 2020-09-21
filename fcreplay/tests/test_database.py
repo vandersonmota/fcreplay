@@ -75,6 +75,7 @@ class TestDatabase:
         db.get_youtube_day_log()
         db.get_oldest_player_replay()
         db.get_random_replay()
+        db.get_oldest_replay()
         db.update_failed_replay(
             challenge_id=MagicMock()
         )
