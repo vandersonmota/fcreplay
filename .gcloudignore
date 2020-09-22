@@ -34,3 +34,5 @@ fcreplay/__pycache__/
 terraform.tfstate
 terraform.tfstate.backup
 venv
+coverage.xml
+.coverage

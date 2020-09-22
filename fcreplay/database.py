@@ -18,6 +18,7 @@ class Database:
             Base.metadata.create_all(self.engine)
         except Exception as e:
             logging.error(f"Unable to connect to {config['sql_baseurl']}: {e}")
+            raise e
 
         self.Session = sessionmaker(bind=self.engine)
 

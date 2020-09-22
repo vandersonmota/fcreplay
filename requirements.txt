@@ -10,6 +10,7 @@ Werkzeug
 appdirs
 beautifulsoup4
 certifi
+cerberus
 chardet
 click
 debugpy
@@ -29,6 +30,8 @@ pillow
 psycopg2
 pyautogui
 pyscreenshot
+pytest
+pytest-cov
 requests
 retrying
 sqlalchemy

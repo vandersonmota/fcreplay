@@ -12,6 +12,8 @@ terraform.tfstate
 terraform.tfstate.backup
 venv
 *.ipynb
+coverage.xml
+.coverage
 
 # Config files
 .client_secrets.json
