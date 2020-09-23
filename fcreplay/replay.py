@@ -55,7 +55,7 @@ class Replay:
         """Get a replay from the database
         """
         logging.info('Getting replay from database')
-        if self.config['player_replay']:
+        if self.config['player_replay_first']:
             replay = self.db.get_oldest_player_replay()
             if replay is not None:
                 logging.info('Found player replay to encode')
