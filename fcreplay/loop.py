@@ -80,19 +80,18 @@ class Loop:
             if self.debug:
                 sys.exit(0)
 
-    def console(self):
-        """Invoked from command line
-        """
-        parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
-        parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
-        parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
-        args = parser.parse_args()
 
-        self.debug = args.debug
-        self.gcloud = args.gcloud
-        self.main()
+def console(self):
+    """Invoked from command line
+    """
+    parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
+    parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
+    parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
+    args = parser.parse_args()
 
-
-if __name__ == "__main__":
     c = Loop()
     c.console()
+
+    c.debug = args.debug
+    c.gcloud = args.gcloud
+    c.main()

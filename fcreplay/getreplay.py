@@ -247,16 +247,16 @@ class Getreplay:
                 )
         return False
 
-    def console(self):
-        arguments = docopt(__doc__, version='fcreplayget')
-        if arguments['game'] is True:
-            self.get_game_replays(game=arguments['<gameid>'])
-        if arguments['ranked'] is True:
-            self.get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
-        if arguments['replay'] is True:
-            self.get_replay(url=arguments['<url>'], player_requested=arguments['--playerrequested'])
 
+def console(self):
+    arguments = docopt(__doc__, version='fcreplayget')
 
-if __name__ == "__main__":
     getreplay = Getreplay()
     getreplay.console()
+
+    if arguments['game'] is True:
+        getreplay.get_game_replays(game=arguments['<gameid>'])
+    if arguments['ranked'] is True:
+        getreplay.get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
+    if arguments['replay'] is True:
+        getreplay.get_replay(url=arguments['<url>'], player_requested=arguments['--playerrequested'])

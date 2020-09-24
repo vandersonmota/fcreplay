@@ -86,12 +86,10 @@ class Gcloud:
         status = function_response.status_code
         return(status)
 
-    def console(self):
-        arguments = docopt(__doc__, version='fcreplaydestroy')
 
-        if arguments['destroy'] is True:
-            self.destroy_fcreplay()
+def console(self):
+    arguments = docopt(__doc__, version='fcreplaydestroy')
 
-
-if __name__ == "__main__":
-    Gcloud().console()
+    g = Gcloud()
+    if arguments['destroy'] is True:
+        g.destroy_fcreplay()

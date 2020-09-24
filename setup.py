@@ -23,9 +23,9 @@ setup(name='fcreplay',
       package_data={'': extra_files},
       entry_points={
           'console_scripts': [
-              'fcreplayget=fcreplay.getreplay:__main__',
-              'fcreplayloop=fcreplay.loop:__main__',
-              'fcreplaydestroy=fcreplay.gcloud:__main__'
+              'fcreplayget=fcreplay.getreplay:console',
+              'fcreplayloop=fcreplay.loop:console',
+              'fcreplaydestroy=fcreplay.gcloud:console'
           ]
       },
       install_requires=[
