@@ -36,18 +36,17 @@ class Loop:
 
     def main(self):
         """The main loop for processing one or more replays
-
-        Args:
-            Debug (bool): Exit after one loop
-            Gcloud (bool): Cloud shutdown after processing
         """
+        if self.debug:
+            Logging.debug(self.config)
+
         # If this is google cloud, and the 'destroying' file exists, remove it
         if self.gcloud and os.path.exists('/tmp/destroying'):
             os.remove('/tmp/destroying')
 
         while True:
             replay = Replay()
-            if replay.replay is not None:
+            if replay.replay.id is not None:
                 replay.add_job()
                 replay.record()
                 replay.move()
