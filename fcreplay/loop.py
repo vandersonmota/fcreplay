@@ -81,7 +81,7 @@ class Loop:
                 sys.exit(0)
 
 
-def console(self):
+def console():
     """Invoked from command line
     """
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')

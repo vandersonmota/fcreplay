@@ -248,7 +248,7 @@ class Getreplay:
         return False
 
 
-def console(self):
+def console():
     arguments = docopt(__doc__, version='fcreplayget')
 
     getreplay = Getreplay()

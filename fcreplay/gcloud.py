@@ -87,7 +87,7 @@ class Gcloud:
         return(status)
 
 
-def console(self):
+def console():
     arguments = docopt(__doc__, version='fcreplaydestroy')
 
     g = Gcloud()
