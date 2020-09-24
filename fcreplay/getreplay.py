@@ -252,7 +252,6 @@ def console():
     arguments = docopt(__doc__, version='fcreplayget')
 
     getreplay = Getreplay()
-    getreplay.console()
 
     if arguments['game'] is True:
         getreplay.get_game_replays(game=arguments['<gameid>'])

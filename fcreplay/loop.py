@@ -90,7 +90,6 @@ def console():
     args = parser.parse_args()
 
     c = Loop()
-    c.console()
 
     c.debug = args.debug
     c.gcloud = args.gcloud
