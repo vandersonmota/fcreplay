@@ -94,4 +94,4 @@ class Gcloud:
 
 
 if __name__ == "__main__":
-    Gcloud.console()
+    Gcloud().console()

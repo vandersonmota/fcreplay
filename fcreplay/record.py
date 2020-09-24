@@ -9,7 +9,7 @@ import threading
 import time
 
 from fcreplay.config import Config
-from fcreplay import logging
+from fcreplay.logging import Logging
 
 
 class Record:
@@ -17,7 +17,7 @@ class Record:
         self.config = Config().config
 
     def start_fcadefbneo(self, fcadefbneo_path=None, fc_challenge_id=None, game_name=None):
-        logging.info(f"/usr/bin/wine {fcadefbneo_path}/fcadefbneo.exe quark:stream,{game_name},{fc_challenge_id}.2,7100 -q")
+        Logging().info(f"/usr/bin/wine {fcadefbneo_path}/fcadefbneo.exe quark:stream,{game_name},{fc_challenge_id}.2,7100 -q")
         fbneo_rc = subprocess.run(
             [
                 '/usr/bin/wine',
@@ -51,7 +51,7 @@ class Record:
         return False
 
     def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
-        logging.info('Starting pulseaudio')
+        Logging().info('Starting pulseaudio')
         subprocess.run(['pulseaudio', '--daemon'])
 
         # Get start time
@@ -62,27 +62,27 @@ class Record:
             os.remove(f"{fcadefbneo_path}/fightcade/started.inf")
 
         # Start ggpofbneo
-        logging.info("Starting fcadefbneo thread")
-        logging.debug(f"Arguments: {fcadefbneo_path}, {fc_challange_id}, {game_name}")
+        Logging().info("Starting fcadefbneo thread")
+        Logging().debug(f"Arguments: {fcadefbneo_path}, {fc_challange_id}, {game_name}")
 
         ggpo_thread = threading.Thread(target=self.start_fcadefbneo, args=[
                                        fcadefbneo_path, fc_challange_id, game_name])
         ggpo_thread.start()
-        logging.info("Started ggpofbneo")
+        Logging().info("Started ggpofbneo")
 
         # Check to see if fcadefbneo has started playing
-        logging.info('Checking to see if replay has started')
+        Logging().info('Checking to see if replay has started')
         while True:
             running_time = (datetime.datetime.now() - begin_time).seconds
 
             if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
-                logging.info('First frame displayed. Looking for recording dialog')
+                Logging().info('First frame displayed. Looking for recording dialog')
                 if self.find_record_dialog():
                     break
 
             # Timeout reached, exiting
             if running_time > kill_time:
-                logging.info('Match never started, exiting')
+                Logging().info('Match never started, exiting')
                 self.cleanup_tasks()
                 return "FailTimeout"
             time.sleep(0.1)
@@ -93,7 +93,7 @@ class Record:
 
             # Log what minute we are on
             if (running_time % 60) == 0:
-                logging.info(
+                Logging().info(
                     f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
 
             # Finished recording video
