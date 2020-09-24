@@ -37,6 +37,8 @@ class Loop:
     def main(self):
         """The main loop for processing one or more replays
         """
+        self.create_dirs()
+
         if self.debug:
             Logging.debug(self.config)
 
