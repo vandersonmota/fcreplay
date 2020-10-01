@@ -1,11 +1,15 @@
+import os
 import pytest
 import sys
+import tempfile
 from unittest.mock import patch, MagicMock
 
 sys.modules['pyautogui'] = MagicMock()
 from fcreplay.loop import Loop
 
+
 class TestLoop:
+
     @patch('fcreplay.loop.Config')
     @patch('fcreplay.loop.Logging')
     @patch('debugpy.wait_for_client')
@@ -18,38 +22,41 @@ class TestLoop:
 
     @patch('fcreplay.loop.Config')
     @patch('fcreplay.loop.Logging')
-    @patch('os.mkdir')
-    def test_create_dir(self, mock_mkdir, mock_logging, mock_config):
-        with patch('os.path.exists', return_value=False) as mock_create_dirs:
-            Loop().create_dirs()
-            assert mock_create_dirs.called, "Should create dirs"
+    def test_create_dir(self, mock_logging, mock_config):
+        loop = Loop()
+        temp_dir = tempfile.TemporaryDirectory()
+        loop.config = {'fcreplay_dir': temp_dir.name}
 
-            mock_logging = MagicMock()
-            assert mock_logging.any_call, "Should Log"
-
-        with patch('os.path.exists', return_value=True) as mock_create_dirs:
-            Loop().create_dirs()
-            assert mock_create_dirs.not_called, "Shouldn't create dirs when they exist"
+        loop.create_dirs()
+        assert os.path.exists(f"{temp_dir.name}/tmp"), "Should create tmp dir"
+        assert os.path.exists(f"{temp_dir.name}/videos"), "Should create vidoes dir"
+        assert os.path.exists(f"{temp_dir.name}/finished"), "Should create finished dir"
+        assert mock_logging.any_call, "Should Log"
 
     @patch('fcreplay.loop.Config')
     @patch('fcreplay.loop.Gcloud')
     @patch('fcreplay.loop.Logging')
-    @patch('fcreplay.loop.Replay', )
-    @patch('os.path')
-    def test_noreplay(self, mock_os_path, mock_replay, mock_logging, mock_gcloud, mock_config):
+    @patch('fcreplay.loop.Replay')
+    def test_noreplay(self, mock_replay, mock_logging, mock_gcloud, mock_config):
         with pytest.raises(SystemExit) as e:
-            mock_replay.replay.return_value = None
+            mock_replay().replay = None
+            temp_dir = tempfile.TemporaryDirectory()
+
             loop = Loop()
+            loop.config = {'fcreplay_dir': temp_dir.name, 'upload_to_ia': False}
             loop.debug = True
+
             loop.main()
 
             assert mock_replay.add_job.not_called, "Shouldn't process a replay when none is returned"
             assert e.type == SystemExit, "Should exit no errors"
 
         with pytest.raises(SystemExit) as e:
-            mock_os_path.exists.return_value = False
+            temp_dir = tempfile.TemporaryDirectory()
 
             loop = Loop()
+            loop.config = {'fcreplay_dir': temp_dir.name}
+
             loop.debug = True
             loop.gcloud = True
             loop.main()
@@ -57,16 +64,17 @@ class TestLoop:
             assert mock_gcloud.destroy_replay.called, "Should destroy replay when gcloud is true"
             assert e.type == SystemExit, "Should exit no errors"
 
-        with pytest.raises(SystemExit) as e, patch('os.remove') as mock_os_remove:
-            mock_os_path.exists.return_value = True
+        with pytest.raises(SystemExit) as e:
+            temp_dir = tempfile.TemporaryDirectory()
 
             loop = Loop()
+            loop.config = {'fcreplay_dir': temp_dir.name}
+
             loop.debug = True
             loop.gcloud = True
             loop.main()
 
             assert mock_gcloud.destroy_replay.called, "Should destroy replay when gcloud is true"
-            assert mock_os_remove.called, "Should try and remove destroying file when it exists"
             assert e.type == SystemExit, "Should exit no errors"
 
     @patch('fcreplay.loop.Config')
@@ -74,9 +82,11 @@ class TestLoop:
     @patch('fcreplay.loop.Replay', )
     def test_ia(self, mock_replay, mock_logging, mock_config):
         with pytest.raises(SystemExit) as e:
+            temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
-            loop.config = {'upload_to_ia': True, 'upload_to_yt': False, 'remove_generated_files': False}
+            loop.config = {'upload_to_ia': True, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name}
             loop.debug = True
+
             loop.main()
 
             assert mock_replay.upload_to_ia.called, "Should upload to IA when upload_to_ia is true"
@@ -87,9 +97,11 @@ class TestLoop:
     @patch('fcreplay.loop.Replay', )
     def test_youtube(self, mock_replay, mock_logging, mock_config):
         with pytest.raises(SystemExit) as e:
+            temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
-            loop.config = {'upload_to_ia': False, 'upload_to_yt': True, 'remove_generated_files': False}
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': True, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name}
             loop.debug = True
+
             loop.main()
 
             assert mock_replay.upload_to_yt.called, "Should upload to YT when upload_to_yt is true"
@@ -100,9 +112,11 @@ class TestLoop:
     @patch('fcreplay.loop.Replay', )
     def test_remove_files(self, mock_replay, mock_logging, mock_config):
         with pytest.raises(SystemExit) as e:
+            temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
-            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': True}
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': True, 'fcreplay_dir': temp_dir.name}
             loop.debug = True
+
             loop.main()
 
             assert mock_replay.remove_generated_files.called, "Should remove generated files when remove_generated_files is true"
@@ -113,9 +127,14 @@ class TestLoop:
     @patch('fcreplay.loop.Replay')
     def test_loop(self, mock_replay, mock_logging, mock_config):
         with pytest.raises(SystemExit) as e:
+            temp_dir = tempfile.TemporaryDirectory()
+            mock_replay.replay.return_value = True
+
             loop = Loop()
-            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': False}
+
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name}
             loop.debug = True
+
             loop.main()
 
             assert mock_replay.add_job.called

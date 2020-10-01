@@ -48,7 +48,7 @@ class Loop:
 
         while True:
             replay = Replay()
-            if replay.replay.id is not None:
+            if replay.replay is not None:
                 replay.add_job()
                 replay.record()
                 replay.move()
