@@ -58,6 +58,12 @@
         disable_gpg_check: True
         state: present
 
+    - name: Disable cockpit
+      yum:
+        name: "cockpit"
+        disable_gpg_check: True
+        state: absent
+
     - name: Enable firewalld
       service:
         name: firewalld
