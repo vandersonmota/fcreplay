@@ -40,7 +40,7 @@ class Loop:
         self.create_dirs()
 
         if self.debug:
-            Logging.debug(self.config)
+            Logging().debug(self.config)
 
         # If this is google cloud, and the 'destroying' file exists, remove it
         if self.gcloud and os.path.exists('/tmp/destroying'):
