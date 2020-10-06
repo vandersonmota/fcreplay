@@ -49,6 +49,7 @@ class Loop:
         """The main loop for processing one or more replays
         """
         self.create_dirs()
+        self.clean()
 
         if self.debug:
             Logging().debug(self.config)
