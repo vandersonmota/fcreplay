@@ -9,21 +9,23 @@ from fcreplay.loop import Loop
 
 
 class TestLoop:
+    def setUp(self):
+        loop = Loop()
+        return loop
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.loop.Logging')
     @patch('debugpy.wait_for_client')
     @patch('debugpy.listen')
-    def test_debugpy(self, mock_debugpy_listen, mock_debugpy_wait_for_client, mock_logging, mock_config):
+    def test_debugpy(self, mock_debugpy_listen, mock_debugpy_wait_for_client, mock_config):
         with patch.dict('os.environ', {'REMOTE_DEBUG': 'True'}):
-            Loop()
+            self.setUp()
             assert mock_debugpy_listen.called
             assert mock_debugpy_wait_for_client.called
 
+    @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.loop.Logging')
-    def test_create_dir(self, mock_logging, mock_config):
-        loop = Loop()
+    def test_create_dir(self, mock_config, mock_logging_config):
+        loop = self.setUp()
         temp_dir = tempfile.TemporaryDirectory()
         loop.config = {'fcreplay_dir': temp_dir.name}
 
@@ -31,19 +33,17 @@ class TestLoop:
         assert os.path.exists(f"{temp_dir.name}/tmp"), "Should create tmp dir"
         assert os.path.exists(f"{temp_dir.name}/videos"), "Should create vidoes dir"
         assert os.path.exists(f"{temp_dir.name}/finished"), "Should create finished dir"
-        assert mock_logging.any_call, "Should Log"
 
     @patch('fcreplay.loop.time.sleep')
     @patch('fcreplay.loop.Config')
     @patch('fcreplay.loop.Gcloud')
-    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Replay')
-    def test_noreplay(self, mock_replay, mock_logging, mock_gcloud, mock_config, mock_time):
+    def test_noreplay(self, mock_replay, mock_gcloud, mock_config, mock_time):
         with pytest.raises(SystemExit) as e:
             mock_replay().replay = None
             temp_dir = tempfile.TemporaryDirectory()
 
-            loop = Loop()
+            loop = self.setUp()
             loop.config = {'fcreplay_dir': temp_dir.name, 'upload_to_ia': False}
             loop.debug = True
 
@@ -79,9 +79,9 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.Replay', )
-    def test_ia(self, mock_replay, mock_logging, mock_config):
+    def test_ia(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
@@ -94,9 +94,9 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.Replay')
-    def test_youtube(self, mock_replay, mock_logging, mock_config):
+    def test_youtube(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
@@ -109,9 +109,9 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit with no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.Replay', )
-    def test_remove_files(self, mock_replay, mock_logging, mock_config):
+    def test_remove_files(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
@@ -124,9 +124,9 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit with no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.loop.Logging')
+    @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.Replay')
-    def test_loop(self, mock_replay, mock_logging, mock_config):
+    def test_loop(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             mock_replay.replay.return_value = True

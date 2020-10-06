@@ -14,7 +14,6 @@ class Loop:
         self.config = Config().config
         self.gcloud = False
         self.debug = False
-        self.log = Logging()
 
         if 'REMOTE_DEBUG' in os.environ:
             import debugpy
