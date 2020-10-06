@@ -1,4 +1,5 @@
 import argparse
+import glob
 import os
 import sys
 import time
@@ -21,14 +22,25 @@ class Loop:
             debugpy.listen(("0.0.0.0", 5678))
             debugpy.wait_for_client()
 
+    def clean(self):
+        """Cleans directories before running
+        """
+        dirs = [
+            f"{self.config['fcreplay_dir']}/tmp/*",
+            f"{self.config['fcreplay_dir']}/finished/*",
+            f"{self.config['fcadefbneo_path']}/avi/*"
+        ]
+
+        for dir in dirs:
+            files = glob.glob(dir)
+            for f in files:
+                os.remove(f)
+
     def create_dirs(self):
         # Create directories if they don't exist
         if not os.path.exists(f"{self.config['fcreplay_dir']}/tmp"):
             Logging().info('Created tmp dir')
             os.mkdir(f"{self.config['fcreplay_dir']}/tmp")
-        if not os.path.exists(f"{self.config['fcreplay_dir']}/videos"):
-            Logging().info('Created videos dir')
-            os.mkdir(f"{self.config['fcreplay_dir']}/videos")
         if not os.path.exists(f"{self.config['fcreplay_dir']}/finished"):
             Logging().info('Created finished dir')
             os.mkdir(f"{self.config['fcreplay_dir']}/finished")

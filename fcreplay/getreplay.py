@@ -76,7 +76,7 @@ class Getreplay:
         # Check if replay exists
         data = self.db.get_single_replay(challenge_id=challenge_id)
         if data is None:
-            # Limit the lenfth of videos
+            # Limit the length of videos
             if length > int(self.config['min_replay_length']) and length < int(self.config['max_replay_length']):
                 Logging().info(f"Adding {challenge_id} to queue")
                 self.db.add_replay(

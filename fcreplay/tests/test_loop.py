@@ -1,4 +1,5 @@
 import os
+import pathlib
 import pytest
 import sys
 import tempfile
@@ -24,6 +25,32 @@ class TestLoop:
 
     @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.Config')
+    def test_clean(self, mock_config, mock_logging_config):
+        loop = self.setUp()
+        fcreplay_temp_dir = tempfile.TemporaryDirectory()
+        fcadefbneo_temp_dir = tempfile.TemporaryDirectory()
+        loop.config = {'fcreplay_dir': fcreplay_temp_dir.name, 'fcadefbneo_path': fcadefbneo_temp_dir.name}
+
+        loop.create_dirs()
+        pathlib.Path(loop.config['fcadefbneo_path'] + '/avi').mkdir(parents=True, exist_ok=True)
+
+        create_list = [
+            f"{loop.config['fcreplay_dir']}/tmp",
+            f"{loop.config['fcreplay_dir']}/finished",
+            f"{loop.config['fcadefbneo_path']}/avi"
+        ]
+
+        for f in create_list:
+            with open(f"{f}/fakefile.bin", 'wb') as fout:
+                fout.write(os.urandom(1024))
+
+        loop.clean()
+
+        for f in create_list:
+            assert len(os.listdir(f)) == 0, "Directory should be empty"
+
+    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Config')
     def test_create_dir(self, mock_config, mock_logging_config):
         loop = self.setUp()
         temp_dir = tempfile.TemporaryDirectory()
@@ -31,7 +58,6 @@ class TestLoop:
 
         loop.create_dirs()
         assert os.path.exists(f"{temp_dir.name}/tmp"), "Should create tmp dir"
-        assert os.path.exists(f"{temp_dir.name}/videos"), "Should create vidoes dir"
         assert os.path.exists(f"{temp_dir.name}/finished"), "Should create finished dir"
 
     @patch('fcreplay.loop.time.sleep')
