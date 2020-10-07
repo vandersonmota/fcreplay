@@ -76,7 +76,7 @@ class Getreplay:
         # Check if replay exists
         data = self.db.get_single_replay(challenge_id=challenge_id)
         if data is None:
-            # Limit the lenfth of videos
+            # Limit the length of videos
             if length > int(self.config['min_replay_length']) and length < int(self.config['max_replay_length']):
                 Logging().info(f"Adding {challenge_id} to queue")
                 self.db.add_replay(
@@ -247,16 +247,15 @@ class Getreplay:
                 )
         return False
 
-    def console(self):
-        arguments = docopt(__doc__, version='fcreplayget')
-        if arguments['game'] is True:
-            self.get_game_replays(game=arguments['<gameid>'])
-        if arguments['ranked'] is True:
-            self.get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
-        if arguments['replay'] is True:
-            self.get_replay(url=arguments['<url>'], player_requested=arguments['--playerrequested'])
 
+def console():
+    arguments = docopt(__doc__, version='fcreplayget')
 
-if __name__ == "__main__":
     getreplay = Getreplay()
-    getreplay.console()
+
+    if arguments['game'] is True:
+        getreplay.get_game_replays(game=arguments['<gameid>'])
+    if arguments['ranked'] is True:
+        getreplay.get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
+    if arguments['replay'] is True:
+        getreplay.get_replay(url=arguments['<url>'], player_requested=arguments['--playerrequested'])

@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, func
 import datetime
 
-from fcreplay import logging
+from fcreplay.logging import Logging
 from fcreplay.models import Base
 from fcreplay.models import Job, Replays, Character_detect, Descriptions, Youtube_day_log
 from fcreplay.config import Config
@@ -17,7 +17,7 @@ class Database:
             self.engine = create_engine(config['sql_baseurl'], echo=True)
             Base.metadata.create_all(self.engine)
         except Exception as e:
-            logging.error(f"Unable to connect to {config['sql_baseurl']}: {e}")
+            Logging().error(f"Unable to connect to {config['sql_baseurl']}: {e}")
             raise e
 
         self.Session = sessionmaker(bind=self.engine)

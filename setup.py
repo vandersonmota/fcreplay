@@ -23,7 +23,6 @@ setup(name='fcreplay',
       package_data={'': extra_files},
       entry_points={
           'console_scripts': [
-              'fcreplaychat=fcreplay.chat.main:main',
               'fcreplayget=fcreplay.getreplay:console',
               'fcreplayloop=fcreplay.loop:console',
               'fcreplaydestroy=fcreplay.gcloud:console'

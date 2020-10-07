@@ -1,4 +1,5 @@
 import argparse
+import glob
 import os
 import sys
 import time
@@ -14,7 +15,6 @@ class Loop:
         self.config = Config().config
         self.gcloud = False
         self.debug = False
-        self.log = Logging()
 
         if 'REMOTE_DEBUG' in os.environ:
             import debugpy
@@ -22,25 +22,38 @@ class Loop:
             debugpy.listen(("0.0.0.0", 5678))
             debugpy.wait_for_client()
 
+    def clean(self):
+        """Cleans directories before running
+        """
+        dirs = [
+            f"{self.config['fcreplay_dir']}/tmp/*",
+            f"{self.config['fcreplay_dir']}/finished/*",
+            f"{self.config['fcadefbneo_path']}/avi/*"
+        ]
+
+        for dir in dirs:
+            files = glob.glob(dir)
+            for f in files:
+                os.remove(f)
+
     def create_dirs(self):
         # Create directories if they don't exist
         if not os.path.exists(f"{self.config['fcreplay_dir']}/tmp"):
             Logging().info('Created tmp dir')
             os.mkdir(f"{self.config['fcreplay_dir']}/tmp")
-        if not os.path.exists(f"{self.config['fcreplay_dir']}/videos"):
-            Logging().info('Created videos dir')
-            os.mkdir(f"{self.config['fcreplay_dir']}/videos")
         if not os.path.exists(f"{self.config['fcreplay_dir']}/finished"):
             Logging().info('Created finished dir')
             os.mkdir(f"{self.config['fcreplay_dir']}/finished")
 
     def main(self):
         """The main loop for processing one or more replays
-
-        Args:
-            Debug (bool): Exit after one loop
-            Gcloud (bool): Cloud shutdown after processing
         """
+        self.create_dirs()
+        self.clean()
+
+        if self.debug:
+            Logging().debug(self.config)
+
         # If this is google cloud, and the 'destroying' file exists, remove it
         if self.gcloud and os.path.exists('/tmp/destroying'):
             os.remove('/tmp/destroying')
@@ -80,19 +93,17 @@ class Loop:
             if self.debug:
                 sys.exit(0)
 
-    def console(self):
-        """Invoked from command line
-        """
-        parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
-        parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
-        parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
-        args = parser.parse_args()
 
-        self.debug = args.debug
-        self.gcloud = args.gcloud
-        self.main()
+def console():
+    """Invoked from command line
+    """
+    parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
+    parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
+    parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
+    args = parser.parse_args()
 
-
-if __name__ == "__main__":
     c = Loop()
-    c.console()
+
+    c.debug = args.debug
+    c.gcloud = args.gcloud
+    c.main()
