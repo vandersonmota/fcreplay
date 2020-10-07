@@ -7,7 +7,7 @@ import time
 import requests
 import uuid
 
-from fcreplay import logging
+from fcreplay.logging import Logging
 from fcreplay import getreplay
 from fcreplay.database import Database
 from fcreplay.config import Config
@@ -17,7 +17,7 @@ db = Database()
 
 
 def video_status(request):
-    logging.info("Check status for completed videos")
+    Logging().info("Check status for completed videos")
 
     # Get all replays that are completed, where video_processed is false
     to_check = db.get_unprocessed_replays()
@@ -25,10 +25,10 @@ def video_status(request):
     for replay in to_check:
         # Check if replay has embeded video link. Easy way to do this is to check
         # if a thumbnail is created
-        logging.info(f"Checking: {replay.id}")
+        Logging().info(f"Checking: {replay.id}")
         r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
 
-        logging.info(f"ID: {replay.id}, Status: {r.status_code}")
+        Logging().info(f"ID: {replay.id}, Status: {r.status_code}")
         if r.status_code == 200:
             db.set_replay_processed(challenge_id=replay.id)
 
@@ -41,25 +41,25 @@ def check_for_replay(request):
     if destroyed_instance:
         return json.dumps({'status': False})
 
-    logging.info("Looking for replay")
+    Logging().info("Looking for replay")
     player_replay = db.get_oldest_player_replay()
     if player_replay is not None:
-        logging.info("Found player replay")
+        Logging().info("Found player replay")
         launch_fcreplay(None)
         return json.dumps({"status": True})
 
     replay = db.get_oldest_replay()
     if replay is not None:
-        logging.info("Found replay")
+        Logging().info("Found replay")
         launch_fcreplay(None)
         return json.dumps({"status": True})
 
-    logging.info("No replays")
+    Logging().info("No replays")
     return json.dumps({"status": False})
 
 
 def destroy_stopped_instances(request):
-    logging.info("Checking if there are instances stopped")
+    Logging().info("Checking if there are instances stopped")
     instance_name = "fcreplay-image-"
     compute = googleapiclient.discovery.build('compute', 'v1')
     result = compute.instances().list(
@@ -71,7 +71,7 @@ def destroy_stopped_instances(request):
         if instance_name in i['name']:
             # Destroy stopped instances
             if i['status'] == "TERMINATED" and config['gcloud_destroy_when_stopped']:
-                logging.info(f"Destoying {i['name']}")
+                Logging().info(f"Destoying {i['name']}")
                 destroy_fcreplay_instance(instance_name=i['name'])
                 return(json.dumps({'status': True}))
 
@@ -79,7 +79,7 @@ def destroy_stopped_instances(request):
 
 
 def fcreplay_running(request):
-    logging.info("Checking if there are instances running")
+    Logging().info("Checking if there are instances running")
     instance_name = "fcreplay-image-"
     compute = googleapiclient.discovery.build('compute', 'v1')
     result = compute.instances().list(
@@ -91,24 +91,24 @@ def fcreplay_running(request):
         if instance_name in i['name']:
             # Count number of running instances
             if i['status'] == "RUNNING":
-                logging.info(f"{i['name']} instance running adding to count")
+                Logging().info(f"{i['name']} instance running adding to count")
                 instance_count += 1
 
             # Count number of 'other' instances
             else:
-                logging.info(f"{instance_name} status is {i['status']}, adding to count")
+                Logging().info(f"{instance_name} status is {i['status']}, adding to count")
                 instance_count += 1
 
     if instance_count >= config['gcloud_instance_max']:
-        logging.info(f"There are {instance_count}/{config['gcloud_instance_max']} running")
+        Logging().info(f"There are {instance_count}/{config['gcloud_instance_max']} running")
         return(json.dumps({'status': True}))
 
-    logging.info(f"There are {instance_count}/{config['gcloud_instance_max']} running")
+    Logging().info(f"There are {instance_count}/{config['gcloud_instance_max']} running")
     return(json.dumps({'status': False}))
 
 
 def launch_fcreplay(request):
-    logging.info("Running: launch_fcreplay")
+    Logging().info("Running: launch_fcreplay")
 
     # Check if instance is running
     running = json.loads(fcreplay_running(None))
@@ -178,18 +178,18 @@ def destroy_fcreplay_instance(request=None, instance_name=None):
     else:
         request_json = None
 
-    logging.info(f"request_json: {request_json}")
-    logging.info(f"instance_name: {instance_name}")
+    Logging().info(f"request_json: {request_json}")
+    Logging().info(f"instance_name: {instance_name}")
     if (request_json is not None and 'instance_name' in request_json) or instance_name is not None:
         if request_json is not None:
-            logging.info("Setting instance name from json")
+            Logging().info("Setting instance name from json")
             instance_name = request_json['instance_name']
 
         if 'fcreplay-image-' not in instance_name:
-            logging.info(f"Not deleting {instance_name}")
+            Logging().info(f"Not deleting {instance_name}")
             return json.dumps({"status": False})
 
-        logging.info(f"Deleting {instance_name} compute instance")
+        Logging().info(f"Deleting {instance_name} compute instance")
 
         compute = googleapiclient.discovery.build('compute', 'v1')
         result = compute.instances().stop(
@@ -210,12 +210,12 @@ def destroy_fcreplay_instance(request=None, instance_name=None):
             instance_name)
         return json.dumps({"status": True})
 
-    logging.info('No instance_name found')
+    Logging().info('No instance_name found')
     return json.dumps({"status": False})
 
 
 def wait_for_operation(compute, project, zone, operation):
-    logging.info('Waiting for operation to finish...')
+    Logging().info('Waiting for operation to finish...')
     while True:
         result = compute.zoneOperations().get(
             project=project,
@@ -223,7 +223,7 @@ def wait_for_operation(compute, project, zone, operation):
             operation=operation).execute()
 
         if result['status'] == 'DONE':
-            logging.info("done.")
+            Logging().info("done.")
             if 'error' in result:
                 raise Exception(result['error'])
             return result
@@ -231,14 +231,14 @@ def wait_for_operation(compute, project, zone, operation):
 
 
 def destroy_vm(compute, project, zone, instance_name):
-    logging.info(f"Destroying: {instance_name}")
+    Logging().info(f"Destroying: {instance_name}")
     result = compute.instances().delete(project=project, zone=zone, instance=instance_name).execute()
     wait_for_operation(compute, project, zone, result['name'])
 
 
 def check_environment(request):
-    logging.info(os.environ)
+    Logging().info(os.environ)
 
 
 def get_top_weekly(request):
-    logging.info(getreplay.get_top_weekly())
+    Logging().info(getreplay.get_top_weekly())

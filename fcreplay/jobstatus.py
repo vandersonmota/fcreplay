@@ -1,6 +1,6 @@
 import datetime
 
-from fcreplay import logging
+from fcreplay.logging import Logging
 from fcreplay.config import Config
 from fcreplay.database import Database
 
@@ -10,21 +10,20 @@ config = Config().config
 def get_current_job_id():
     db = Database()
     job = db.get_current_job()
-    logging.info(f"Current job ID is: {job.challenge_id}")
+    Logging().info(f"Current job ID is: {job.challenge_id}")
     return(job.challenge_id)
 
 
 def get_replay_status(challenge_id):
     db = Database()
     replay = db.get_single_replay(challenge_id=challenge_id)
-    logging.info(f"Current job STATUS is: {replay.status}")
+    Logging().info(f"Current job STATUS is: {replay.status}")
     return(replay.status)
 
 
 def get_current_job_remaining():
     # Returns the time left to complete current job
     db = Database()
-    challenge_id = get_current_job_id()
 
     job = db.get_current_job()
     current_time = datetime.datetime.utcnow()
@@ -34,7 +33,7 @@ def get_current_job_remaining():
     running_time = int((current_time - start_time).seconds)
     time_left = length - running_time
 
-    logging.info(f"Current job status: running_time: {running_time}, time_left: {time_left}")
+    Logging().info(f"Current job status: running_time: {running_time}, time_left: {time_left}")
 
     if time_left <= 0:
         # Time left is less than 0, probably uploading or doing something
@@ -47,7 +46,7 @@ def get_current_job_details():
     challenge_id = get_current_job_id()
     db = Database()
     replay = db.get_single_replay(challenge_id=challenge_id)
-    logging.info(f"Current job rowdata is: {replay}")
+    Logging().info(f"Current job rowdata is: {replay}")
     return(replay)
 
 
@@ -55,7 +54,7 @@ def challenge_exists(challenge_id):
     # Checks to see if current challenge exists
     db = Database()
     replay = db.get_single_replay(challenge_id=challenge_id)
-    if replay == None:
+    if replay is None:
         return False
     else:
         return True
@@ -93,12 +92,12 @@ def get_queue_position(challenge_id):
             # Get all player replays, then find my position in replays:
             # Get all unfinished player replays, sorted by date added
             db = Database()
-            
+
             replays = db.get_all_queued_player_replays()
             position = 0
-            logging.debug(f"Looking for player replay {challenge_id}")
+            Logging().debug(f"Looking for player replay {challenge_id}")
             for replay in replays:
-                logging.debug(f"Row id: {replay.id}")
+                Logging().debug(f"Row id: {replay.id}")
                 position += 1
                 if replay.id == challenge_id:
                     return position
