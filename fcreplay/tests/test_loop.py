@@ -70,7 +70,7 @@ class TestLoop:
             temp_dir = tempfile.TemporaryDirectory()
 
             loop = self.setUp()
-            loop.config = {'fcreplay_dir': temp_dir.name, 'upload_to_ia': False}
+            loop.config = {'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'upload_to_ia': False}
             loop.debug = True
 
             loop.main()
@@ -82,7 +82,7 @@ class TestLoop:
             temp_dir = tempfile.TemporaryDirectory()
 
             loop = Loop()
-            loop.config = {'fcreplay_dir': temp_dir.name}
+            loop.config = {'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
 
             loop.debug = True
             loop.gcloud = True
@@ -95,7 +95,7 @@ class TestLoop:
             temp_dir = tempfile.TemporaryDirectory()
 
             loop = Loop()
-            loop.config = {'fcreplay_dir': temp_dir.name}
+            loop.config = {'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
 
             loop.debug = True
             loop.gcloud = True
@@ -111,7 +111,7 @@ class TestLoop:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
-            loop.config = {'upload_to_ia': True, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name}
+            loop.config = {'upload_to_ia': True, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             loop.debug = True
 
             loop.main()
@@ -126,7 +126,7 @@ class TestLoop:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
-            loop.config = {'upload_to_ia': False, 'upload_to_yt': True, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name}
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': True, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             loop.debug = True
 
             loop.main()
@@ -141,7 +141,7 @@ class TestLoop:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             loop = Loop()
-            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': True, 'fcreplay_dir': temp_dir.name}
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': True, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             loop.debug = True
 
             loop.main()
@@ -159,7 +159,7 @@ class TestLoop:
 
             loop = Loop()
 
-            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name}
+            loop.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             loop.debug = True
 
             loop.main()
