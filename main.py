@@ -123,7 +123,7 @@ def launch_fcreplay(request):
 
     instance_body = {
         'name': instance_name,
-        'machineType': f"zones/{config['gcloud_zone']}/machineTypes/custom-6-5632",
+        'machineType': f"zones/{config['gcloud_zone']}/machineTypes/custom-4-4096",
         "networkInterfaces": [
             {
                 "network": "global/networks/default",
