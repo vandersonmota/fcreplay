@@ -250,9 +250,8 @@ def submitResult():
         challenge_id = result.challenge_url.data
         session['challenge_url'] = result.challenge_url.data
 
-        from fcreplay.getreplay import get_replay
-        replay_result = get_replay(
-            challenge_id, player_requested=True)
+        from fcreplay.getreplay import Getreplay
+        replay_result = Getreplay().get_replay(challenge_id, player_requested=True)
 
         session['replay_result'] = replay_result
         logging.info(f"Submit replay: {challenge_id} status is: {replay_result}")
