@@ -15,6 +15,7 @@ from fcreplay.logging import Logging
 from pathlib import Path
 import requests
 import socket
+import subprocess
 import sys
 
 
@@ -84,6 +85,9 @@ class Gcloud:
 
         Logging().info(f"destroy_fcreplay retruned: {function_response.status_code}")
         status = function_response.status_code
+
+        if self.config['gcloud_shutdown_instance']:
+            subprocess.run(['shutdown', 'now', '-h'])
         return(status)
 
 

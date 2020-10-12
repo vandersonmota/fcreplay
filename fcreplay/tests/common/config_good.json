@@ -8,6 +8,7 @@
     "gcloud_destroy_on_fail": true,
     "gcloud_instance_max": 5,
     "gcloud_project": "gcloud project id",
+    "gcloud_shutdown_instance": false,
     "gcloud_region": "gcloud region",
     "gcloud_zone": "gcloud zone id",
     "gcloud_compute_service_account": "gcloud compute service account email",

@@ -74,6 +74,13 @@ class Config:
                     'description': 'Google cloud region'
                 }
             },
+            'gcloud_shutdown_instance': {
+                'type': 'boolean',
+                'meta': {
+                    'default': True,
+                    'description': 'Shutdown instance once instance has finished'
+                }
+            },
             'gcloud_zone': {
                 'type': 'string',
                 'meta': {
@@ -118,7 +125,6 @@ class Config:
                         "license_url": "http://creativecommons.org/publicdomain/zero/1.0",
                         "mediatype": "video",
                         "subject": ["video", "fightcade"]
-
                     },
                     'description': 'Dictionary of Internet Archive settings'
                 }
