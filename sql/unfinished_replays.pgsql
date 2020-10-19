@@ -1,1 +1,1 @@
-select id from replays where created = false and status not like 'ADDED'
+select * from replays where created = false and status not like 'ADDED' ORDER BY date_added DESC

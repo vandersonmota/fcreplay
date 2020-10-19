@@ -23,6 +23,7 @@ coverage.xml
 config.json
 config_dev.json
 description_append.txt
+sql/
 
 # Log file
 fcreplay.log
