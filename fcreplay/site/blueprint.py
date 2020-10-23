@@ -1,9 +1,20 @@
-from fcreplay.site.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
+from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
+from fcreplay.config import Config
+from fcreplay.models import Character_detect, Replays, Descriptions
+
+from flask import Blueprint
 from flask import abort, jsonify, render_template, request, session, redirect, send_from_directory, url_for
 
 import datetime
+import json
+import logging
+import pkg_resources
 import pytz
 
+app = Blueprint('blueprint', __name__)
+config = Config().config
+
+@app.route('/')
 def index():
     searchForm = SearchForm()
     page = request.args.get('page', 1, type=int)
@@ -19,6 +30,7 @@ def index():
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
+@app.route('/api/videolinks', methods=['POST'])
 def videolinks():
     if 'ids' not in request.json:
         abort(404)
@@ -37,16 +49,19 @@ def videolinks():
     return jsonify(replay_data)
 
 
+@app.route('/api/supportedgames')
 def supportedgames():
     return jsonify(config['supported_games'])
 
 
+@app.route('/submit')
 def submit():
     searchForm = SearchForm()
     submitForm = SubmitForm()
     return render_template('submit.j2.html', form=searchForm, submitForm=submitForm, submit_active=True)
 
 
+@app.route('/submitResult', methods=['POST', 'GET'])
 def submitResult():
     logging.debug(f"Session: {session}")
     # I feel like there should be a better way to do this
@@ -72,10 +87,12 @@ def submitResult():
         return render_template('submitResult.j2.html', form=searchForm, result=result, submt_active=True)
 
 
+@app.route('/assets/<path:path>')
 def send_js(path):
     return send_from_directory('templates/assets', path)
 
 
+@app.route('/about')
 def about():
     searchForm = SearchForm()
 
@@ -92,12 +109,14 @@ def about():
     return render_template('about.j2.html', about_active=True, form=searchForm, supportedGames=supportedGames, numberOfReplays=numberOfReplays, toProcess=toProcess)
 
 
+@app.route('/advancedSearch')
 def advancedSearch():
     searchForm = SearchForm()
     advancedSearchForm = AdvancedSearchForm()
     return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm)
 
 
+@app.route('/advancedSearchResult', methods=['POST', 'GET'])
 def advancedSearchResult():
     logging.debug(f"Session: {session}")
     # I feel like there should be a better way to do this
@@ -164,6 +183,9 @@ def advancedSearchResult():
         Replays.video_processed == True
     ]
 
+    with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
+        character_dict = json.load(json_data_file)
+
     if game in character_dict:
         replay_query.append(
             Replays.id.in_(
@@ -186,6 +208,7 @@ def advancedSearchResult():
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
+@app.route('/search', methods=['POST', 'GET'])
 def search():
     logging.debug(f"Session: {session}")
     # I feel like there should be a better way to do this
@@ -245,10 +268,13 @@ def search():
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
 
 
+@app.route('/robots.txt')
+@app.route('/ads.txt')
 def robots():
     return send_from_directory(app.static_folder, request.path[1:])
 
 
+@app.route('/sitemap.xml')
 def sitemap():
     tz = pytz.timezone("Pacific/Auckland")
     aware_dt = tz.localize(datetime.datetime.now())
@@ -256,6 +282,7 @@ def sitemap():
     return render_template('sitemap.j2.xml', update_date=update_date)
 
 
+@app.route('/video/<challenge_id>',)
 def videopage(challenge_id):
     searchForm = SearchForm()
 

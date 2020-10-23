@@ -1,7 +1,7 @@
-from fcreplay.config import Config
+from fcreplay.config import Config as FcreplayConfig
 
 class Config(object):
-    config = Config().config()
+    config = FcreplayConfig().config()
 
     ENV = 'prod'
     DEBUG = False
