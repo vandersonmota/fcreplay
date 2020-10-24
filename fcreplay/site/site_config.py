@@ -1,5 +1,6 @@
 from fcreplay.config import Config as FcreplayConfig
 
+
 class Config(object):
     config = FcreplayConfig().config
 

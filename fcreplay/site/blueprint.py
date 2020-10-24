@@ -14,7 +14,7 @@ import pytz
 
 app = Blueprint('blueprint', __name__)
 config = Config().config
-#db.init_app(app)
+
 
 @app.route('/')
 def index():

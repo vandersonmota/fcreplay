@@ -8,6 +8,7 @@ from fcreplay.site.database import db
 
 import os
 
+
 def create_app(app_config):
     if 'REMOTE_DEBUG' in os.environ:
         import debugpy
@@ -15,11 +16,23 @@ def create_app(app_config):
         debugpy.wait_for_client()
 
     app = Flask(__name__, static_folder='static')
+
+    # Get flask config from object
     app.config.from_object(app_config)
+
+    # Initalise Database
     db.init_app(app)
+
+    # Initalise Jinija2 Filters
     app_filters(app)
+
+    # Register blueprint
     app.register_blueprint(blueprint_app)
+
+    # Add flask_bootstrap
     Bootstrap(app)
+
+    # Cors
     cors(app)
 
     return app

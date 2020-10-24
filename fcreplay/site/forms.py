@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField, SelectField
 
 config = Config().config
 
+
 class AdvancedSearchForm(FlaskForm):
     characters = [
         ('Any', 'Any'),
