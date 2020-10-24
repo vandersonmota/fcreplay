@@ -1,6 +1,7 @@
 from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
 from fcreplay.config import Config
-from fcreplay.models import Character_detect, Replays, Descriptions
+from fcreplay.site.models import Replays, Descriptions, Character_detect
+from fcreplay.site.database import db
 
 from flask import Blueprint
 from flask import abort, jsonify, render_template, request, session, redirect, send_from_directory, url_for
@@ -13,6 +14,7 @@ import pytz
 
 app = Blueprint('blueprint', __name__)
 config = Config().config
+#db.init_app(app)
 
 @app.route('/')
 def index():

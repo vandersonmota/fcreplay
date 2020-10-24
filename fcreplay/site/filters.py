@@ -1,13 +1,12 @@
 from flask import request
-
 import time
 
-def convertLength(self, length):
+def convertLength(length):
     time_res = time.gmtime(length)
     res = time.strftime("%H:%M:%S", time_res)
     return(res)
 
-def linkPath(self, url):
+def linkPath(url):
     if request.path != '/':
         return '../' + url
     else:

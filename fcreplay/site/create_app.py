@@ -4,6 +4,7 @@ from flask_cors import CORS
 
 from fcreplay.site.filters import convertLength, linkPath
 from fcreplay.site.blueprint import app as blueprint_app
+from fcreplay.site.database import db
 
 import os
 
@@ -13,21 +14,12 @@ def create_app(app_config):
         debugpy.listen(("0.0.0.0", 5678))
         debugpy.wait_for_client()
 
-    try:
-        import googleclouddebugger
-        googleclouddebugger.enable(
-            breakpoint_enable_canary=True
-        )
-    except ImportError:
-        pass
-
     app = Flask(__name__, static_folder='static')
     app.config.from_object(app_config)
-
-    app.register_blueprint(blueprint_app)
-
-    Bootstrap(app)
+    db.init_app(app)
     app_filters(app)
+    app.register_blueprint(blueprint_app)
+    Bootstrap(app)
     cors(app)
 
     return app
