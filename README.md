@@ -207,3 +207,13 @@ gcloud scheduler jobs create http 'check-for-replay' --schedule='*/2 * * * *' \
   --oidc-service-account-email="fcrecorder-compute-account@fcrecorder-286007.iam.gserviceaccount.com" \
   --oidc-token-audience="https://us-central1-fcrecorder-286007.cloudfunctions.net/check_for_replay"
 ```
+
+# Site
+To test the site with flask:
+
+```commandline
+export FLASK_APP=fcreplay/site/app.py
+export FLASK_ENVIRONMENT=development
+```
+
+This requires you to have a valide config_dev.json file

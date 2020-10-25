@@ -8,7 +8,7 @@ import requests
 import uuid
 
 from fcreplay.logging import Logging
-from fcreplay import getreplay
+from fcreplay.getreplay import Getreplay
 from fcreplay.database import Database
 from fcreplay.config import Config
 
@@ -241,4 +241,4 @@ def check_environment(request):
 
 
 def get_top_weekly(request):
-    Logging().info(getreplay.get_top_weekly())
+    Logging().info(Getreplay().get_top_weekly())
