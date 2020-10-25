@@ -156,7 +156,7 @@ class Getreplay:
             replays += r.json()['results']['results']
 
         for i in replays:
-            if 'gameid' not in self.config['supported_games']:
+            if i['gameid'] not in self.config['supported_games']:
                 Logging().info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
                 pass
             status = self.add_replay(
