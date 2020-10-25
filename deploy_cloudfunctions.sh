@@ -12,11 +12,13 @@ if [ $? -gt 0 ]; then
   exit 1
 fi
 
-for f in $functions; do 
+for f in $functions; do
+    echo "Deploying function ${f}"
     gcloud functions deploy $f --timeout=120 --entry-point $f --runtime python37 --trigger-http --service-account=$SERVICE_ACCOUNT
     if [ $? -gt 0 ]; then
         exit 1
     fi
+    echo ""
 done
 
 exit 0
