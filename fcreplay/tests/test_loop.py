@@ -60,11 +60,12 @@ class TestLoop:
         assert os.path.exists(f"{temp_dir.name}/tmp"), "Should create tmp dir"
         assert os.path.exists(f"{temp_dir.name}/finished"), "Should create finished dir"
 
+    @patch('fcreplay.logging.Config')
     @patch('fcreplay.loop.time.sleep')
     @patch('fcreplay.loop.Config')
     @patch('fcreplay.loop.Gcloud')
     @patch('fcreplay.loop.Replay')
-    def test_noreplay(self, mock_replay, mock_gcloud, mock_config, mock_time):
+    def test_noreplay(self, mock_replay, mock_gcloud, mock_config, mock_time, mock_logging_config):
         with pytest.raises(SystemExit) as e:
             mock_replay().replay = None
             temp_dir = tempfile.TemporaryDirectory()

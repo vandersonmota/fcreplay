@@ -12,7 +12,7 @@ import logging
 import pkg_resources
 import pytz
 
-app = Blueprint('blueprint', __name__)
+app = Blueprint('blueprint', __name__, static_folder='static')
 config = Config().config
 
 

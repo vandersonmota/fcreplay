@@ -13,7 +13,8 @@ class TestDatabase:
     @patch('fcreplay.database.Config')
     def setUp(self, mock_config, mock_func, mock_create_engine, mock_logging_config):
         db = Database()
-        assert mock_create_engine.called, 'Database should call create_engine'
+
+        mock_create_engine.assert_called(), 'Database should call create_engine'
 
         mock_create_engine.side_effect = Exception
         with pytest.raises(Exception) as e:
@@ -88,4 +89,4 @@ class TestDatabase:
         db.set_replay_processed(challenge_id=MagicMock())
         db.rerecord_replay(challenge_id=MagicMock())
 
-        assert mock_session.called, 'Database functions should complete'
+        mock_session.assert_called(), 'Database functions should complete'

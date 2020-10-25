@@ -292,8 +292,7 @@ class Config:
             with open(e.filename, 'w') as f:
                 json.dump(default_json, f, indent=4)
 
-            print(
-                f"Unable to find config, default config written to {e.filename}")
+            print(f"Unable to find config, default config written to {e.filename}")
             print("Adjust default values and run again")
             sys.exit(1)
 

@@ -47,6 +47,7 @@ pytest = "*"
 cerberus = "*"
 flake8 = "*"
 pytest-pudb = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.8"

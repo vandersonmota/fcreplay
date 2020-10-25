@@ -15,7 +15,8 @@ def create_app(app_config):
         debugpy.listen(("0.0.0.0", 5678))
         debugpy.wait_for_client()
 
-    app = Flask(__name__, static_folder='static')
+    #app = Flask(__name__, static_folder='static')
+    app = Flask(__name__)
 
     # Get flask config from object
     app.config.from_object(app_config)
