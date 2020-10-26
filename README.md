@@ -125,13 +125,10 @@ I've include a basic ansible playbook for the installation, you will need to hav
    3. Add the user to the wheel group: `groupmems -a deployment -g wheel`
    4. Copy your ssh key with `ssh-copy-id deployment@<host>`
    5. Disable password login in the `/etc/ssh/sshd_config` and restart sshd: `systemctl restart sshd`
-   6. Launch the ansible script:
-      1. Development: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"FC2_PATH": "/path/to/local/FC2", "gitbranch": "master" }' playbook.yml`
-      2. Google Cloud: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"gcloud": True, "FC2_PATH": "/path/to/local/FC2", "gitbranch": "master" }' playbook.yml`
-      3. Google Cloud auto destroy: `ansible-playbook -i <host>, -u <deployment_user> -K --diff --extra-vars '{"destroy": True, "gcloud": True, "FC2_PATH": "/path/to/local/FC2", "gitbranch": "master" }' playbook.yml`
-   7. After running the ansible script, you will need to start a xorg session and run `wine /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/fcadefbneo.exe` once to initialise wine
-   8. Then run in a xorg session, run winetricks and install:
-      * allcodecs
+   6. Check your environment variables by running `check_ansible.sh`
+   7. Launch the ansible script: `ansible-playbook -i <host>, -u <deployment_user> -K --diff playbook.yml` 
+   8. After running the ansible script, you will need to start a xorg session and run `wine /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/fcadefbneo.exe` once to initialise wine
+   9. Then run in a xorg session, run winetricks and install:
       * avifil32
       * cinepack
       * xvid
