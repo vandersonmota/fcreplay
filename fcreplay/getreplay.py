@@ -158,7 +158,7 @@ class Getreplay:
         for i in replays:
             if i['gameid'] not in self.config['supported_games']:
                 Logging().info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
-                pass
+                continue
             status = self.add_replay(
                 replay=i,
                 emulator=i['emulator'],
