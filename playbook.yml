@@ -285,7 +285,7 @@
         name: google-fluentd-catch-all-config
         disable_gpg_check: True
         state: latest
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Add google cloud fcreplay logging
       copy:
@@ -294,14 +294,14 @@
         owner: root
         group: root
         mode: '0640'
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Enable google cloud logging systemd service
       service:
         name: google-fluentd
         state: started
         enabled: yes
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Autostart recording for gcloud
       replace:
@@ -310,7 +310,7 @@
         replace: 'exec "xterm'
       become: True
       become_user: fcrecorder
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Create config directory
       file:
@@ -350,7 +350,7 @@
         name: fcrecord
         state: stopped
         enabled: true
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Make sure group wheel is not in the sudoers configuration
       lineinfile:
@@ -362,11 +362,11 @@
         name: dnf-makecache.service
         state: stopped
         enabled: false
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Disable mamkecache timer
       service:
         name: dnf-makecache.timer
         state: stopped
         enabled: false
-      when: lookup('env', 'FCREPLAY_GCLOUD')
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool

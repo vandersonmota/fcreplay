@@ -57,10 +57,10 @@ fi
 
 # Check for FCREPLAY_GCLOUD environment variable
 if [ ! -z $FCREPLAY_GCLOUD ]; then
-    if [[ $FCREPLAY_GCLOUD == True || $FCREPLAY_GCLOUD == False ]]; then
+    if [[ $FCREPLAY_GCLOUD == true || $FCREPLAY_GCLOUD == false ]]; then
         echo "PASS:    Optional environment variable FCREPLAY_GCLOUD (${FCREPLAY_GCLOUD}) is set"
     else
-        echo "ERROR:   Optional environment variable FCREPLAY_GCLOUD (${FCREPLAY_GCLOUD}) is not True or False"
+        echo "ERROR:   Optional environment variable FCREPLAY_GCLOUD (${FCREPLAY_GCLOUD}) is not true or false"
         ERROR=1
     fi
 else

@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pipenv-setup = "*"
 
 [packages]
 appdirs = "*"
@@ -21,7 +22,6 @@ i3ipc = "*"
 idna = "*"
 internetarchive = "*"
 itsdangerous = "*"
-numpy = "*"
 opencv-python = "*"
 psycopg2 = "*"
 pyscreenshot = "*"
@@ -39,7 +39,6 @@ SQLAlchemy = "*"
 WTForms = "*"
 Werkzeug = "*"
 Flask-Cors = "*"
-Pillow = "*"
 PyAutoGUI = "*"
 SQLAlchemy-Utils = "*"
 pip = "*"
