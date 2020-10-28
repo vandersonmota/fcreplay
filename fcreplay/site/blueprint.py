@@ -80,7 +80,7 @@ def submitResult():
         logging.info(f"Submit replay: {challenge_id} status is: {replay_result}")
 
         # Add replay and get status here
-        return redirect(url_for('submitResult'))
+        return redirect(url_for('blueprint.submitResult'))
     else:
         searchForm = SearchForm()
         if 'replay_result' not in session:
@@ -133,7 +133,7 @@ def advancedSearchResult():
         session['order_by'] = result.order_by.data
         session['game'] = result.game.data
 
-        return redirect(url_for('advancedSearchResult'))
+        return redirect(url_for('blueprint.advancedSearchResult'))
     else:
         if 'search' not in session:
             return index()
@@ -221,7 +221,7 @@ def search():
         session['order_by'] = result.order_by.data
         session['game'] = result.game.data
 
-        return redirect(url_for('search'))
+        return redirect(url_for('blueprint.search'))
     else:
         if 'search' not in session:
             return index()
