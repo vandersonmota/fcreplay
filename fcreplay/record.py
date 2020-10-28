@@ -101,7 +101,9 @@ class Record:
             # Finished recording video
             if running_time > fc_time:
                 # We need to manually stop the recording. Move the mouse into the
-                # fcadefbneo window, press alt, then down*6, then enter/return
+                # fcadefbneo window, press alt, then down*7, then enter/return.
+                # I'm not sure why, but the 'duration' time being reported is
+                # actually too short. So we extend it by 2 seconds.
                 pyautogui.moveTo(700, 384)
                 time.sleep(0.1)
                 pyautogui.press('alt')
@@ -119,10 +121,14 @@ class Record:
                 pyautogui.press('down')
                 time.sleep(0.1)
                 pyautogui.press('down')
-                time.sleep(0.1)
+
+                # Since the duration is too short, we extend it by 2 seconds here
+                time.sleep(2)
                 pyautogui.keyDown('enter')
                 time.sleep(0.1)
                 pyautogui.keyUp('enter')
+
+                # Sleep for 2 seconds here in case there is some sort of delay writing file
                 time.sleep(2)
                 self.cleanup_tasks()
                 return "Pass"
