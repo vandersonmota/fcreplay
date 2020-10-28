@@ -40,7 +40,7 @@ def create_app(app_config):
 
 
 def app_filters(app):
-    app.jinja_env.filters['convertLenth'] = convertLength
+    app.jinja_env.filters['convertLength'] = convertLength
     app.jinja_env.filters['linkPath'] = linkPath
 
 
