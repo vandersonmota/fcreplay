@@ -12,9 +12,14 @@ class Database:
     def __init__(self):
         config = Config().config
 
+        if 'DEBUG' in config['loglevel']:
+            sql_echo = True
+        else:
+            sql_echo = False
+
         # Create Engine
         try:
-            self.engine = create_engine(config['sql_baseurl'], echo=True)
+            self.engine = create_engine(config['sql_baseurl'], echo=sql_echo)
             Base.metadata.create_all(self.engine)
         except Exception as e:
             Logging().error(f"Unable to connect to {config['sql_baseurl']}: {e}")
