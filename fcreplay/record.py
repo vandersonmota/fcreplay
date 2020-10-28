@@ -91,8 +91,8 @@ class Record:
         minute_count = -1
 
         # I'm not sure why, but the 'duration' time being reported is
-        # actually too short. So we extend it by 4 seconds.
-        fc_time = fc_time + 4
+        # actually too short. So we extend it by 3 seconds.
+        fc_time = fc_time + 3
 
         while True:
             running_time = (datetime.datetime.now() - begin_time).seconds
@@ -107,25 +107,25 @@ class Record:
                 # We need to manually stop the recording. Move the mouse into the
                 # fcadefbneo window, press alt, then down*7, then enter/return.
                 pyautogui.moveTo(700, 384)
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('alt')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.keyDown('enter')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.keyUp('enter')
 
                 # Sleep for 2 seconds here in case there is some sort of delay writing file
