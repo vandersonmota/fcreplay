@@ -90,10 +90,6 @@ class Record:
         begin_time = datetime.datetime.now()
         minute_count = -1
 
-        # I'm not sure why, but the 'duration' time being reported is
-        # actually too short. So we extend it by 3 seconds.
-        fc_time = fc_time + 3
-
         while True:
             running_time = (datetime.datetime.now() - begin_time).seconds
 
