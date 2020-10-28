@@ -30,7 +30,6 @@
           - jq
           - libpq-devel
           - maim
-          - mencoder
           - p7zip
           - p7zip-plugins
           - pavucontrol
