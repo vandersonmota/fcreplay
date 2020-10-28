@@ -171,17 +171,22 @@ class Replay:
 
         avi_files_path = '|'.join(avi_files)
 
+        ffmpeg_options = [
+            'ffmpeg', '-threads', '4',
+            '-i', f'concat:{avi_files_path}',
+            '-vf', 'scale=800x600',
+            '-c:v', 'libx264',
+            '-preset', 'fast',
+            '-crf', '23',
+            '-c:a', 'libmp3lame',
+            '-q:a', '128',
+            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"
+        ]
+
+        Logging().info(f"Running ffmpeg with: {' '.join(ffmpeg_options)}")
+
         ffmpeg_rc = subprocess.run(
-            [
-                'ffmpeg', '-i', f'concat:{avi_files_path}',
-                '-vf', 'scale=800x600',
-                '-c:v', 'libx264',
-                '-preset', 'slow',
-                '-crf', '23',
-                '-c:a', 'libmp3lame',
-                '-q:a', '128',
-                f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mkv"
-            ],
+            ffmpeg_options,
             capture_output=True
         )
 
