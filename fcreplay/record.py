@@ -88,13 +88,15 @@ class Record:
             time.sleep(0.1)
 
         begin_time = datetime.datetime.now()
+        minute_count = -1
+
         while True:
             running_time = (datetime.datetime.now() - begin_time).seconds
 
             # Log what minute we are on
-            if (running_time % 60) == 0:
-                Logging().info(
-                    f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
+            if (running_time % 60) == 0 and int(running_time / 60) != minute_count:
+                Logging().info(f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
+                minute_count = int(running_time / 60)
 
             # Finished recording video
             if running_time > fc_time:
