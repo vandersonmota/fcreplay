@@ -116,6 +116,8 @@ class Record:
                 time.sleep(0.1)
                 pyautogui.press('down')
                 time.sleep(0.1)
+                pyautogui.press('down')
+                time.sleep(0.1)
                 pyautogui.keyDown('enter')
                 time.sleep(0.1)
                 pyautogui.keyUp('enter')
