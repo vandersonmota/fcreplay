@@ -1,0 +1,1 @@
+DELETE FROM replays WHERE failed = 'true'

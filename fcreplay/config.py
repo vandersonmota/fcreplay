@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+"""fcreplayconfig.
+
+Usage:
+  fcreplayconfig validate <config.json>
+  fcreplayconfig (-h | --help)
+
+Options:
+  -h --help         Show this screen.
+"""
+from docopt import docopt
 from cerberus import Validator
 import base64
 import json
@@ -74,6 +85,13 @@ class Config:
                     'description': 'Google cloud region'
                 }
             },
+            'gcloud_shutdown_instance': {
+                'type': 'boolean',
+                'meta': {
+                    'default': True,
+                    'description': 'Shutdown instance once instance has finished'
+                }
+            },
             'gcloud_zone': {
                 'type': 'string',
                 'meta': {
@@ -118,7 +136,6 @@ class Config:
                         "license_url": "http://creativecommons.org/publicdomain/zero/1.0",
                         "mediatype": "video",
                         "subject": ["video", "fightcade"]
-
                     },
                     'description': 'Dictionary of Internet Archive settings'
                 }
@@ -267,16 +284,23 @@ class Config:
                 }
             }
         }
+        self.config = self.get_config()
+        self.validate_config(self.config, self.schema)
 
+    def get_config(self):
+        """Returns config based on FCREPLAY_CONFIG environment variable
+        If variable is unset, then look for config.json
+        If file does not exist, generate default config
+        """
         try:
             if 'FCREPLAY_CONFIG' in os.environ:
                 with open(os.environ['FCREPLAY_CONFIG'], 'r') as json_data_file:
-                    self.config = json.load(json_data_file)
+                    return json.load(json_data_file)
             else:
                 with open("config.json", 'r') as json_data_file:
-                    self.config = json.load(json_data_file)
+                    return json.load(json_data_file)
+
         except FileNotFoundError as e:
-            # Generate default output
             default_json = {}
             for k in self.schema:
                 print(self.schema[k])
@@ -286,12 +310,28 @@ class Config:
             with open(e.filename, 'w') as f:
                 json.dump(default_json, f, indent=4)
 
-            print(
-                f"Unable to find config, default config written to {e.filename}")
+            print(f"Unable to find config, default config written to {e.filename}")
             print("Adjust default values and run again")
             sys.exit(1)
 
-        self.v = Validator()
-        if self.v.validate(self.config, self.schema) is False:
-            print(json.dumps(self.v.errors, indent=4))
+    def validate_config(self, config, schema):
+        v = Validator()
+        if v.validate(config, schema) is False:
+            print(json.dumps(v.errors, indent=4))
             raise LookupError
+
+
+def console():
+    arguments = docopt(__doc__, version='fcreplayconfig')
+    if '<config.json>' in arguments:
+        os.environ['FCREPLAY_CONFIG'] = arguments['<config.json>']
+
+        # Try to validate config file
+        Config().config
+
+        # If this works, then print success
+        print("Configuration validated successfuly")
+
+
+if __name__ == "__main__":
+    console()

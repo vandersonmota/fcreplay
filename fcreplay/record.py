@@ -88,37 +88,43 @@ class Record:
             time.sleep(0.1)
 
         begin_time = datetime.datetime.now()
+        minute_count = -1
+
         while True:
             running_time = (datetime.datetime.now() - begin_time).seconds
 
             # Log what minute we are on
-            if (running_time % 60) == 0:
-                Logging().info(
-                    f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
+            if (running_time % 60) == 0 and int(running_time / 60) != minute_count:
+                Logging().info(f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
+                minute_count = int(running_time / 60)
 
             # Finished recording video
             if running_time > fc_time:
                 # We need to manually stop the recording. Move the mouse into the
-                # fcadefbneo window, press alt, then down*6, then enter/return
+                # fcadefbneo window, press alt, then down*7, then enter/return.
                 pyautogui.moveTo(700, 384)
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('alt')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.press('down')
-                time.sleep(0.1)
+                time.sleep(0.05)
+                pyautogui.press('down')
+                time.sleep(0.05)
                 pyautogui.keyDown('enter')
-                time.sleep(0.1)
+                time.sleep(0.05)
                 pyautogui.keyUp('enter')
+
+                # Sleep for 2 seconds here in case there is some sort of delay writing file
                 time.sleep(2)
                 self.cleanup_tasks()
                 return "Pass"

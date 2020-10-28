@@ -21,8 +21,10 @@ coverage.xml
 .storage_creds.json
 .youtube-upload-credentials.json
 config.json
+config_prod.json
 config_dev.json
 description_append.txt
+sql/
 
 # Log file
 fcreplay.log

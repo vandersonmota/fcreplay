@@ -1,0 +1,1 @@
+SELECT * FROM replays LIMIT 10

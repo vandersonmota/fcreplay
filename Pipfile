@@ -1,0 +1,55 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pipenv-setup = "*"
+
+[packages]
+appdirs = "*"
+beautifulsoup4 = "*"
+certifi = "*"
+chardet = "*"
+click = "*"
+debugpy = "*"
+docopt = "*"
+dominate = "*"
+google-api-python-client = "*"
+google-python-cloud-debugger = "*"
+gunicorn = "*"
+i3ipc = "*"
+idna = "*"
+internetarchive = "*"
+itsdangerous = "*"
+opencv-python = "*"
+psycopg2 = "*"
+pyscreenshot = "*"
+requests = "*"
+retrying = "*"
+urllib3 = "*"
+visitor = "*"
+Bootstrap-Flask = "*"
+Flask = "*"
+Flask-SQLAlchemy = "*"
+Flask-WTF = "*"
+Jinja2 = "*"
+MarkupSafe = "*"
+SQLAlchemy = "*"
+WTForms = "*"
+Werkzeug = "*"
+Flask-Cors = "*"
+PyAutoGUI = "*"
+SQLAlchemy-Utils = "*"
+pip = "*"
+pytest = "*"
+cerberus = "*"
+flake8 = "*"
+pytest-pudb = "*"
+lxml = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

@@ -36,3 +36,5 @@ terraform.tfstate.backup
 venv
 coverage.xml
 .coverage
+Pipfile
+Pipfile.lock

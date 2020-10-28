@@ -1,196 +1,19 @@
-from flask import Flask, request, render_template, g, session, send_from_directory, redirect, url_for, abort, jsonify
-from flask import Blueprint
-from flask_bootstrap import Bootstrap
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from flask_cors import CORS
-
+from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
 from fcreplay.config import Config
+from fcreplay.site.models import Replays, Descriptions, Character_detect
+from fcreplay.site.database import db
 
-from wtforms import Form, StringField, BooleanField, SubmitField, SelectField
+from flask import Blueprint
+from flask import abort, jsonify, render_template, request, session, redirect, send_from_directory, url_for
 
 import datetime
-import os
-import pytz
 import json
 import logging
-import time
 import pkg_resources
+import pytz
 
-if 'REMOTE_DEBUG' in os.environ:
-    import debugpy
-    debugpy.listen(("0.0.0.0", 5678))
-    debugpy.wait_for_client()
-
-try:
-    import googleclouddebugger
-    googleclouddebugger.enable(
-        breakpoint_enable_canary=True
-    )
-except ImportError:
-    pass
-
+app = Blueprint('blueprint', __name__, static_folder='static')
 config = Config().config
-
-with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
-    character_dict = json.load(json_data_file)
-
-app = Flask(__name__, static_folder='static')
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = config['sql_baseurl']
-app.config['SECRET_KEY'] = config['secret_key']
-
-Bootstrap(app)
-db = SQLAlchemy(app)
-
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
-
-class AdvancedSearchForm(FlaskForm):
-    characters = [
-        ('Any', 'Any'),
-        ('alex', 'alex'),
-        ('akuma', 'akuma'),
-        ('chunli', 'chunli'),
-        ('dudley', 'dudley'),
-        ('elena', 'elena'),
-        ('hugo', 'hugo'),
-        ('ibuki', 'ibuki'),
-        ('ken', 'ken'),
-        ('makoto', 'makoto'),
-        ('necro', 'necro'),
-        ('oro', 'oro'),
-        ('q', 'q'),
-        ('remy', 'remy'),
-        ('ryu', 'ryu'),
-        ('sean', 'sean'),
-        ('twelve', 'twelve'),
-        ('urien', 'urien'),
-        ('yang', 'yang'),
-        ('yun', 'yun')]
-
-    orderby_list = [
-        ('date_added', 'Date Added'),
-        ('date_replay', 'Replay Date'),
-        ('length', 'Length')
-    ]
-
-    rank_list = [
-        ('any', 'Any'),
-        ('0', '?'),
-        ('1', 'E'),
-        ('2', 'D'),
-        ('3', 'C'),
-        ('4', 'B'),
-        ('5', 'A'),
-        ('6', 'S')
-    ]
-
-    # Generate supported games
-    game_list = []
-    game_list.append(
-        ('Any', 'Any')
-    )
-
-    for game in sorted(config['supported_games']):
-        game_list.append(
-            (game, config['supported_games'][game]['game_name'])
-        )
-
-    search = StringField()
-    game = SelectField('Game', choices=game_list,
-                       render_kw={'class': 'fixed', 'onChange': 'gameSelect(this)', 'id': 'game'})
-    p1_rank = SelectField('P1 Rank', choices=rank_list,
-                          render_kw={'class': 'fixed', 'style': 'width:75px'})
-    p2_rank = SelectField('P2 Rank', choices=rank_list,
-                          render_kw={'class': 'fixed', 'style': 'width:75px'})
-    char1 = SelectField('Character1', choices=characters,
-                        render_kw={'class': 'fixed'})
-    char2 = SelectField('Character2', choices=characters,
-                        render_kw={'class': 'fixed'})
-    order_by = SelectField('Order by', choices=orderby_list,
-                           render_kw={'class': 'fixed'})
-    submit = SubmitField('Search')
-
-
-class SearchForm(FlaskForm):
-    orderby_list = [
-        ('date_replay', 'Replay Date'),
-        ('date_added', 'Date Added'),
-        ('length', 'Length')
-    ]
-
-    # Generate supported games
-    game_list = []
-    game_list.append(
-        ('Any', 'Any')
-    )
-    for game in sorted(config['supported_games']):
-        game_list.append(
-            (game, config['supported_games'][game]['game_name'])
-        )
-
-    search = StringField()
-    game = SelectField('Game', choices=game_list,
-                       render_kw={'class': 'fixed'})
-    order_by = SelectField('Order by', choices=orderby_list,
-                           render_kw={'class': 'fixed'})
-    submit = SubmitField('Search')
-
-
-class SubmitForm(FlaskForm):
-    challenge_url = StringField()
-    submit = SubmitField()
-
-
-class Replays(db.Model):
-    id = db.Column(db.Text, primary_key=True)
-    p1_loc = db.Column(db.String)
-    p2_loc = db.Column(db.String)
-    p1_rank = db.Column(db.String)
-    p2_rank = db.Column(db.String)
-    p1 = db.Column(db.String)
-    p2 = db.Column(db.String)
-    date_replay = db.Column(db.DateTime)
-    length = db.Column(db.Integer)
-    created = db.Column(db.Boolean)
-    failed = db.Column(db.Boolean)
-    status = db.Column(db.String)
-    date_added = db.Column(db.Integer)
-    player_requested = db.Column(db.Boolean)
-    game = db.Column(db.String)
-    video_processed = db.Column(db.Boolean)
-
-
-class Descriptions(db.Model):
-    id = db.Column(db.Text, primary_key=True)
-    description = db.Column(db.Text)
-
-
-class Character_detect(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    challenge_id = db.Column(db.Text, primary_key=True)
-    p1_char = db.Column(db.String)
-    p2_char = db.Column(db.String)
-    vid_time = db.Column(db.String)
-
-
-@app.template_filter()
-def convertlength(length):
-    time_res = time.gmtime(length)
-    res = time.strftime("%H:%M:%S", time_res)
-    return(res)
-
-
-@app.template_filter()
-def linkPath(url):
-    if request.path != '/':
-        return '../' + url
-    else:
-        return url
 
 
 @app.route('/')
@@ -250,9 +73,8 @@ def submitResult():
         challenge_id = result.challenge_url.data
         session['challenge_url'] = result.challenge_url.data
 
-        from fcreplay.getreplay import get_replay
-        replay_result = get_replay(
-            challenge_id, player_requested=True)
+        from fcreplay.getreplay import Getreplay
+        replay_result = Getreplay().get_replay(challenge_id, player_requested=True)
 
         session['replay_result'] = replay_result
         logging.info(f"Submit replay: {challenge_id} status is: {replay_result}")
@@ -362,6 +184,9 @@ def advancedSearchResult():
         ),
         Replays.video_processed == True
     ]
+
+    with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
+        character_dict = json.load(json_data_file)
 
     if game in character_dict:
         replay_query.append(
@@ -486,7 +311,3 @@ def videopage(challenge_id):
     logging.debug(
         f"Video page, replay: {replay}, characters: {characters}, seek: {seek}")
     return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm, games=config['supported_games'])
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
