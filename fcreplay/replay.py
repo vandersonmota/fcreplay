@@ -169,7 +169,7 @@ class Replay:
             sorted_avi_files_list.append(i[0])
         avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in sorted_avi_files_list]
 
-        avi_files_path = '|'.join([f"{self.config['fcreplay_dir']}/finished/" + i for i in avi_files])
+        avi_files_path = '|'.join(avi_files)
 
         ffmpeg_rc = subprocess.run(
             [
