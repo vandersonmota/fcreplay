@@ -10,7 +10,7 @@ class Logging:
         self.GCLOUD_FUNCTION = True
         if 'X_GOOGLE_FUNCTION_IDENTITY' not in os.environ:
             logging.basicConfig(
-                format='%(asctime)s %(levelname)s: %(message)s',
+                format='%(asctime)s %(name)s %(levelname)s: %(message)s',
                 filename=self.config['logfile'],
                 level=self.config['loglevel'],
                 datefmt='%Y-%m-%d %H:%M:%S'
