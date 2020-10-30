@@ -19,6 +19,7 @@ class Database:
 
         # Create Engine
         try:
+            Logging().info(f"Creating DB Instance with: {config['sql_baseurl']}")
             self.engine = create_engine(config['sql_baseurl'], echo=sql_echo)
             Base.metadata.create_all(self.engine)
         except Exception as e:
