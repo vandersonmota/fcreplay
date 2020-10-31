@@ -174,7 +174,7 @@ class Replay:
         # 2. x264 for whatever reason inserts audio delay
         mencoder_options = [
             'mencoder', '-oac', 'mp3lame', '-lameopts', 'vbr=3',
-            '-ovc', 'lavc', '-lavcopts', 'vcodec=mpeg4:vbitrate=2000',
+            '-ovc', 'lavc', '-lavcopts', 'vcodec=mpeg4:vbitrate=4000',
             '-vf', 'flip,scale=800:600,dsize=4/3',
             *avi_files,
             '-of', 'lavf',
