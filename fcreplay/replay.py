@@ -135,7 +135,7 @@ class Replay:
         # Check recording status
         if record_status != "Pass":
             Logging().error(f"Recording failed on {self.replay.id},"
-                            "Status: {record_status}, exiting.")
+                            f"Status: {record_status}, exiting.")
 
             if record_status == "FailTimeout":
                 raise TimeoutError
