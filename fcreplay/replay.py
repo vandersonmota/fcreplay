@@ -156,13 +156,17 @@ class Replay:
         for f in avi_files_list:
             shutil.move(f"{self.config['fcadefbneo_path']}/avi/{f}",
                         f"{self.config['fcreplay_dir']}/finished/{f}")
+            Logging().info(f"Moved file: {f}")
 
         self.update_status(status.MOVED)
 
     @handle_fail
     def encode(self):
         Logging().info("Encoding file")
+
         avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
+        Logging().info(f"List of files is: {avi_files_list}")
+
         if len(avi_files_list) > 1:
             avi_dict = {i: int(i.split('_')[1].split('.')[0], 16) for i in avi_files_list}
             sorted_avi_files_list = []
