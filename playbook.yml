@@ -239,6 +239,7 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Copy the gcloudlauncher
       copy:
@@ -247,6 +248,7 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Copy the startup service file
       copy:
@@ -263,22 +265,6 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-
-    - name: Copy fcreplaychat launcher
-      copy:
-        src: ./files/chatlauncher.sh
-        dest: /usr/local/bin/chatlauncher.sh
-        owner: fcrecorder
-        group: fcrecorder
-        mode: '0750'
-
-    - name: Copy fcreplaychat service
-      copy:
-        src: ./files/fcreplaychat.service
-        dest: /usr/lib/systemd/system/fcreplaychat.service
-        owner: root
-        group: root
-        mode: '0644'
 
     - name: Install cloud logging config
       yum:
