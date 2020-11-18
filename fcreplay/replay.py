@@ -175,7 +175,7 @@ class Replay:
                 sorted_avi_files_list.append(i[0])
             avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in sorted_avi_files_list]
         else:
-            avi_files = avi_files_list
+            avi_files = [f"{self.config['fcreplay_dir']}/finished/" + avi_files_list[0]]
 
         return avi_files
 

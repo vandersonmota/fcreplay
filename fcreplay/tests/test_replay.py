@@ -83,3 +83,15 @@ class TestReplay:
         sorted_list = r.sort_files(unsorted_list)
 
         assert sorted_list == good_list, 'List with hex characters should be sorted'
+
+        single_list = [
+            'foo_bar_0.avi'
+        ]
+
+        good_list = [
+            'dir/finished/foo_bar_0.avi'
+        ]
+        
+        sorted_list = r.sort_files(single_list)
+        assert sorted_list == good_list, 'List with single file should be sorted'
+
