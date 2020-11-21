@@ -99,6 +99,13 @@ class Config:
                     'description': 'Google cloud zone'
                 }
             },
+            'get_weekly_replay_pages': {
+                'type': 'number',
+                'meta': {
+                    'default': 1,
+                    'description': 'Number of replay pages to get for weekly replays'
+                }
+            },
             'ia_settings': {
                 'type': 'dict',
                 'required': False,

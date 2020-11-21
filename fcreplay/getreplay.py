@@ -150,7 +150,8 @@ class Getreplay:
         query = {'req': 'searchquarks', 'best': True, 'since': start_week_ms}
 
         replays = []
-        for i in range(0, 3):
+        pages = self.config['get_weekly_replay_pages']
+        for i in range(0, pages):
             query['offset'] = i * 15
             r = self.get_data(query)
             replays += r.json()['results']['results']
