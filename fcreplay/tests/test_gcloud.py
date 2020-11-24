@@ -72,4 +72,4 @@ class TestGcloud:
         gcloud.destroy_fcreplay()
 
         mock_requests.post.assert_called(), "Should call post to destroy instance"
-        mock_subprocess.run.assert_called_with(['shutdown', 'now', '-h']), "Should shutdown instance"
+        mock_subprocess.run.assert_called_with(['sudo', '/usr/sbin/shutdown', 'now', '-h']), "Should shutdown instance"
