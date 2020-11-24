@@ -1,7 +1,6 @@
 {% extends 'dashboard.j2.html' %} {% block content %}
   {% set i=0 %}
 <div class='row'>
-  {% include 'ad_card.j2.html' %}
   {% for replay in replays %} {% include 'card.j2.html' %} {% set i=i+1 %} {% endfor %}
 </div>
 <!-- Pagination -->
