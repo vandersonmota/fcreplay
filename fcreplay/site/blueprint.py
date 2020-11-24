@@ -26,7 +26,7 @@ def index():
         Replays.failed == 'no'
     ).filter(
         Replays.video_processed == True
-    ).order_by(Replays.date_added.desc()).paginate(page, per_page=8)
+    ).order_by(Replays.date_added.desc()).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
@@ -264,7 +264,7 @@ def search():
     ).order_by(order)
 
     logging.debug(replay_query)
-    pagination = replay_query.paginate(page, per_page=8)
+    pagination = replay_query.paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
