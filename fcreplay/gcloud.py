@@ -87,7 +87,7 @@ class Gcloud:
         status = function_response.status_code
 
         if self.config['gcloud_shutdown_instance']:
-            subprocess.run(['shutdown', 'now', '-h'])
+            subprocess.run(['sudo', '/usr/sbin/shutdown', 'now', '-h'])
         return(status)
 
 

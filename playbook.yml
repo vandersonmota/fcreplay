@@ -338,10 +338,15 @@
         enabled: true
       when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
-    - name: Make sure group wheel is not in the sudoers configuration
+    - name: Make sure fcrecorder user can restart google-fluentd
       lineinfile:
         path: /etc/sudoers
         line: 'fcrecorder   ALL=NOPASSWD:/usr/bin/systemctl restart google-fluentd'
+
+    - name: Make sure fcrecorder user can shutdown server
+      lineinfile:
+        path: /etc/sudoers
+        line: 'fcrecorder   ALL=NOPASSWD:/usr/sbin/shutdown'
 
     - name: Disable makecache
       service:
