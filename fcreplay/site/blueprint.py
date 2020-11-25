@@ -98,11 +98,14 @@ def send_js(path):
 def about():
     searchForm = SearchForm()
 
-    sortedGames = sorted(config['supported_games'])
+    sortedGames = sorted(config['supported_games'].items(), key=lambda item: item[1]['game_name'])
     supportedGames = {}
     for game in sortedGames:
-        supportedGames[game] = config['supported_games'][game]
-        supportedGames[game]['count'] = db.session.execute(f"select count(id) from replays where created = true and game = '{game}'").first()[0]
+        supportedGames[game[0]] = {
+            'game_name': config['supported_games'][game[0]]['game_name'],
+            'character_detect': config['supported_games'][game[0]]['character_detect']
+        }
+        supportedGames[game[0]]['count'] = db.session.execute(f"select count(id) from replays where created = true and game = '{game[0]}'").first()[0]
 
     numberOfReplays = db.session.execute('select count(id) from replays where created = true').first()[0]
 

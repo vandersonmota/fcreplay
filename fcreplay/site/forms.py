@@ -51,9 +51,9 @@ class AdvancedSearchForm(FlaskForm):
         ('Any', 'Any')
     )
 
-    for game in sorted(config['supported_games']):
+    for game in sorted(config['supported_games'].items(), key=lambda item: item[1]['game_name']):
         game_list.append(
-            (game, config['supported_games'][game]['game_name'])
+            (game[0], game[1]['game_name'])
         )
 
     search = StringField()
