@@ -21,6 +21,32 @@ for f in "${warn_files[@]}"; do
     fi
 done
 
+# Check for autostart
+if [ ! -z $FCREPLAY_AUTOSTART ]; then
+    if [[ $FCREPLAY_AUTOSTART == true || $FCREPLAY_AUTOSTART == false ]]; then
+        echo "PASS:    Optional environment variable FCREPLAY_AUTOSTART (${FCREPLAY_AUTOSTART}) is set"
+    else
+        echo "ERROR:   Optional environment variable FCREPLAY_AUTOSTART (${FCREPLAY_AUTOSTART}) is not true or false"
+        ERROR=1
+    fi
+else
+    echo "ERROR: Environment variable 'FCREPLAY_AUTOSTART' is not set"
+    ERROR=1
+fi
+
+# Check for proxmox
+if [ ! -z $FCREPLAY_PROXMOX ]; then
+    if [[ $FCREPLAY_PROXMOX == true || $FCREPLAY_PROXMOX == false ]]; then
+        echo "PASS:    Optional environment variable FCREPLAY_PROXMOX (${FCREPLAY_PROXMOX}) is set"
+    else
+        echo "ERROR:   Optional environment variable FCREPLAY_PROXMOX (${FCREPLAY_PROXMOX}) is not true or false"
+        ERROR=1
+    fi
+else
+    echo "ERROR: Environment variable 'FCREPLAY_PROXMOX' is not set"
+    ERROR=1
+fi
+
 # Check for FC2_PATH environment variable
 if [ ! -z $FC2_PATH ]; then
     if [ ! -d $FC2_PATH ]; then

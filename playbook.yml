@@ -233,23 +233,32 @@
         group: fcrecorder
         mode: '0664'
 
-    - name: Copy the gcloudlauncher
+    - name: Copy the fcreplaylauncher script for proxmox
       copy:
-        src: ./files/gcloudlauncher.sh
-        dest: /usr/local/bin/gcloudlauncher.sh
+        src: ./files/fcreplaylauncher-proxmox.sh
+        dest: /usr/local/bin/fcreplaylauncher.sh
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_PROXMOX' | bool
 
-    - name: Copy the gcloudlauncher
+    - name: Copy the fcreplaylauncher script for proxmox
       copy:
-        src: ./files/gcloudshutdown.sh
-        dest: /usr/local/bin/gcloudshutdown.sh
+        src: ./files/fcreplaylauncher-proxmox.sh
+        dest: /usr/local/bin/fcreplaylauncher.sh
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_GCLOUD' | bool
+
+    - name: Copy the fcreplay shutdown script
+      copy:
+        src: ./files/fcreplayshutdown.sh
+        dest: /usr/local/bin/fcreplayshutdown.sh
+        owner: fcrecorder
+        group: fcrecorder
+        mode: '0750'
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool
 
     - name: Copy the startup service file
       copy:
@@ -290,14 +299,14 @@
         enabled: yes
       when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
-    - name: Autostart recording for gcloud
+    - name: Autostart recording when FCREPLAY_AUTOSTART enabled
       replace:
         path: /home/fcrecorder/.config/i3/config
         regexp: '^# exec "xterm'
         replace: 'exec "xterm'
       become: True
       become_user: fcrecorder
-      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool
 
     - name: Create config directory
       file:
@@ -337,7 +346,7 @@
         name: fcrecord
         state: stopped
         enabled: true
-      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool
 
     - name: Make sure fcrecorder user can restart google-fluentd
       lineinfile:
@@ -354,11 +363,19 @@
         name: dnf-makecache.service
         state: stopped
         enabled: false
-      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Disable mamkecache timer
       service:
         name: dnf-makecache.timer
         state: stopped
         enabled: false
-      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
+
+    - name: Copy proxmox startup fix for cloud-init
+      copy:
+        src: ./files/proxmox_hostname_fix.sh
+        dest: /var/lib/cloud/scripts/per-boot/proxmox_hostname_fix.sh
+        mode: 0755
+        owner: root
+        group: root
+      become: true
+      when: lookup('env', 'FCREPLAY_PROXMOX' | bool

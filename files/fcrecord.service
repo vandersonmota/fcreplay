@@ -5,8 +5,8 @@ After=sshd.service
 [Service]
 Type=simple
 RemainAfterExit=true
-ExecStart=/usr/local/bin/gcloudlauncher.sh
-ExecStop=/usr/local/bin/gcloudshutdown.sh
+ExecStart=/usr/local/bin/fcreplaylauncher.sh
+ExecStop=/usr/local/bin/fcreplayshutdown.sh
 User=fcrecorder
 Group=fcrecorder
 WorkingDirectory=/home/fcrecorder
