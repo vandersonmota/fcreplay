@@ -85,13 +85,6 @@ class Config:
                     'description': 'Google cloud region'
                 }
             },
-            'gcloud_shutdown_instance': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Shutdown instance once instance has finished'
-                }
-            },
             'gcloud_zone': {
                 'type': 'string',
                 'meta': {
@@ -217,6 +210,13 @@ class Config:
                 'meta': {
                     'default': base64.b64encode(os.urandom(64)).decode(),
                     'description': 'Secret key used for flask/site cookies'
+                }
+            },
+            'shutdown_instance': {
+                'type': 'boolean',
+                'meta': {
+                    'default': True,
+                    'description': 'Shutdown instance once instance has finished'
                 }
             },
             'sql_baseurl': {

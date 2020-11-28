@@ -27,6 +27,7 @@ setup(
             "fcreplayget=fcreplay.getreplay:console",
             "fcreplayloop=fcreplay.loop:console",
             "fcreplaydestroy=fcreplay.gcloud:console",
+            "fcreplayvalidate=fcreplay.config:console"
         ]
     },
     install_requires=[

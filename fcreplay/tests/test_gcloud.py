@@ -13,7 +13,7 @@ class TestGcloud:
         gcloud = Gcloud()
         gcloud.config = {
             "gcloud_compute_service_account": "test",
-            "gcloud_shutdown_instance": False
+            "shutdown_instance": False
         }
         return gcloud
 
@@ -68,7 +68,7 @@ class TestGcloud:
             mock_requests.post.assert_called(), "Should call post to destroy instance"
             mock_subprocess.run.assert_not_called(), "Should not shutdown instance"
 
-        gcloud.config['gcloud_shutdown_instance'] = True
+        gcloud.config['shutdown_instance'] = True
         gcloud.destroy_fcreplay()
 
         mock_requests.post.assert_called(), "Should call post to destroy instance"

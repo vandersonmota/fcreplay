@@ -1,6 +1,7 @@
 import argparse
 import glob
 import os
+import subprocess
 import sys
 import time
 
@@ -88,6 +89,10 @@ class Loop:
 
             if self.gcloud:
                 Gcloud().destroy_fcreplay()
+                sys.exit(0)
+
+            if self.config['shutdown_instance']:
+                subprocess.run(['sudo', '/usr/sbin/shutdown', 'now', '-h'])
                 sys.exit(0)
 
             if self.debug:

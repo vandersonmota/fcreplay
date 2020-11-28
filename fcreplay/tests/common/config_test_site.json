@@ -10,7 +10,7 @@
   "gcloud_destroy_when_stopped": false,
   "gcloud_instance_max": 4,
   "gcloud_project": "UNUSED",
-  "gcloud_shutdown_instance": false,
+  "shutdown_instance": false,
   "gcloud_region": "UNUSED",
   "gcloud_zone": "UNUSED",
   "ia_settings": {

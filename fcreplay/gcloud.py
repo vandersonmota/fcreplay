@@ -86,7 +86,7 @@ class Gcloud:
         Logging().info(f"destroy_fcreplay retruned: {function_response.status_code}")
         status = function_response.status_code
 
-        if self.config['gcloud_shutdown_instance']:
+        if self.config['shutdown_instance']:
             subprocess.run(['sudo', '/usr/sbin/shutdown', 'now', '-h'])
         return(status)
 
