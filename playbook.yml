@@ -53,6 +53,12 @@
           - xorg-x11-drv-dummy
           - xterm
 
+    - name: Install qemu-guest-agent for proxmox
+      yum:
+        name: "qemu-guest-agent"
+        disable_gpg_check: true
+      when: lookup('env', 'FCREPLAY_PROXMOX') | bool
+
     - name: install the 'Development tools' package group
       yum:
         name: "@Development tools"
