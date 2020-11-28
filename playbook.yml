@@ -240,7 +240,7 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_PROXMOX' | bool
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_PROXMOX') | bool
 
     - name: Copy the fcreplaylauncher script for proxmox
       copy:
@@ -249,7 +249,7 @@
         owner: fcrecorder
         group: fcrecorder
         mode: '0750'
-      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_GCLOUD' | bool
+      when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Copy the fcreplay shutdown script
       copy:
@@ -378,4 +378,13 @@
         owner: root
         group: root
       become: true
-      when: lookup('env', 'FCREPLAY_PROXMOX' | bool
+      when: lookup('env', 'FCREPLAY_PROXMOX') | bool
+
+    - name: Fix startup for proxmox
+      replace:
+        path: /home/fcrecorder/startup.sh
+        regexp: '^fcreplayloop --gcloud'
+        replace: 'fcreplayloop'
+      become: True
+      become_user: fcrecorder
+      when: lookup('env', 'FCREPLAY_PROXMOX') | bool
