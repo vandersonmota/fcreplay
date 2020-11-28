@@ -132,7 +132,7 @@ class Getreplay:
             if i['emulator'] == 'fbneo' and i['live'] is False:
                 status = self.add_replay(
                     replay=i,
-                    emaultor=i['emulator'],
+                    emulator=i['emulator'],
                     game=game,
                     player_replay=False
                 )
