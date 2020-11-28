@@ -59,6 +59,12 @@
         disable_gpg_check: true
       when: lookup('env', 'FCREPLAY_PROXMOX') | bool
 
+    - name: Enable qemu-guest-agent
+      service:
+        name: qemu-guest-agent
+        state: stopped
+        enabled: yes
+
     - name: install the 'Development tools' package group
       yum:
         name: "@Development tools"
@@ -358,6 +364,7 @@
       lineinfile:
         path: /etc/sudoers
         line: 'fcrecorder   ALL=NOPASSWD:/usr/bin/systemctl restart google-fluentd'
+      when: lookup('env', 'FCREPLAY_GCLOUD') | bool
 
     - name: Make sure fcrecorder user can shutdown server
       lineinfile:
