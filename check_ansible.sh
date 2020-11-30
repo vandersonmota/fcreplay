@@ -94,6 +94,25 @@ else
     WARN=1
 fi
 
+# Check for FCREPLAY_PROMTAIL environment variable
+if [ ! -z $FCREPLAY_PROMTAIL ]; then
+    if [[ $FCREPLAY_PROMTAIL == true || $FCREPLAY_PROMTAIL == false ]]; then
+        echo "PASS:    Optional environment variable FCREPLAY_PROMTAIL (${FCREPLAY_PROMTAIL}) is set"
+        # Check for FCREPLAY_PROMTAIL_URL environment variable
+        if [[ ! -z $FCREPLAY_PROMTAIL_URL && $FCREPLAY_PROMTAIL == true ]]; then
+            echo "PASS:    Optional environment variable FCREPLAY_PROMTAIL_URL (${FCREPLAY_PROMTAIL_URL}) is set"
+        elif [[ $FCREPLAY_PROMTAIL == true ]]; then
+            echo "WARNING: Optional environment variable 'FCREPLAY_PROMTAIL_URL' is not set"
+            ERROR=1
+        fi
+    else
+        echo "ERROR:   Environment variable FCREPLAY_PROMTAIL (${FCREPLAY_PROMTAIL}) is not true or false"
+        ERROR=1
+    fi
+else
+    echo "ERROR:   Environment variable 'FCREPLAY_PROMTAIL' is not set"
+    WARN=1
+fi
 
 if [ $ERROR -gt 0 ]; then exit 1; fi
 if [ $WARN -gt 0 ]; then exit 1; fi

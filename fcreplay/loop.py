@@ -16,6 +16,7 @@ class Loop:
         self.config = Config().config
         self.gcloud = False
         self.debug = False
+        self.onetime = False
 
         if 'REMOTE_DEBUG' in os.environ:
             import debugpy
@@ -95,6 +96,9 @@ class Loop:
                 subprocess.run(['sudo', '/usr/sbin/shutdown', 'now', '-h'])
                 sys.exit(0)
 
+            if self.onetime:
+                sys.exit(0)
+
             if self.debug:
                 sys.exit(0)
 
@@ -103,12 +107,14 @@ def console():
     """Invoked from command line
     """
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
-    parser.add_argument('--debug', action='store_true', help='Exits after a single loop')
+    parser.add_argument('--debug', action='store_true', help='Exits after a single loop and turns on debugging')
     parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
+    parser.add_argument('--onetime', action='store_true', help='Exits after a single loop')
     args = parser.parse_args()
 
     c = Loop()
 
     c.debug = args.debug
     c.gcloud = args.gcloud
+    c.onetime = args.onetime
     c.main()

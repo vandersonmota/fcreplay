@@ -397,7 +397,51 @@
       replace:
         path: /home/fcrecorder/startup.sh
         regexp: '^fcreplayloop --gcloud'
-        replace: 'fcreplayloop'
+        replace: 'fcreplayloop --onetime'
       become: True
       become_user: fcrecorder
       when: lookup('env', 'FCREPLAY_PROXMOX') | bool
+
+    - name: Unzip promtail
+      unarchive:
+        src: /tmp/promtail-linux-amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+      become: True
+      when: lookup('env', 'FCREPLAY_PROMTAIL') | bool
+
+    - name: Add promtail service
+      copy:
+        src: ./files/promtail.service
+        dest: /usr/lib/systemd/system/promtail.service
+        owner: root
+        group: root
+        mode: '0664'
+      become: True
+      when: lookup('env', 'FCREPLAY_PROMTAIL') | bool
+
+    - name: Enable promtail service
+      service:
+        name: promtail
+        state: stopped
+        enabled: true
+      become: True
+      when: lookup('env', 'FCREPLAY_PROMTAIL') | bool
+ 
+    - name: Copy promtail config
+      copy:
+        src: ./files/promtail.yaml
+        dest: /etc/promtail.yaml
+        owner: root
+        group: root
+        mode: 0640
+      become: True
+      when: lookup('env', 'FCREPLAY_PROMTAIL') | bool
+    
+    - name: Replace promtail url
+      replace:
+        path: /etc/promtail.yaml
+        regexp: 'REPLACEME'
+        replace: lookup('env', FCREPLAY_PROMTAIL_URL)
+      become: True
+      when: lookup('env', 'FCREPLAY_PROMTAIL') | bool
