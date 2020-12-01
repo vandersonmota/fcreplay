@@ -30,7 +30,7 @@ if [ ! -z $FCREPLAY_AUTOSTART ]; then
         ERROR=1
     fi
 else
-    echo "ERROR: Environment variable 'FCREPLAY_AUTOSTART' is not set"
+    echo "ERROR:   Environment variable 'FCREPLAY_AUTOSTART' is not set"
     ERROR=1
 fi
 
@@ -43,7 +43,7 @@ if [ ! -z $FCREPLAY_PROXMOX ]; then
         ERROR=1
     fi
 else
-    echo "ERROR: Environment variable 'FCREPLAY_PROXMOX' is not set"
+    echo "ERROR:   Environment variable 'FCREPLAY_PROXMOX' is not set"
     ERROR=1
 fi
 

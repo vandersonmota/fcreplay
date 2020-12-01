@@ -84,7 +84,7 @@
         enabled: yes
 
     - name: VNC Rules
-      firewalld:
+      ansible.posix.firewalld:
         port: 5900/tcp
         immediate: yes
         permanent: yes
@@ -254,9 +254,9 @@
         mode: '0750'
       when: lookup('env', 'FCREPLAY_AUTOSTART') | bool and lookup('env', 'FCREPLAY_PROXMOX') | bool
 
-    - name: Copy the fcreplaylauncher script for proxmox
+    - name: Copy the fcreplaylauncher script for google cloud
       copy:
-        src: ./files/fcreplaylauncher-proxmox.sh
+        src: ./files/fcreplaylauncher-gcloud.sh
         dest: /usr/local/bin/fcreplaylauncher.sh
         owner: fcrecorder
         group: fcrecorder
@@ -288,7 +288,7 @@
         group: fcrecorder
         mode: '0750'
 
-    - name: Install cloud logging config
+    - name: Install google cloud logging config
       yum:
         name: google-fluentd-catch-all-config
         disable_gpg_check: True
@@ -404,8 +404,9 @@
 
     - name: Unzip promtail
       unarchive:
-        src: /tmp/promtail-linux-amd64.zip
+        src: https://github.com/grafana/loki/releases/download/v2.0.0/promtail-linux-amd64.zip
         dest: /usr/local/bin
+        mode: 0755
         remote_src: yes
       become: True
       when: lookup('env', 'FCREPLAY_PROMTAIL') | bool
