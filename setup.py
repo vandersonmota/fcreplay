@@ -68,7 +68,7 @@ setup(
         "itsdangerous==1.1.0",
         "jeepney==0.6.0; python_version >= '3.5' and platform_system == 'Linux'",
         "jinja2==2.11.2",
-        "jsonpatch==1.27; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+        "jsonpatch==1.28; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
         "jsonpointer==2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
         "lxml==4.6.2",
         "markupsafe==1.1.1",

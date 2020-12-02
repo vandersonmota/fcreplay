@@ -11,6 +11,19 @@ clients:
 scrape_configs:
   - job_name: fcreplay
     pipeline_stages:
+    - match:
+        selector: '{__path__="/home/fcrecorder/fcreplay/fcreplay.log"}'
+        stages:
+        - regex:
+            expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s(?P<source>.*) (?P<hostname>.*) (?P<level>.*):'
+        - labels:
+            timestamp:
+            source:
+            level:
+            output:
+        - timestamp:
+            format: '2006-01-02 15:04:05'
+            source: timestamp
     static_configs:
     - targets:
         - localhost

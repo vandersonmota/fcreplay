@@ -1,6 +1,7 @@
 from fcreplay.config import Config
 import os
 import logging
+import socket
 
 
 class Logging:
@@ -10,7 +11,8 @@ class Logging:
         self.GCLOUD_FUNCTION = True
         if 'X_GOOGLE_FUNCTION_IDENTITY' not in os.environ:
             logging.basicConfig(
-                format='%(asctime)s %(name)s %(levelname)s: %(message)s',
+                stream='fcreplay',
+                format='%(asctime)s ' + socket.gethostname() + ' %(name)s %(levelname)s: %(message)s',
                 filename=self.config['logfile'],
                 level=self.config['loglevel'],
                 datefmt='%Y-%m-%d %H:%M:%S'

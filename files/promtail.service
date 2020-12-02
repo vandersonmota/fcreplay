@@ -4,7 +4,7 @@ Documentation=https://github.com/grafana/loki/tree/master/docs/clients/promtail
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/promtail -config.file=/etc/config.yaml
+ExecStart=/usr/local/bin/promtail-linux-amd64 -config.file=/etc/promtail.yaml
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartForceExitStatus=SIGPIPE
