@@ -1,6 +1,6 @@
 [Unit]
 Description=FightCade Record
-After=sshd.service
+After=cloud-final.service
 
 [Service]
 Type=simple

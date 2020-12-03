@@ -11,7 +11,6 @@ class Logging:
         self.GCLOUD_FUNCTION = True
         if 'X_GOOGLE_FUNCTION_IDENTITY' not in os.environ:
             logging.basicConfig(
-                stream='fcreplay',
                 format='%(asctime)s ' + socket.gethostname() + ' %(name)s %(levelname)s: %(message)s',
                 filename=self.config['logfile'],
                 level=self.config['loglevel'],
