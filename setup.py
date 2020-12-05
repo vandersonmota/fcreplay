@@ -57,7 +57,7 @@ setup(
         "google-api-python-client==1.12.8",
         "google-auth==1.23.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
         "google-auth-httplib2==0.0.4",
-        "google-python-cloud-debugger==2.15",
+        "google-python-cloud-debugger",
         "googleapis-common-protos==1.52.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
         "gunicorn==20.0.4",
         "httplib2==0.18.1",
