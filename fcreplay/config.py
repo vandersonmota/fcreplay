@@ -50,20 +50,6 @@ class Config:
                     'description': 'Google cloud service account email address'
                 }
             },
-            'gcloud_destroy_on_fail': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Destroy google cloud instance on recording failure',
-                }
-            },
-            'gcloud_destroy_when_stopped': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Destroy stopped cloud instances when cloud function is run',
-                }
-            },
             'gcloud_instance_max': {
                 'type': 'number',
                 'meta': {
@@ -210,13 +196,6 @@ class Config:
                 'meta': {
                     'default': base64.b64encode(os.urandom(64)).decode(),
                     'description': 'Secret key used for flask/site cookies'
-                }
-            },
-            'shutdown_instance': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Shutdown instance once instance has finished'
                 }
             },
             'sql_baseurl': {

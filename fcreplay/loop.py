@@ -1,12 +1,10 @@
 import argparse
 import glob
 import os
-import subprocess
 import sys
 import time
 
 from fcreplay.config import Config
-from fcreplay.gcloud import Gcloud
 from fcreplay.logging import Logging
 from fcreplay.replay import Replay
 
@@ -14,7 +12,6 @@ from fcreplay.replay import Replay
 class Loop:
     def __init__(self):
         self.config = Config().config
-        self.gcloud = False
         self.debug = False
         self.onetime = False
 
@@ -56,10 +53,6 @@ class Loop:
         if self.debug:
             Logging().debug(self.config)
 
-        # If this is google cloud, and the 'destroying' file exists, remove it
-        if self.gcloud and os.path.exists('/tmp/destroying'):
-            os.remove('/tmp/destroying')
-
         while True:
             replay = Replay()
             if replay.replay is not None:
@@ -88,14 +81,6 @@ class Loop:
                 Logging().info("No more replays. Waiting for replay submission")
                 time.sleep(5)
 
-            if self.gcloud:
-                Gcloud().destroy_fcreplay()
-                sys.exit(0)
-
-            if self.config['shutdown_instance']:
-                subprocess.run(['sudo', '/usr/sbin/shutdown', 'now', '-h'])
-                sys.exit(0)
-
             if self.onetime:
                 sys.exit(0)
 
@@ -108,13 +93,11 @@ def console():
     """
     parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
     parser.add_argument('--debug', action='store_true', help='Exits after a single loop and turns on debugging')
-    parser.add_argument('--gcloud', action='store_true', help='Enabled google cloud functions')
     parser.add_argument('--onetime', action='store_true', help='Exits after a single loop')
     args = parser.parse_args()
 
     c = Loop()
 
     c.debug = args.debug
-    c.gcloud = args.gcloud
     c.onetime = args.onetime
     c.main()

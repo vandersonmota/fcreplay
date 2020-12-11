@@ -1,4 +1,9 @@
-#!/bin/bash
-cd /home/fcrecorder/fcreplay
-source ./venv/bin/activate
-fcreplayloop --gcloud
+#!/bin/sh
+cd /root
+fcreplayloop --onetime
+
+pkill -9 tail
+pkill -9 i3
+pkill -9 xterm
+pkill -9 x11vnc
+pkill -9 Xvfb
