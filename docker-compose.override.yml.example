@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  fcreplay-tasker:
+    command: 'tasker'
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CLIENT_SECRETS=/path/to/.client_secrets.json
+      - CONFIG=/path/to/config.json
+      - CPUS=4
+      - DESCRIPTION_APPEND=/path/to/description_append.txt
+      - IA=/path/to/.ia
+      - MAX_INSTANCES=1
+      - MEMORY=4g
+      - ROMS=/path/to/ROMs
+      - YOUTUBE_UPLOAD_CREDENTIALS=/path/to/.youtube-upload-credentials.json

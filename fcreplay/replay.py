@@ -30,24 +30,24 @@ class Replay:
         with open('/tmp/fcreplay_status', 'w') as f:
             f.write(f"{self.replay.id} STARTED")
 
-    def handle_fail(func):
-        """Handle Failure decorator
-        """
-        def failed(self, *args, **kwargs):
-            try:
-                return func(self, *args, **kwargs)
-            except Exception as e:
-                trace_back = sys.exc_info()[2]
-                Logging().error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
-                Logging().info(f"Setting {self.replay.id} to failed")
-                self.db.update_failed_replay(challenge_id=self.replay.id)
-                self.update_status(status.FAILED)
+#    def handle_fail(func):
+#        """Handle Failure decorator
+#        """
+#        def failed(self, *args, **kwargs):
+#            try:
+#                return func(self, *args, **kwargs)
+#            except Exception as e:
+#                trace_back = sys.exc_info()[2]
+#                Logging().error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
+#                Logging().info(f"Setting {self.replay.id} to failed")
+#                self.db.update_failed_replay(challenge_id=self.replay.id)
+#                self.update_status(status.FAILED)
+#
+#                sys.exit(1)
+#
+#        return failed
 
-                sys.exit(1)
-
-        return failed
-
-    @handle_fail
+    #@handle_fail
     def get_replay(self):
         """Get a replay from the database
         """
@@ -70,7 +70,7 @@ class Replay:
 
         return replay
 
-    @handle_fail
+    #@handle_fail
     def add_job(self):
         """Update jobs database table with the current replay
         """
@@ -82,14 +82,14 @@ class Replay:
             length=self.replay.length
         )
 
-    @handle_fail
+    #@handle_fail
     def remove_job(self):
         """Remove job from database
         """
         self.update_status(status.REMOVED_JOB)
         self.db.remove_job(challenge_id=self.replay.id)
 
-    @handle_fail
+    #@handle_fail
     def update_status(self, status):
         """Update the replay status
         """
@@ -102,7 +102,7 @@ class Replay:
             status=status
         )
 
-    @handle_fail
+    #@handle_fail
     def record(self):
         """Start recording a replay
         """
@@ -146,7 +146,7 @@ class Replay:
 
         return True
 
-    @handle_fail
+    #@handle_fail
     def move(self):
         """Move files to finished area
         """
@@ -160,7 +160,7 @@ class Replay:
         Logging().info("Finished moving files")
         self.update_status(status.MOVED)
 
-    @handle_fail
+    #@handle_fail
     def sort_files(self, avi_files_list):
         Logging().info("Sorting files")
 
@@ -178,7 +178,7 @@ class Replay:
 
         return avi_files
 
-    #@handle_fail
+    ##@handle_fail
     def encode(self):
         Logging().info("Encoding file")
 
@@ -217,7 +217,7 @@ class Replay:
             Logging().error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {ffmpeg_rc.stdout}, stderr: {ffmpeg_rc.stderr}")
             raise e
 
-    @handle_fail
+    #@handle_fail
     def set_description(self):
         """Set the description of the video
 
@@ -253,7 +253,7 @@ class Replay:
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
         return True
 
-    @handle_fail
+    #@handle_fail
     def create_thumbnail(self):
         """Create thumbnail from video
         """
@@ -269,7 +269,7 @@ class Replay:
         self.update_status(status.THUMBNAIL_CREATED)
         Logging().info("Finished making thumbnail")
 
-    @handle_fail
+    #@handle_fail
     @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
     def upload_to_ia(self):
         """Upload to internet archive
@@ -306,7 +306,7 @@ class Replay:
         self.update_status(status.UPLOADED_TO_IA)
         Logging().info("Finished upload to archive.org")
 
-    @handle_fail
+    #@handle_fail
     def upload_to_yt(self):
         """Upload video to youtube
         """
@@ -395,7 +395,7 @@ class Replay:
         else:
             raise ModuleNotFoundError
 
-    @handle_fail
+    #@handle_fail
     def remove_generated_files(self):
         """Remove generated files
 
@@ -409,7 +409,7 @@ class Replay:
         self.update_status(status.REMOVED_GENERATED_FILES)
         Logging().info("Finished removing files")
 
-    @handle_fail
+    #@handle_fail
     def set_created(self):
         self.update_status(status.FINISHED)
         self.db.update_created_replay(challenge_id=self.replay.id)

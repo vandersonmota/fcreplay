@@ -1,6 +1,6 @@
 #!/bin/sh
 cd /root
-fcreplayloop --onetime
+fcreplayloop
 
 pkill -9 tail
 pkill -9 i3

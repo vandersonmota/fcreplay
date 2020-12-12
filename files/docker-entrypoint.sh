@@ -1,7 +1,7 @@
 #!/bin/bash
 # Look for arguments
 function help() {
-    echo "No argument supplied. Use one of 'record', 'replay', 'tasker', or 'validate'"
+    echo "No argument supplied. Use one of 'fcrecord', 'fcreplayget', 'tasker', or 'validate'"
     exit 1
 }
 
@@ -15,19 +15,19 @@ function fcrecord() {
     #x11vnc > /dev/null 2>&1
 }
 
-function fcvalidate() {
+function fcreplayvalidate() {
     cd /root
-    fcreplayvalidate $@
+    /usr/bin/fcreplayvalidate $@
 }
 
-function fcreplay() {
+function fcreplayget() {
     cd /root
-    fcreplayget $@
+    /usr/bin/fcreplayget $@
 }
 
 function fctasker() {
     cd /root
-    fcreplaytasker $@
+    /usr/bin/fcreplaytasker $@
 }
 
 if [ $# -eq 0 ]; then
@@ -40,8 +40,8 @@ case $1 in
     fcrecord
     ;;
 
-  replay)
-    fcreplay ${@:2}
+  fcreplayget)
+    fcreplayget ${@:2}
     ;;
   
   tasker)

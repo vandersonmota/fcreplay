@@ -1,33 +1,3 @@
-<!--ts-->
-   * [About](#about)
-   * [Goal](#goal)
-   * [Features](#features)
-      * [Description generation](#description-generation)
-   * [Requirements](#requirements)
-      * [Database](#database)
-      * [Optional: Google cloud](#optional-google-cloud)
-         * [A few more notes:](#a-few-more-notes)
-      * [Todo](#todo)
-      * [Requirements](#requirements-1)
-         * [Uploading to youtube.com](#uploading-to-youtubecom)
-         * [Uploading to archive.org](#uploading-to-archiveorg)
-   * [Installation and setup](#installation-and-setup)
-      * [Configuration](#configuration)
-         * [Infrastructure Deployment](#infrastructure-deployment)
-      * [Deployment](#deployment)
-      * [Monitoring Recording](#monitoring-recording)
-         * [Google cloud](#google-cloud)
-   * [Usage](#usage)
-      * [Activating](#activating)
-      * [Getting replays](#getting-replays)
-      * [Recording a replay](#recording-a-replay)
-      * [Running automatically on startup](#running-automatically-on-startup)
-      * [Google cloud](#google-cloud-1)
-
-<!-- Added by: gino, at: Sat 10 Oct 2020 06:59:54 PM NZDT -->
-
-<!--te-->
-
 # About
 This project will automatically encoded [fightcade](https://www.fightcade.com/) replays and upload them to archive.org: [Gino Lisignoli - Archive.org](https://archive.org/search.php?query=creator%3A%22Gino+Lisignoli%22) or youtube: [fightcade archive](https://www.youtube.com/channel/UCrYudzO9Nceu6mVBnFN6haA)
 
@@ -53,9 +23,10 @@ A desctiption is generated that contains:
 # Requirements
 ## Database
 Fcreplay uses sqlalchemy and has been tested with postgres and is used store any replay metadata
+Docker and docker-compose is required to run the application
 
 ## Optional: Google cloud
-Fcreplay is designed to run on google cloud
+Fcreplay has some scheduled jobs for checking the status of encoded videos. To be migrated to docker at some point
 
 ### A few more notes:
 To trigger recording the file `started.inf` is checked. If the file exists then pyautogui is used to start recording the avi file(s)
@@ -68,14 +39,14 @@ This is all done in a headless X11 session
  - Better exception handling.
  - Thumbnails are generated but not used
 
-## Requirements
+## Hardware
 To run this, you need:
  1. A VM or physical machine.
      1. With at least 4 Cores (Fast ones would be ideal)
      1. With at least 4GB Ram
      1. With at least 250GB of storage 
         1. This is the amount of temporary storage required to encode a replay of up to 3 hours long. Replay recording requires ~20MB/sec
- 2. Running Fedora 32
+ 2. Running docker and docker-compose
  3. Some familiarity with linux will help
 
 ### Uploading to youtube.com
@@ -96,115 +67,29 @@ If you are using the ansible playbook, you will also want to have ready the foll
  - Youtube upload credentials: `.youtube-upload-credentials.json`
  - Archive.org secrets: `.ia`
 
+## Building
+First generate a docker-compose.override.yml file from the example
 
-### Infrastructure Deployment
-To deploy to google cloud you need to:
-
-1. Create a project
-2. Create a fedora32 image
-   1. This was done by following: https://linuxhint.com/install-fedora-google-compute-engine
-   2. Install google-fluentd
-3. Create the base instance from the fedora32 image called fcreplay-image
-4. Create a service account "fcrecorder-compute-admin"
-   1. Give it the folowing roles:
-      - Cloud Functions Invoker
-      - Compute Admin
-      - Logs Configuration Writer
-      - Logs Writer
-      - Monitoring Metric Writer
-      - Service Account User
-   2. Make add this in your config.json file
-5. Deploy the cloud functions
-
-## Deployment
-I've include a basic ansible playbook for the installation, you will need to have ssh access to the `fcreplay-image` and a deployment user with root access.
-
-2. Use the ansible script to setup the base instance.
-   1. Create a deployment user with with sudo access: `adduser deployment`
-   2. Set a password `passwd deployment`
-   3. Add the user to the wheel group: `groupmems -a deployment -g wheel`
-   4. Copy your ssh key with `ssh-copy-id deployment@<host>`
-   5. Disable password login in the `/etc/ssh/sshd_config` and restart sshd: `systemctl restart sshd`
-   6. Check your environment variables by running `check_ansible.sh`
-   7. Launch the ansible script: `ansible-playbook -i <host>, -u <deployment_user> -K --diff playbook.yml` 
-   8. After running the ansible script, you will need to start a xorg session and run `wine /home/fcrecorder/fcreplay/Fightcade/emulator/fbneo/fcadefbneo.exe` once to initialise wine
-   9. Then run in a xorg session, run winetricks and install:
-      * avifil32
-      * cinepack
-      * xvid
- 
-## Monitoring Recording
-If you want to watch recording happening, you need to:
-1. Login and switch to the fcrecorder user
-2. Create a x11vnc password as the fcrecorder user `x11vnc -storepasswd`
-3. Add a firewalld rule to allow connections `firewall-cmd '--add-port 5900/tcp`
-
-When recording is happening, you can then run `x11vnc --rfbauth ~/.vnc/passwd -noxfixes -noxdamage -noxrecord` as the fcrecord user. This will start a vnc server allowing you to connect to your instance on port 5900
-
-
-### Google cloud
-When deploying with the ansible playbook, and the ansible variable `"gcloud": True`, the fcrecord service is automatically set to start when the hostname is fcreplay-image-1
-
-This will cause `fcreplayloop --gcloud` to be automatically run when the instance is started. See `loop.py` for more info
+Useing docker-compose, run the following to build the base image
+```commandline
+docker-compose build
+```
 
 # Usage
-The typical useage of fcreplay is to run this in google cloud, where the service
+The typical useage of fcreplay is to run `docker-compose up` to start the task scheduler that will launch the replay encoding containers
 
-## Activating
-Before running fcreplay, you need to activate the python environment
+## Validating your config
+This command will do a basic check on your config:
 ```commandline
-cd ~/fcreplay
-source ./venv/bin/activate
-```
+docker-compose run --rm fcreplay-tasker validate /root/config.json
 
 ## Getting replays
 This will download a replay, and place it in the database
 ```commandline
-fcreplayget <fightcade profile> <replay url>
-```
-
-## Recording a replay
-Within a Xorg session:
-```commandline
-fcreplayloop
-```
-You can also run `fcreplayloop --debug` to only run for a single iteration. Useful for testing.
-
-## Running automatically on startup
-To run fcreplay automatically on startup you need to enable the service, and uncommet the i3 line:
-```commandline
-systemctl enable fcrecord
-sed -i 's/^# exec "xterm/exec "xterm/' .config/i3/config
+docker-compose run --rm fcreplay-tasker fcreplayget --help
 ```
 
 ## Google cloud
-Once you have setup the base image, you need to make a image called: fcrecord:
-```commandline
-gcloud compute images create fcreplay-image \
-  --source-disk fcrecorder\
-  --source-disk-zone us-central1-a \
-  --family fedora32 \
-  --storage-location us-central1
-```
-
-
-Once started, the instance will look for a replay on startup and begin encoding.
-
-If you want to see the logs, the following query should work:
-
-```
-(logName="projects/fcrecorder/logs/fcreplay" AND labels."compute.googleapis.com/resource_name" = "fcreplay-image-1") OR
-(resource.type="cloud_function" AND severity=INFO AND labels.execution_id:*)
-```
-
-To create a scheduled job, run:
-```commandline
-gcloud scheduler jobs create http 'check-for-replay' --schedule='*/2 * * * *' \
-  --uri="https://us-central1-fcrecorder-286007.cloudfunctions.net/check_for_replay" \
-  --oidc-service-account-email="fcrecorder-compute-account@fcrecorder-286007.iam.gserviceaccount.com" \
-  --oidc-token-audience="https://us-central1-fcrecorder-286007.cloudfunctions.net/check_for_replay"
-```
-
 # Site
 To test the site with flask:
 

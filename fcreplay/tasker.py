@@ -7,22 +7,22 @@ import uuid
 
 
 class Tasker:
-    def __init__(self):
-        self.db = Database()
-
     def check_for_replay(self):
         print("Looking for replay")
         player_replay = self.db.get_oldest_player_replay()
         if player_replay is not None:
             print("Found player replay")
             self.launch_fcreplay()
+            return True
 
         replay = self.db.get_oldest_replay()
         if replay is not None:
             print("Found replay")
             self.launch_fcreplay()
+            return True
 
         print("No replays")
+        return False
 
     def number_of_instances(self):
         d_client = docker.from_env()
@@ -40,27 +40,31 @@ class Tasker:
         d_client.containers.run(
             'fcreplay/image:latest',
             command='record',
-            cpu_count=os.environ['CPUS'],
+            cpu_count=int(os.environ['CPUS']),
             detach=True,
-            mem_limit=os.environ['MEMORY'],
+            mem_limit=str(os.environ['MEMORY']),
             remove=True,
             name=f"fcreplay-instance-{str(uuid.uuid4().hex)}",
             volumes={
-                os.environ['CLIENT_SECRETS']: {'bind': '/root/.client_secrets', 'mode': 'ro'},
-                os.environ['CONFIG']: {'bind': '/root/config.json', 'mode': 'ro'},
-                os.environ['DESCRIPTION_APPEND']: {'bind': '/root/description_append.txt', 'mode': 'ro'},
-                os.environ['IA']: {'bind': '/root/.ia', 'mode': 'ro'},
-                os.environ['ROMS']: {'bind': '/root/Fightcade/emulator/fbneo/ROMs', 'mode': 'ro'},
-                os.environ['YOUTUBE_UPLOAD_CREDENTIALS']: {'bind': '/root/.youtube-upload-credentials.json', 'mode': 'ro'}
+                str(os.environ['CLIENT_SECRETS']): {'bind': '/root/.client_secrets', 'mode': 'ro'},
+                str(os.environ['CONFIG']): {'bind': '/root/config.json', 'mode': 'ro'},
+                str(os.environ['DESCRIPTION_APPEND']): {'bind': '/root/description_append.txt', 'mode': 'ro'},
+                str(os.environ['IA']): {'bind': '/root/.ia', 'mode': 'ro'},
+                str(os.environ['ROMS']): {'bind': '/Fightcade/emulator/fbneo/ROMs', 'mode': 'ro'},
+                str(os.environ['YOUTUBE_UPLOAD_CREDENTIALS']): {'bind': '/root/.youtube-upload-credentials.json', 'mode': 'ro'}
             }
         )
 
     def main(self):
-        if self.number_of_instances < int(os.environ['MAX_INSTANCES']):
-            self.check_for_replay()
-        else:
-            print(f"Maximum number of instances ({os.environ['MAX_INSTANCES']}) reached")
-        time.sleep(120)
+        while True:
+            self.db = Database()
+            if self.number_of_instances() < int(os.environ['MAX_INSTANCES']):
+                self.check_for_replay()
+            else:
+                print(f"Maximum number of instances ({os.environ['MAX_INSTANCES']}) reached")
+
+            print("Sleeping for 120 seconds")
+            time.sleep(120)
 
 
 def console():

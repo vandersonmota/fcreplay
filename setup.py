@@ -26,7 +26,7 @@ setup(
         "console_scripts": [
             "fcreplayget=fcreplay.getreplay:console",
             "fcreplayloop=fcreplay.loop:console",
-            "fcreplaytasker=fcreplay.tasker.console",
+            "fcreplaytasker=fcreplay.tasker:console",
             "fcreplayvalidate=fcreplay.config:console",
         ]
     },

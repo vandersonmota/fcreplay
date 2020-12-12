@@ -26,7 +26,8 @@ config_dev.json
 docker_config_prod.json
 docker_config_dev.json
 description_append.txt
-sql/
+docker-compose.override.yml
+sql/*
 
 # Log file
 fcreplay.log

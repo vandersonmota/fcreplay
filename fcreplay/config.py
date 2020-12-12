@@ -2,7 +2,7 @@
 """fcreplayconfig.
 
 Usage:
-  fcreplayconfig validate <config.json>
+  fcreplayconfig <config.json>
   fcreplayconfig (-h | --help)
 
 Options:

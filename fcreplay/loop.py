@@ -53,51 +53,44 @@ class Loop:
         if self.debug:
             Logging().debug(self.config)
 
-        while True:
-            replay = Replay()
-            if replay.replay is not None:
-                replay.add_job()
-                replay.record()
-                replay.move()
-                replay.encode()
-                replay.set_description()
-                replay.create_thumbnail()
+        replay = Replay()
+        if replay.replay is not None:
+            replay.add_job()
+            replay.record()
+            replay.move()
+            replay.encode()
+            replay.set_description()
+            replay.create_thumbnail()
 
-                if self.config['upload_to_ia']:
-                    replay.upload_to_ia()
+            if self.config['upload_to_ia']:
+                replay.upload_to_ia()
 
-                if self.config['upload_to_yt']:
-                    replay.upload_to_yt()
+            if self.config['upload_to_yt']:
+                replay.upload_to_yt()
 
-                if self.config['remove_generated_files']:
-                    replay.remove_generated_files()
+            if self.config['remove_generated_files']:
+                replay.remove_generated_files()
 
-                replay.remove_job()
+            replay.remove_job()
 
-                replay.db.update_created_replay(challenge_id=replay.replay.id)
-                replay.set_created()
+            replay.db.update_created_replay(challenge_id=replay.replay.id)
+            replay.set_created()
 
-            else:
-                Logging().info("No more replays. Waiting for replay submission")
-                time.sleep(5)
+        else:
+            Logging().info("No more replays. Waiting for replay submission")
+            time.sleep(5)
 
-            if self.onetime:
-                sys.exit(0)
-
-            if self.debug:
-                sys.exit(0)
+        sys.exit(0)
 
 
 def console():
     """Invoked from command line
     """
-    parser = argparse.ArgumentParser(description='FCReplay - Video Catpure')
-    parser.add_argument('--debug', action='store_true', help='Exits after a single loop and turns on debugging')
-    parser.add_argument('--onetime', action='store_true', help='Exits after a single loop')
+    parser = argparse.ArgumentParser(description='fcreplay - Video Catpure')
+    parser.add_argument('--debug', action='store_true', help='Turns on debugging. Requires port 5678/tcp')
     args = parser.parse_args()
 
     c = Loop()
 
     c.debug = args.debug
-    c.onetime = args.onetime
     c.main()
