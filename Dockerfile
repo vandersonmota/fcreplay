@@ -44,18 +44,33 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
   zlib-dev
 RUN pip3 install --upgrade cython pip scikit-build
 
-# Install fcreplay
-COPY fcreplay /root/fcreplay
-COPY setup.py /root/setup.py
-RUN cd /root && python3 setup.py install
-
-# Fix i3 Fonts
-RUN update-ms-fonts
-
 # Fix wine sound and video recording
 RUN winetricks -q avifil32 && \
   winetricks -q d3dx9 && \
   winetricks sound=pulse
+
+# Fix i3 Fonts
+RUN update-ms-fonts
+
+# Download Fightcade linux
+RUN cd / && \
+  wget https://www.fightcade.com/download/linux && \
+  tar xvf linux && \
+  mkdir -p /Fightcade/emulator/fbneo/config && \
+  mkdir -p /Fightcade/emulator/fbneo/ROMs && \
+  rm -rf /linux
+
+# Download and install youtube-dl
+RUN cd /root && \
+  pip install --upgrade google-api-python-client oauth2client progressbar2 && \
+  git clone https://github.com/tokland/youtube-upload.git && \
+  cd youtube-upload && \
+  python3 setup.py install
+
+# Install fcreplay
+COPY fcreplay /root/fcreplay
+COPY setup.py /root/setup.py
+RUN cd /root && python3 setup.py install
 
 # Setup i3 for autostart
 RUN mkdir -p /root/.config/i3
@@ -70,14 +85,6 @@ RUN touch /root/.Xauthority && touch /root/fcreplay.log
 COPY files/default.pa /etc/pulse/default.pa
 COPY files/system.pa /etc/pulse/system.pa
 
-# Download Fightcade linux
-RUN cd / && \
-  wget https://www.fightcade.com/download/linux && \
-  tar xvf linux && \
-  mkdir -p /Fightcade/emulator/fbneo/config && \
-  mkdir -p /Fightcade/emulator/fbneo/ROMs && \
-  rm -rf /linux
-
 # Copy over configuration files for xaudio fix
 COPY files/fcadefbneo.default.ini /Fightcade/emulator/fbneo/config/fcadefbneo.default.ini
 COPY files/fcadefbneo.ini /Fightcade/emulator/fbneo/config/fcadefbneo.ini
@@ -86,5 +93,3 @@ COPY files/docker-entrypoint.sh /docker-entrypoint.sh
 
 CMD ["record"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
-
-EXPOSE 5900

@@ -2,11 +2,16 @@
 from fcreplay.database import Database
 import docker
 import os
+import shutil
 import time
 import uuid
 
 
 class Tasker:
+    def __init__(self):
+        self.started_instances = {}
+        self.db = Database()
+
     def check_for_replay(self):
         print("Looking for replay")
         player_replay = self.db.get_oldest_player_replay()
@@ -35,29 +40,60 @@ class Tasker:
 
         return instance_count
 
+    def running_instance(self, instance_hostname):
+        d_client = docker.from_env()
+        for i in d_client.containers.list():
+            if instance_hostname in i.attrs['Config']['Hostname']:
+                return True
+
+        return False
+
+    def remove_temp_dirs(self):
+        for docker_hostname in self.started_instances:
+            if not self.running_instance(docker_hostname):
+                print(f"Removing '/avi_storage_temp/{self.started_instances[docker_hostname]}'")
+                shutil.rmtree(f"/avi_storage_temp/{self.started_instances[docker_hostname]}")
+                del self.started_instances[docker_hostname]
+
     def launch_fcreplay(self):
         d_client = docker.from_env()
-        d_client.containers.run(
+        instance_uuid = str(uuid.uuid4().hex)
+
+        print(f"Starting new instance with temp dir: '{os.environ['AVI_TEMP_DIR']}/{instance_uuid}'")
+        c_instance = d_client.containers.run(
             'fcreplay/image:latest',
-            command='record',
+            command='fcrecord',
             cpu_count=int(os.environ['CPUS']),
             detach=True,
             mem_limit=str(os.environ['MEMORY']),
             remove=True,
-            name=f"fcreplay-instance-{str(uuid.uuid4().hex)}",
+            name=f"fcreplay-instance-{instance_uuid}",
             volumes={
-                str(os.environ['CLIENT_SECRETS']): {'bind': '/root/.client_secrets', 'mode': 'ro'},
+                str(os.environ['CLIENT_SECRETS']): {'bind': '/root/.client_secrets.json', 'mode': 'ro'},
                 str(os.environ['CONFIG']): {'bind': '/root/config.json', 'mode': 'ro'},
                 str(os.environ['DESCRIPTION_APPEND']): {'bind': '/root/description_append.txt', 'mode': 'ro'},
                 str(os.environ['IA']): {'bind': '/root/.ia', 'mode': 'ro'},
                 str(os.environ['ROMS']): {'bind': '/Fightcade/emulator/fbneo/ROMs', 'mode': 'ro'},
-                str(os.environ['YOUTUBE_UPLOAD_CREDENTIALS']): {'bind': '/root/.youtube-upload-credentials.json', 'mode': 'ro'}
+                str(os.environ['YOUTUBE_UPLOAD_CREDENTIALS']): {'bind': '/root/.youtube-upload-credentials.json', 'mode': 'ro'},
+                f"{os.environ['AVI_TEMP_DIR']}/{instance_uuid}": {'bind': '/Fightcade/emulator/fbneo/avi', 'mode': 'rw'}
             }
         )
 
+        self.started_instances[c_instance.attrs['Config']['Hostname']] = instance_uuid
+
     def main(self):
+        if 'REMOTE_DEBUG' in os.environ:
+            print("Starting remote debugger on port 5678")
+            import debugpy
+            debugpy.listen(("0.0.0.0", 5678))
+            print("Waiting for connection...")
+            debugpy.wait_for_client()
+
         while True:
-            self.db = Database()
+            # Prune directories
+            print("Removing empty temp directories")
+            self.remove_temp_dirs()
+
             if self.number_of_instances() < int(os.environ['MAX_INSTANCES']):
                 self.check_for_replay()
             else:

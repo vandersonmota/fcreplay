@@ -26,7 +26,6 @@ class Loop:
         """
         dirs = [
             f"{self.config['fcreplay_dir']}/tmp/*",
-            f"{self.config['fcreplay_dir']}/finished/*",
             f"{self.config['fcadefbneo_path']}/avi/*"
         ]
 
@@ -40,9 +39,6 @@ class Loop:
         if not os.path.exists(f"{self.config['fcreplay_dir']}/tmp"):
             Logging().info('Created tmp dir')
             os.mkdir(f"{self.config['fcreplay_dir']}/tmp")
-        if not os.path.exists(f"{self.config['fcreplay_dir']}/finished"):
-            Logging().info('Created finished dir')
-            os.mkdir(f"{self.config['fcreplay_dir']}/finished")
 
     def main(self):
         """The main loop for processing one or more replays
@@ -57,7 +53,6 @@ class Loop:
         if replay.replay is not None:
             replay.add_job()
             replay.record()
-            replay.move()
             replay.encode()
             replay.set_description()
             replay.create_thumbnail()

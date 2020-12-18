@@ -19,6 +19,12 @@
     "subject": ["UNUSED"]
   },
   "logfile": "/tmp/fcreplay_site_test.log",
+  "logging_loki": {
+      "enabled": false,
+      "password": "securepassword",
+      "url": "http://some.loki:3100/loki/api/v1/push",
+      "username": "someusername"
+  },
   "loglevel": "DEBUG",
   "max_replay_length": 10800,
   "min_replay_length": 60,

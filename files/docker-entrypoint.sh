@@ -12,7 +12,6 @@ function fcrecord() {
     export WINEDEBUG=-all
     i3 > /dev/null 2>&1 &
     tail -f /root/fcreplay.log
-    #x11vnc > /dev/null 2>&1
 }
 
 function fcreplayvalidate() {
@@ -36,8 +35,8 @@ fi
 
 # Look for the first argument
 case $1 in
-  record)
-    fcrecord
+  fcrecord)
+    fcrecord ${@:2}
     ;;
 
   fcreplayget)

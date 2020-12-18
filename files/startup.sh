@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 cd /root
-fcreplayloop
+fcreplayloop 
+sleep 1
+echo '' >> /root/fcreplay.log
+sleep 1
 
 pkill -9 tail
 pkill -9 i3

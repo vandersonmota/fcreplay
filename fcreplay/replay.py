@@ -30,24 +30,24 @@ class Replay:
         with open('/tmp/fcreplay_status', 'w') as f:
             f.write(f"{self.replay.id} STARTED")
 
-#    def handle_fail(func):
-#        """Handle Failure decorator
-#        """
-#        def failed(self, *args, **kwargs):
-#            try:
-#                return func(self, *args, **kwargs)
-#            except Exception as e:
-#                trace_back = sys.exc_info()[2]
-#                Logging().error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
-#                Logging().info(f"Setting {self.replay.id} to failed")
-#                self.db.update_failed_replay(challenge_id=self.replay.id)
-#                self.update_status(status.FAILED)
-#
-#                sys.exit(1)
-#
-#        return failed
+    def handle_fail(func):
+        """Handle Failure decorator
+        """
+        def failed(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                trace_back = sys.exc_info()[2]
+                Logging().error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
+                Logging().info(f"Setting {self.replay.id} to failed")
+                self.db.update_failed_replay(challenge_id=self.replay.id)
+                self.update_status(status.FAILED)
 
-    #@handle_fail
+                sys.exit(1)
+
+        return failed
+
+    @handle_fail
     def get_replay(self):
         """Get a replay from the database
         """
@@ -70,7 +70,7 @@ class Replay:
 
         return replay
 
-    #@handle_fail
+    @handle_fail
     def add_job(self):
         """Update jobs database table with the current replay
         """
@@ -82,14 +82,14 @@ class Replay:
             length=self.replay.length
         )
 
-    #@handle_fail
+    @handle_fail
     def remove_job(self):
         """Remove job from database
         """
         self.update_status(status.REMOVED_JOB)
         self.db.remove_job(challenge_id=self.replay.id)
 
-    #@handle_fail
+    @handle_fail
     def update_status(self, status):
         """Update the replay status
         """
@@ -102,7 +102,7 @@ class Replay:
             status=status
         )
 
-    #@handle_fail
+    @handle_fail
     def record(self):
         """Start recording a replay
         """
@@ -146,21 +146,7 @@ class Replay:
 
         return True
 
-    #@handle_fail
-    def move(self):
-        """Move files to finished area
-        """
-        Logging().info(f"Moving avi files from: {self.config['fcadefbneo_path']}/avi, to: {self.config['fcreplay_dir']}/finished/")
-        avi_files_list = os.listdir(f"{self.config['fcadefbneo_path']}/avi")
-        for f in avi_files_list:
-            shutil.move(f"{self.config['fcadefbneo_path']}/avi/{f}",
-                        f"{self.config['fcreplay_dir']}/finished/{f}")
-            Logging().info(f"Moved file: {f}")
-
-        Logging().info("Finished moving files")
-        self.update_status(status.MOVED)
-
-    #@handle_fail
+    @handle_fail
     def sort_files(self, avi_files_list):
         Logging().info("Sorting files")
 
@@ -172,17 +158,17 @@ class Replay:
             sorted_avi_files_list = []
             for i in sorted(avi_dict.items(), key=lambda x: x[1]):
                 sorted_avi_files_list.append(i[0])
-            avi_files = [f"{self.config['fcreplay_dir']}/finished/" + i for i in sorted_avi_files_list]
+            avi_files = [f"{self.config['fcadefbneo_path']}/avi/" + i for i in sorted_avi_files_list]
         else:
-            avi_files = [f"{self.config['fcreplay_dir']}/finished/" + avi_files_list[0]]
+            avi_files = [f"{self.config['fcadefbneo_path']}/avi/" + avi_files_list[0]]
 
         return avi_files
 
-    ##@handle_fail
+    @handle_fail
     def encode(self):
         Logging().info("Encoding file")
 
-        avi_files_list = os.listdir(f"{self.config['fcreplay_dir']}/finished")
+        avi_files_list = os.listdir(f"{self.config['fcadefbneo_path']}/avi")
         Logging().info(f"List of files is: {avi_files_list}")
 
         # Sort files
@@ -198,10 +184,10 @@ class Replay:
             '-i', f'concat:{avi_files_path}',
             '-vf', 'scale=800x600',
             '-c:v', 'mpeg4',
-            '-qscale:v', '3',
+            '-qscale:v', '5',
             '-c:a', 'libmp3lame',
             '-q:a', '128',
-            f"{self.config['fcreplay_dir']}/finished/{self.replay.id}.mp4"
+            f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mp4"
         ]
 
         Logging().info(f"Running ffmpeg with: {' '.join(ffmpeg_options)}")
@@ -217,7 +203,7 @@ class Replay:
             Logging().error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {ffmpeg_rc.stdout}, stderr: {ffmpeg_rc.stderr}")
             raise e
 
-    #@handle_fail
+    @handle_fail
     def set_description(self):
         """Set the description of the video
 
@@ -253,23 +239,23 @@ class Replay:
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
         return True
 
-    #@handle_fail
+    @handle_fail
     def create_thumbnail(self):
         """Create thumbnail from video
         """
         Logging().info("Making thumbnail")
-        filename = f"{self.replay.id}.mkv"
+        filename = f"{self.replay.id}.mp4"
         subprocess.run([
             "ffmpeg",
             "-ss", "20",
-            "-i", f"{self.config['fcreplay_dir']}/finished/{filename}",
+            "-i", f"{self.config['fcadefbneo_path']}/avi/{filename}",
             "-vframes:v", "1",
             f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg"])
 
         self.update_status(status.THUMBNAIL_CREATED)
         Logging().info("Finished making thumbnail")
 
-    #@handle_fail
+    @handle_fail
     @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
     def upload_to_ia(self):
         """Upload to internet archive
@@ -281,7 +267,7 @@ class Replay:
         self.update_status(status.UPLOADING_TO_IA)
         title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}.mkv"
+        filename = f"{self.replay.id}.mp4"
         date_short = str(self.replay.date_replay)[10]
 
         # Make identifier for Archive.org
@@ -300,20 +286,20 @@ class Replay:
             'licenseurl': self.config['ia_settings']['license_url']}
 
         Logging().info("Starting upload to archive.org")
-        fc_video.upload(f"{self.config['fcreplay_dir']}/finished/{filename}",
+        fc_video.upload(f"{self.config['fcadefbneo_path']}/avi/{filename}",
                         metadata=metadata, verbose=True)
 
         self.update_status(status.UPLOADED_TO_IA)
         Logging().info("Finished upload to archive.org")
 
-    #@handle_fail
+    @handle_fail
     def upload_to_yt(self):
         """Upload video to youtube
         """
         self.update_status(status.UPLOADING_TO_YOUTUBE)
         title = f"{self.config['supported_games'][self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}.mkv"
+        filename = f"{self.replay.id}.mp4"
         import_format = '%Y-%m-%d %H:%M:%S'
         date_raw = datetime.datetime.strptime(
             str(self.replay.date_replay), import_format)
@@ -375,7 +361,7 @@ class Replay:
                     '--recording-date', youtube_date,
                     '--default-language', 'en',
                     '--thumbnail', f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg",
-                    f"{self.config['fcreplay_dir']}/finished/{filename}",
+                    f"{self.config['fcadefbneo_path']}/avi/{filename}",
                 ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
             Logging().info(yt_rc.stdout.decode())
@@ -395,21 +381,21 @@ class Replay:
         else:
             raise ModuleNotFoundError
 
-    #@handle_fail
+    @handle_fail
     def remove_generated_files(self):
         """Remove generated files
 
         Generated files are thumbnail and videofile
         """
-        Logging().info("Removing old files")
-        filename = f"{self.replay.id}.mkv"
-        os.remove(f"{self.config['fcreplay_dir']}/finished/{filename}")
+        Logging().info("Removing generated files")
+        for f in os.listdir(f"{self.config['fcadefbneo_path']}/avi/"):
+            os.remove(f"{self.config['fcadefbneo_path']}/{f}")
         os.remove(f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg")
 
         self.update_status(status.REMOVED_GENERATED_FILES)
         Logging().info("Finished removing files")
 
-    #@handle_fail
+    @handle_fail
     def set_created(self):
         self.update_status(status.FINISHED)
         self.db.update_created_replay(challenge_id=self.replay.id)

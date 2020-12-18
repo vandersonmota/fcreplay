@@ -126,6 +126,19 @@ class Config:
                     'description': 'Dictionary of Internet Archive settings'
                 }
             },
+            'logging_loki': {
+                'type': 'dict',
+                'required': True,
+                'meta': {
+                    'default': {
+                        'enabled': False,
+                        'password': 'password',
+                        'url': 'https://my-loki-instance:1234/loki/api/v1/push',
+                        'username': 'username'
+                    },
+                    'description': 'Enables logging to a loki endpoint'
+                }
+            },
             'logfile': {
                 'type': 'string',
                 'meta': {
@@ -135,7 +148,7 @@ class Config:
             },
             'loglevel': {
                 'type': 'string',
-                'allowed': ['INFO', 'DEBUG'],
+                'allowed': ['ERROR', 'INFO', 'DEBUG'],
                 'required': True,
                 'meta': {
                     'default': 'INFO',
@@ -308,6 +321,13 @@ class Config:
 
 
 def console():
+    if 'REMOTE_DEBUG' in os.environ:
+        print("Starting remote debugger on port 5678")
+        import debugpy
+        debugpy.listen(("0.0.0.0", 5678))
+        print("Waiting for connection...")
+        debugpy.wait_for_client()
+
     arguments = docopt(__doc__, version='fcreplayconfig')
     if '<config.json>' in arguments:
         os.environ['FCREPLAY_CONFIG'] = arguments['<config.json>']

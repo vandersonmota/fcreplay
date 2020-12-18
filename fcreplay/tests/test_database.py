@@ -1,3 +1,4 @@
+from unittest import mock
 import pytest
 import sys
 from unittest.mock import patch, MagicMock
@@ -23,8 +24,9 @@ class TestDatabase:
 
         return db
 
+    @patch('fcreplay.database.Logging')
     @patch('fcreplay.database.sessionmaker')
-    def test_db_session(self, mock_session):
+    def test_db_session(self, mock_session, mock_logging_config):
         db = self.setUp()
         db.add_replay(
             challenge_id=MagicMock(),

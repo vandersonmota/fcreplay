@@ -23,7 +23,7 @@ class TestLoop:
             assert mock_debugpy_listen.called
             assert mock_debugpy_wait_for_client.called
 
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Config')
     def test_clean(self, mock_config, mock_logging_config):
         loop = self.setUp()
@@ -36,7 +36,6 @@ class TestLoop:
 
         create_list = [
             f"{loop.config['fcreplay_dir']}/tmp",
-            f"{loop.config['fcreplay_dir']}/finished",
             f"{loop.config['fcadefbneo_path']}/avi"
         ]
 
@@ -49,7 +48,7 @@ class TestLoop:
         for f in create_list:
             assert len(os.listdir(f)) == 0, "Directory should be empty"
 
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Config')
     def test_create_dir(self, mock_config, mock_logging_config):
         loop = self.setUp()
@@ -58,9 +57,8 @@ class TestLoop:
 
         loop.create_dirs()
         assert os.path.exists(f"{temp_dir.name}/tmp"), "Should create tmp dir"
-        assert os.path.exists(f"{temp_dir.name}/finished"), "Should create finished dir"
 
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.time.sleep')
     @patch('fcreplay.loop.Config')
     @patch('fcreplay.loop.Replay')
@@ -101,7 +99,7 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Replay', )
     def test_ia(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
@@ -116,7 +114,7 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Replay')
     def test_youtube(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
@@ -131,7 +129,7 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit with no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Replay', )
     def test_remove_files(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:
@@ -146,7 +144,7 @@ class TestLoop:
             assert e.type == SystemExit, "Should exit with no errors"
 
     @patch('fcreplay.loop.Config')
-    @patch('fcreplay.logging.Config')
+    @patch('fcreplay.loop.Logging')
     @patch('fcreplay.loop.Replay')
     def test_loop(self, mock_replay, mock_logging_config, mock_config):
         with pytest.raises(SystemExit) as e:

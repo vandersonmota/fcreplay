@@ -10,6 +10,7 @@ pytest-pudb = "~=0.7"
 flake8 = "~=3.8"
 pytest = "~=6.1"
 autopep8 = "*"
+coverage = "*"
 
 [packages]
 appdirs = "~=1.4"
@@ -50,6 +51,7 @@ cerberus = "~=1.3"
 lxml = "~=4.6"
 numpy = "~=1.19"
 docker = "~=4.4.0"
+python-logging-loki = "*"
 
 [requires]
 python_version = "3.8"
