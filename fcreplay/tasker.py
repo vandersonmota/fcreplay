@@ -81,31 +81,18 @@ class Tasker:
 
         self.started_instances[c_instance.attrs['Config']['Hostname']] = instance_uuid
 
-    def main(self):
-        if 'REMOTE_DEBUG' in os.environ:
-            print("Starting remote debugger on port 5678")
-            import debugpy
-            debugpy.listen(("0.0.0.0", 5678))
-            print("Waiting for connection...")
-            debugpy.wait_for_client()
-
+    def main(self, instances=1):
+        if 'MAX_INSTANCES' in os.environ:
+            instances = int(os.environ['MAX_INSTANCES'])
         while True:
             # Prune directories
             print("Removing empty temp directories")
             self.remove_temp_dirs()
 
-            if self.number_of_instances() < int(os.environ['MAX_INSTANCES']):
+            if self.number_of_instances() < instances:
                 self.check_for_replay()
             else:
                 print(f"Maximum number of instances ({os.environ['MAX_INSTANCES']}) reached")
 
             print("Sleeping for 120 seconds")
             time.sleep(120)
-
-
-def console():
-    Tasker().main()
-
-
-if __name__ == '__main__':
-    console()

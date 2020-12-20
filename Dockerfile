@@ -91,5 +91,5 @@ COPY files/fcadefbneo.ini /Fightcade/emulator/fbneo/config/fcadefbneo.ini
 
 COPY files/docker-entrypoint.sh /docker-entrypoint.sh
 
-CMD ["record"]
+CMD ["fcrecord"]
 ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import re
 import shutil
@@ -11,9 +12,10 @@ from retrying import retry
 
 from fcreplay.record import Record
 from fcreplay.status import status
-from fcreplay.logging import Logging
 from fcreplay.config import Config
 from fcreplay.database import Database
+
+log = logging.getLogger('fcreplay')
 
 
 class Replay:
@@ -38,8 +40,8 @@ class Replay:
                 return func(self, *args, **kwargs)
             except Exception as e:
                 trace_back = sys.exc_info()[2]
-                Logging().error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
-                Logging().info(f"Setting {self.replay.id} to failed")
+                log.error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
+                log.info(f"Setting {self.replay.id} to failed")
                 self.db.update_failed_replay(challenge_id=self.replay.id)
                 self.update_status(status.FAILED)
 
@@ -51,21 +53,21 @@ class Replay:
     def get_replay(self):
         """Get a replay from the database
         """
-        Logging().info('Getting replay from database')
+        log.info('Getting replay from database')
         if self.config['player_replay_first']:
             replay = self.db.get_oldest_player_replay()
             if replay is not None:
-                Logging().info('Found player replay to encode')
+                log.info('Found player replay to encode')
                 return replay
             else:
-                Logging().info('No more player replays')
+                log.info('No more player replays')
 
         if self.config['random_replay']:
-            Logging().info('Getting random replay')
+            log.info('Getting random replay')
             replay = self.db.get_random_replay()
             return replay
         else:
-            Logging().info('Getting oldest replay')
+            log.info('Getting oldest replay')
             replay = self.db.get_oldest_replay()
 
         return replay
@@ -93,7 +95,7 @@ class Replay:
     def update_status(self, status):
         """Update the replay status
         """
-        Logging().info(f"Set status to {status}")
+        log.info(f"Set status to {status}")
         # This file is legacy?
         with open('/tmp/fcreplay_status', 'w') as f:
             f.write(f"{self.replay.id} {status}")
@@ -106,15 +108,15 @@ class Replay:
     def record(self):
         """Start recording a replay
         """
-        Logging().info(
+        log.info(
             f"Starting capture with {self.replay.id} and {self.replay.length}")
         time_min = int(self.replay.length / 60)
-        Logging().info(f"Capture will take {time_min} minutes")
+        log.info(f"Capture will take {time_min} minutes")
 
         self.update_status(status.RECORDING)
 
         # Star a recording store recording status
-        Logging().debug(
+        log.debug(
             f"""Starting record.main with argumens:
             fc_challange_id={self.replay.id},
             fc_time={self.replay.length},
@@ -132,23 +134,23 @@ class Replay:
 
         # Check recording status
         if record_status != "Pass":
-            Logging().error(f"Recording failed on {self.replay.id},"
+            log.error(f"Recording failed on {self.replay.id},"
                             f"Status: {record_status}, exiting.")
 
             if record_status == "FailTimeout":
                 raise TimeoutError
             else:
-                Logging().error(f"Unknown error: ${record_status}, exiting")
+                log.error(f"Unknown error: ${record_status}, exiting")
                 raise ValueError
 
-        Logging().info("Capture finished")
+        log.info("Capture finished")
         self.update_status(status.RECORDED)
 
         return True
 
     @handle_fail
     def sort_files(self, avi_files_list):
-        Logging().info("Sorting files")
+        log.info("Sorting files")
 
         if len(avi_files_list) > 1:
             avi_dict = {}
@@ -166,10 +168,10 @@ class Replay:
 
     @handle_fail
     def encode(self):
-        Logging().info("Encoding file")
+        log.info("Encoding file")
 
         avi_files_list = os.listdir(f"{self.config['fcadefbneo_path']}/avi")
-        Logging().info(f"List of files is: {avi_files_list}")
+        log.info(f"List of files is: {avi_files_list}")
 
         # Sort files
         avi_files = self.sort_files(avi_files_list)
@@ -190,7 +192,7 @@ class Replay:
             f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mp4"
         ]
 
-        Logging().info(f"Running ffmpeg with: {' '.join(ffmpeg_options)}")
+        log.info(f"Running ffmpeg with: {' '.join(ffmpeg_options)}")
 
         ffmpeg_rc = subprocess.run(
             ffmpeg_options,
@@ -200,7 +202,7 @@ class Replay:
         try:
             ffmpeg_rc.check_returncode()
         except subprocess.CalledProcessError as e:
-            Logging().error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {ffmpeg_rc.stdout}, stderr: {ffmpeg_rc.stderr}")
+            log.error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {ffmpeg_rc.stdout}, stderr: {ffmpeg_rc.stderr}")
             raise e
 
     @handle_fail
@@ -210,7 +212,7 @@ class Replay:
         Returns:
             Boolean: Success or failure
         """
-        Logging().info("Creating description")
+        log.info("Creating description")
 
         self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
                                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
@@ -220,7 +222,7 @@ class Replay:
         if self.config['description_append_file'][0] is True:
             # Check if file exists:
             if not os.path.exists(self.config['description_append_file'][1]):
-                Logging().error(
+                log.error(
                     f"Description append file {self.config['description_append_file'][1]} doesn't exist")
                 return False
             else:
@@ -228,14 +230,14 @@ class Replay:
                     self.description_text += "\n" + description_append.read()
 
         self.update_status(status.DESCRIPTION_CREATED)
-        Logging().info("Finished creating description")
+        log.info("Finished creating description")
 
         # Add description to database
-        Logging().info('Adding description to database')
+        log.info('Adding description to database')
         self.db.add_description(
             challenge_id=self.replay.id, description=self.description_text)
 
-        Logging().debug(
+        log.debug(
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
         return True
 
@@ -243,7 +245,7 @@ class Replay:
     def create_thumbnail(self):
         """Create thumbnail from video
         """
-        Logging().info("Making thumbnail")
+        log.info("Making thumbnail")
         filename = f"{self.replay.id}.mp4"
         subprocess.run([
             "ffmpeg",
@@ -253,7 +255,7 @@ class Replay:
             f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg"])
 
         self.update_status(status.THUMBNAIL_CREATED)
-        Logging().info("Finished making thumbnail")
+        log.info("Finished making thumbnail")
 
     @handle_fail
     @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
@@ -285,12 +287,12 @@ class Replay:
             'language': self.config['ia_settings']['language'],
             'licenseurl': self.config['ia_settings']['license_url']}
 
-        Logging().info("Starting upload to archive.org")
+        log.info("Starting upload to archive.org")
         fc_video.upload(f"{self.config['fcadefbneo_path']}/avi/{filename}",
                         metadata=metadata, verbose=True)
 
         self.update_status(status.UPLOADED_TO_IA)
-        Logging().info("Finished upload to archive.org")
+        log.info("Finished upload to archive.org")
 
     @handle_fail
     def upload_to_yt(self):
@@ -311,19 +313,19 @@ class Replay:
         if shutil.which('youtube-upload') is not None:
             # Check if credentials file exists
             if not os.path.exists(self.config['youtube_credentials']):
-                Logging().error("Youtube credentials don't exist exist")
+                log.error("Youtube credentials don't exist exist")
                 return False
 
             if not os.path.exists(self.config['youtube_secrets']):
-                Logging().error("Youtube secrets don't exist")
+                log.error("Youtube secrets don't exist")
                 return False
 
             # Check min and max length:
             if (int(self.replay.length) / 60) < int(self.config['yt_min_length']):
-                Logging().info("Replay is too short. Not uploading to youtube")
+                log.info("Replay is too short. Not uploading to youtube")
                 return False
             if (int(self.replay.length) / 60) > int(self.config['yt_max_length']):
-                Logging().info("Replay is too long. Not uploading to youtube")
+                log.info("Replay is too long. Not uploading to youtube")
                 return False
 
             # Find number of uploads today
@@ -337,11 +339,11 @@ class Replay:
             if day_log.date.date() == today:
                 # Check number of uploads
                 if day_log.count >= int(self.config['youtube_max_daily_uploads']):
-                    Logging().info("Maximum uploads reached for today")
+                    log.info("Maximum uploads reached for today")
                     return False
             else:
                 # It's a new day, update the counter
-                Logging().info("New day for youtube uploads")
+                log.info("New day for youtube uploads")
                 self.db.update_youtube_day_log_count(count=1, date=today)
 
             # Create description file
@@ -349,7 +351,7 @@ class Replay:
                 description_file.write(self.description_text)
 
             # Do upload
-            Logging().info("Uploading to youtube")
+            log.info("Uploading to youtube")
             yt_rc = subprocess.run(
                 [
                     'youtube-upload',
@@ -364,12 +366,12 @@ class Replay:
                     f"{self.config['fcadefbneo_path']}/avi/{filename}",
                 ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
-            Logging().info(yt_rc.stdout.decode())
-            Logging().info(yt_rc.stderr.decode())
+            log.info(yt_rc.stdout.decode())
+            log.info(yt_rc.stderr.decode())
 
             if not self.replay.player_requested:
-                Logging().info('Updating day_log')
-                Logging().info("Updating counter")
+                log.info('Updating day_log')
+                log.info("Updating counter")
                 self.db.update_youtube_day_log_count(
                     count=day_log.count + 1, date=today)
 
@@ -377,7 +379,7 @@ class Replay:
             os.remove(f"{self.config['fcreplay_dir']}/tmp/description.txt")
 
             self.update_status(status.UPLOADED_TO_YOUTUBE)
-            Logging().info('Finished uploading to Youtube')
+            log.info('Finished uploading to Youtube')
         else:
             raise ModuleNotFoundError
 
@@ -387,13 +389,13 @@ class Replay:
 
         Generated files are thumbnail and videofile
         """
-        Logging().info("Removing generated files")
+        log.info("Removing generated files")
         for f in os.listdir(f"{self.config['fcadefbneo_path']}/avi/"):
-            os.remove(f"{self.config['fcadefbneo_path']}/{f}")
+            os.remove(f"{self.config['fcadefbneo_path']}/avi/{f}")
         os.remove(f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg")
 
         self.update_status(status.REMOVED_GENERATED_FILES)
-        Logging().info("Finished removing files")
+        log.info("Finished removing files")
 
     @handle_fail
     def set_created(self):

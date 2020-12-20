@@ -22,8 +22,9 @@ def test_invalid_json(request):
 
 def test_empty_json(request):
     os.environ['FCREPLAY_CONFIG'] = datadir(request, 'config_empty.json')
-    with pytest.raises(LookupError):
+    with pytest.raises(SystemExit) as e:
         Config().config
+        assert e.type == SystemExit, "Should exit when file isn't valid"
 
 
 def test_file_not_found(request):
@@ -32,8 +33,3 @@ def test_file_not_found(request):
     with pytest.raises(SystemExit) as e:
         Config().config
         assert e.type == SystemExit, "Should exit when file doesn't exist"
-
-    assert os.path.exists(temp_config), "Should create config"
-    config = Config().config
-    assert type(config) is dict, "Generated config should be dict"
-    os.remove(temp_config)

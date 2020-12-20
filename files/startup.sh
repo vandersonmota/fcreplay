@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /root
-fcreplayloop 
+fcreplay instance 
 sleep 1
 echo '' >> /root/fcreplay.log
 sleep 1

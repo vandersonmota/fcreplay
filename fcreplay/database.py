@@ -1,11 +1,12 @@
 from fcreplay.config import Config
-from fcreplay.logging import Logging
 from fcreplay.models import Base
 from fcreplay.models import Job, Replays, Character_detect, Descriptions, Youtube_day_log
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 import datetime
 import logging
+
+log = logging.getLogger('fcreplay')
 
 
 class Database:
@@ -20,11 +21,11 @@ class Database:
 
         # Create Engine
         try:
-            Logging().info(f"Creating DB Instance with: {config['sql_baseurl']}")
+            log.info(f"Creating DB Instance with: {config['sql_baseurl']}")
             self.engine = create_engine(config['sql_baseurl'], echo=sql_echo, pool_pre_ping=True)
             Base.metadata.create_all(self.engine)
         except Exception as e:
-            Logging().error(f"Unable to connect to {config['sql_baseurl']}: {e}")
+            log.error(f"Unable to connect to {config['sql_baseurl']}: {e}")
             raise e
 
         self.Session = sessionmaker(bind=self.engine)

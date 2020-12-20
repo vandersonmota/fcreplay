@@ -8,11 +8,10 @@ from fcreplay.replay import Replay
 
 
 class TestReplay:
-    @patch('fcreplay.replay.Logging')
     @patch('fcreplay.replay.subprocess')
     @patch('fcreplay.replay.Database')
     @patch('fcreplay.replay.Config')
-    def test_encode(self, mock_config, mock_database, mock_subprocess, mock_logging):
+    def test_encode(self, mock_config, mock_database, mock_subprocess):
         r = Replay()
 
         with tempfile.TemporaryDirectory() as single_file_dir:
@@ -42,11 +41,10 @@ class TestReplay:
             r.encode()
             mock_subprocess.run.assert_called(), 'Multifile with underscores should call encoder'
 
-    @patch('fcreplay.replay.Logging')
     @patch('fcreplay.replay.subprocess')
     @patch('fcreplay.replay.Database')
     @patch('fcreplay.replay.Config')
-    def test_sort(self, mock_config, mock_database, mock_subprocess, mock_logging):
+    def test_sort(self, mock_config, mock_database, mock_subprocess):
         r = Replay()
 
         r.config = {

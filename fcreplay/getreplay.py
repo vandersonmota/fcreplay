@@ -1,33 +1,16 @@
-"""getreplay.
-
-Usage:
-  fcreplayget game <gameid>
-  fcreplayget ranked <gameid> [--playerid=<playerid>] [--pages=<pages>]
-  fcreplayget replay <url> [--playerrequested]
-  fcreplayget (-h | --help)
-
-Options:
-  -h --help         Show this screen.
-"""
-from fcreplay.logging import Logging
 from fcreplay.config import Config
 from fcreplay.database import Database
 from retrying import retry
 import datetime
-import os
+import logging
 import re
 import requests
 from datetime import timedelta
-from docopt import docopt
 
+log = logging.getLogger('fcreplay')
 
 class Getreplay:
     def __init__(self):
-        if 'REMOTE_DEBUG' in os.environ:
-            import debugpy
-            debugpy.listen(("0.0.0.0", 5678))
-            debugpy.wait_for_client()
-
         self.config = Config().config
         self.db = Database()
 
@@ -38,7 +21,7 @@ class Getreplay:
             json=query
         )
         if r.status_code == 500:
-            Logging().error("500 Code, trying up to 3 times")
+            logging.error("500 Code, trying up to 3 times")
             raise IOError("Unable to get data")
         else:
             return r
@@ -71,14 +54,14 @@ class Getreplay:
             p2_rank = '0'
 
         # Insert into database
-        Logging().info(f"Looking for {challenge_id}")
+        logging.info(f"Looking for {challenge_id}")
 
         # Check if replay exists
         data = self.db.get_single_replay(challenge_id=challenge_id)
         if data is None:
             # Limit the length of videos
             if length > int(self.config['min_replay_length']) and length < int(self.config['max_replay_length']):
-                Logging().info(f"Adding {challenge_id} to queue")
+                logging.info(f"Adding {challenge_id} to queue")
                 self.db.add_replay(
                     challenge_id=challenge_id,
                     p1_loc=p1_loc,
@@ -100,11 +83,11 @@ class Getreplay:
                 )
                 return('ADDED')
             else:
-                Logging().info(f"{challenge_id} is only {length} not adding")
+                logging.info(f"{challenge_id} is only {length} not adding")
                 if player_replay:
                     return('TOO_SHORT')
         else:
-            Logging().info(f"{challenge_id} already exists")
+            logging.info(f"{challenge_id} already exists")
             if player_replay:
                 # Check if the returned replay is a player replay
                 if data.player_requested:
@@ -137,7 +120,7 @@ class Getreplay:
                     player_replay=False
                 )
                 if status != 'ADDED':
-                    Logging().info(f'Not adding game, Status: {status}')
+                    logging.info(f'Not adding game, Status: {status}')
 
         return("ADDED")
 
@@ -158,7 +141,7 @@ class Getreplay:
 
         for i in replays:
             if i['gameid'] not in self.config['supported_games']:
-                Logging().info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
+                logging.info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
                 continue
             status = self.add_replay(
                 replay=i,
@@ -167,7 +150,7 @@ class Getreplay:
                 player_replay=False
             )
             if status != 'ADDED':
-                Logging().info(f"Not adding replay {i['quarkid']}, Status: {status}")
+                logging.info(f"Not adding replay {i['quarkid']}, Status: {status}")
 
         return("ADDED")
 
@@ -206,7 +189,7 @@ class Getreplay:
                     player_replay=False
                 )
                 if status != 'ADDED':
-                    Logging().info(f'Not adding game, Status: {status}')
+                    logging.info(f'Not adding game, Status: {status}')
 
         return("ADDED")
 
@@ -225,7 +208,7 @@ class Getreplay:
         emulator = url.split('/')[3]
         game = url.split('/')[4]
         challenge_id = url.split('/')[5]
-        Logging().debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
+        logging.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
 
         if game not in self.config['supported_games']:
             return('UNSUPPORTED_GAME')
@@ -247,16 +230,3 @@ class Getreplay:
                     player_replay=player_requested
                 )
         return False
-
-
-def console():
-    arguments = docopt(__doc__, version='fcreplayget')
-
-    getreplay = Getreplay()
-
-    if arguments['game'] is True:
-        getreplay.get_game_replays(game=arguments['<gameid>'])
-    if arguments['ranked'] is True:
-        getreplay.get_ranked_replays(game=arguments['<gameid>'], username=arguments['--playerid'], pages=arguments['--pages'])
-    if arguments['replay'] is True:
-        getreplay.get_replay(url=arguments['<url>'], player_requested=arguments['--playerrequested'])

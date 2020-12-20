@@ -1,25 +1,18 @@
-import argparse
 import glob
+import logging
 import os
 import sys
 import time
 
 from fcreplay.config import Config
-from fcreplay.logging import Logging
 from fcreplay.replay import Replay
 
+log = logging.getLogger('fcreplay')
 
-class Loop:
+
+class Instance:
     def __init__(self):
         self.config = Config().config
-        self.debug = False
-        self.onetime = False
-
-        if 'REMOTE_DEBUG' in os.environ:
-            import debugpy
-            self.debug = True
-            debugpy.listen(("0.0.0.0", 5678))
-            debugpy.wait_for_client()
 
     def clean(self):
         """Cleans directories before running
@@ -37,7 +30,7 @@ class Loop:
     def create_dirs(self):
         # Create directories if they don't exist
         if not os.path.exists(f"{self.config['fcreplay_dir']}/tmp"):
-            Logging().info('Created tmp dir')
+            log.info('Created tmp dir')
             os.mkdir(f"{self.config['fcreplay_dir']}/tmp")
 
     def main(self):
@@ -45,9 +38,6 @@ class Loop:
         """
         self.create_dirs()
         self.clean()
-
-        if self.debug:
-            Logging().debug(self.config)
 
         replay = Replay()
         if replay.replay is not None:
@@ -72,20 +62,7 @@ class Loop:
             replay.set_created()
 
         else:
-            Logging().info("No more replays. Waiting for replay submission")
+            log.info("No more replays. Waiting for replay submission")
             time.sleep(5)
 
         sys.exit(0)
-
-
-def console():
-    """Invoked from command line
-    """
-    parser = argparse.ArgumentParser(description='fcreplay - Video Catpure')
-    parser.add_argument('--debug', action='store_true', help='Turns on debugging. Requires port 5678/tcp')
-    args = parser.parse_args()
-
-    c = Loop()
-
-    c.debug = args.debug
-    c.main()

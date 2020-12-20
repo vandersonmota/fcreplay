@@ -8,11 +8,10 @@ from fcreplay.database import Database
 
 
 class TestDatabase:
-    @patch('fcreplay.logging.Config')
     @patch('fcreplay.database.create_engine')
     @patch('fcreplay.database.func')
     @patch('fcreplay.database.Config')
-    def setUp(self, mock_config, mock_func, mock_create_engine, mock_logging_config):
+    def setUp(self, mock_config, mock_func, mock_create_engine):
         db = Database()
 
         mock_create_engine.assert_called(), 'Database should call create_engine'
@@ -24,9 +23,8 @@ class TestDatabase:
 
         return db
 
-    @patch('fcreplay.database.Logging')
     @patch('fcreplay.database.sessionmaker')
-    def test_db_session(self, mock_session, mock_logging_config):
+    def test_db_session(self, mock_session):
         db = self.setUp()
         db.add_replay(
             challenge_id=MagicMock(),

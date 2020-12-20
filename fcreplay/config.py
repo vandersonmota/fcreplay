@@ -1,14 +1,3 @@
-#!/usr/bin/env python
-"""fcreplayconfig.
-
-Usage:
-  fcreplayconfig <config.json>
-  fcreplayconfig (-h | --help)
-
-Options:
-  -h --help         Show this screen.
-"""
-from docopt import docopt
 from cerberus import Validator
 import base64
 import json
@@ -300,44 +289,27 @@ class Config:
                     return json.load(json_data_file)
 
         except FileNotFoundError as e:
-            default_json = {}
-            for k in self.schema:
-                print(self.schema[k])
-                if 'default' in self.schema[k]['meta']:
-                    default_json[k] = self.schema[k]['meta']['default']
-
-            with open(e.filename, 'w') as f:
-                json.dump(default_json, f, indent=4)
-
-            print(f"Unable to find config, default config written to {e.filename}")
-            print("Adjust default values and run again")
+            print("Unable to find config file, please generate one using `fcreplay config generate`")
             sys.exit(1)
 
     def validate_config(self, config, schema):
         v = Validator()
         if v.validate(config, schema) is False:
             print(json.dumps(v.errors, indent=4))
-            raise LookupError
+            print("\nConfig is invalid. Please fix the above errors")
+            sys.exit(1)
+        else:
+            return True
 
+    def validate_config_file(self, config_file):
+        with open(config_file) as f:
+            if self.validate_config(json.load(f), self.schema):
+                print('Config file is valid')
 
-def console():
-    if 'REMOTE_DEBUG' in os.environ:
-        print("Starting remote debugger on port 5678")
-        import debugpy
-        debugpy.listen(("0.0.0.0", 5678))
-        print("Waiting for connection...")
-        debugpy.wait_for_client()
+    def generate_config(self):
+        default_json = {}
+        for k in self.schema:
+            if 'default' in self.schema[k]['meta']:
+                default_json[k] = self.schema[k]['meta']['default']
 
-    arguments = docopt(__doc__, version='fcreplayconfig')
-    if '<config.json>' in arguments:
-        os.environ['FCREPLAY_CONFIG'] = arguments['<config.json>']
-
-        # Try to validate config file
-        Config().config
-
-        # If this works, then print success
-        print("Configuration validated successfuly")
-
-
-if __name__ == "__main__":
-    console()
+        print(json.dumps(default_json, indent=4))
