@@ -63,7 +63,7 @@ def main():
         if args['replay']:
             Getreplay().get_replay(
                 url=args['<url>'],
-                player_requested=['--playerrequested']
+                player_requested=args['--playerrequested']
             )
 
     elif args['instance']:
