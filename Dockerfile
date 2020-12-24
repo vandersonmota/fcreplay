@@ -1,56 +1,45 @@
-FROM i386/alpine:3
+FROM python:3.8-buster
 
 LABEL maintainer="glisignoli"
 
 # Required packages for build/run
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+RUN apt-get update && apt-get install -y \
   bash \
-  cmake \
   ffmpeg \
   fontconfig \
-  g++ \
-  gcc \
   git \
+  i3 \
   i3status \
-  i3wm \
-  jpeg \
-  jpeg-dev \
-  lcms2-dev \
-  libffi-dev \
-  libjpeg \
-  libjpeg-turbo-dev \
-  libxslt-dev \
-  linux-headers \
-  make \
-  msttcorefonts-installer \
-  musl \
-  musl-dev \
-  openjpeg \
-  openjpeg-dev \
-  openjpeg-tools \
-  postgresql-dev \
+  mencoder \
   pulseaudio \
-  python3 \
-  python3-dev \
-  python3-tkinter \
-  py3-pip \
-  py3-setuptools \
-  wine \
-  winetricks \
+  software-properties-common \
+  wget \
   x11vnc \
   xterm \
   xvfb \
   zenity \
-  zlib-dev
+  zlib1g-dev
+
+RUN apt-add-repository contrib && \
+  apt-add-repository non-free
+
+RUN dpkg --add-architecture i386 && \
+  apt update && \
+  apt install -y \
+    wine \
+    wine32 \
+    wine64 \
+    libwine \
+    libwine:i386 \
+    fonts-wine \
+    winetricks
+
 RUN pip3 install --upgrade cython pip scikit-build
 
 # Fix wine sound and video recording
 RUN winetricks -q avifil32 && \
   winetricks -q d3dx9 && \
   winetricks sound=pulse
-
-# Fix i3 Fonts
-RUN update-ms-fonts
 
 # Download Fightcade linux
 RUN cd / && \

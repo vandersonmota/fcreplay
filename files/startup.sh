@@ -1,5 +1,7 @@
 #!/bin/bash
 cd /root
+#wineboot --init
+export I3SOCK=$(i3 --get-socketpath)
 fcreplay instance 
 sleep 1
 echo '' >> /root/fcreplay.log

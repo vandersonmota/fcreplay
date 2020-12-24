@@ -16,7 +16,7 @@ function fcrecord() {
 
 function fcreplay() {
     cd /root
-    /usr/bin/fcreplay $@
+    /usr/local/bin/fcreplay $@
 }
 
 if [ $# -eq 0 ]; then
