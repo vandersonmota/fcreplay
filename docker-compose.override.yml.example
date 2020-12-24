@@ -11,6 +11,7 @@ services:
       - CONFIG=/path/to/config.json
       - CPUS=4
       - DESCRIPTION_APPEND=/path/to/description_append.txt
+      - FCREPLAY_NETWORK=some_docker_network
       - IA=/path/to/.ia
       - MAX_INSTANCES=1
       - MEMORY=4g

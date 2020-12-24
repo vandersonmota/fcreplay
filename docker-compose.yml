@@ -12,6 +12,7 @@ services:
       - CPUS=4
       - DESCRIPTION_APPEND=/path/to/description_append.txt
       - IA=/path/to/.ia
+      - FCREPLAY_NETWORK=some_docker_network
       - MAX_INSTANCES=1
       - MEMORY=4g
       - ROMS=/path/to/ROMs

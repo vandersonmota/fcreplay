@@ -59,6 +59,9 @@ class Tasker:
         d_client = docker.from_env()
         instance_uuid = str(uuid.uuid4().hex)
 
+        if 'FCREPLAY_NETWORK' not in os.environ:
+            os.environ['FCREPLAY_NETWORK'] = 'bridge'
+
         print(f"Starting new instance with temp dir: '{os.environ['AVI_TEMP_DIR']}/{instance_uuid}'")
         c_instance = d_client.containers.run(
             'fcreplay/image:latest',
@@ -66,6 +69,7 @@ class Tasker:
             cpu_count=int(os.environ['CPUS']),
             detach=True,
             mem_limit=str(os.environ['MEMORY']),
+            network=os.environ['FCREPLAY_NETWORK'],
             remove=True,
             name=f"fcreplay-instance-{instance_uuid}",
             volumes={
