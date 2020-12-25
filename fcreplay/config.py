@@ -13,14 +13,14 @@ class Config:
                 'required': True,
                 'meta': {
                     'description': "Enable description to be appended from file",
-                    'default': [False, '/path/to/description_file.txt'],
+                    'default': [False, '/root/description_file.txt'],
                 }
             },
             'fcadefbneo_path': {
                 'type': 'string',
                 'required': True,
                 'meta': {
-                    'default': '/home/fcrecorder/fcreplay/Fightcade/emulator/fbneo',
+                    'default': '/Fightcade/emulator/fbneo',
                     'description': 'Path to fcadefbneo'
                 },
             },
@@ -28,7 +28,7 @@ class Config:
                 'type': 'string',
                 'required': True,
                 'meta': {
-                    'default': '/home/fcrecorder/fcreplay',
+                    'default': '/root',
                     'description': 'Path of where to run fcreplay',
                 }
             },
@@ -204,7 +204,7 @@ class Config:
                 'type': 'string',
                 'required': True,
                 'meta': {
-                    'default': 'postgres://username:password@url.com:1234',
+                    'default': 'postgres://username:password@postgres:5432',
                     'description': 'URL of database'
                 }
             },
@@ -239,7 +239,7 @@ class Config:
             'youtube_credentials': {
                 'type': 'string',
                 'meta': {
-                    'default': '/path/to/youtube-upload-credentials.json',
+                    'default': '/root/.youtube-upload-credentials.json',
                     'description': 'Path to youtube-upload-credentials.json file'
                 }
             },
@@ -253,7 +253,7 @@ class Config:
             'youtube_secrets': {
                 'type': 'string',
                 'meta': {
-                    'default': '/path/to/youtube-secrets.json',
+                    'default': '/root/.youtube-secrets.json',
                     'description': 'Path to youtube-secrets.json file'
                 }
             },

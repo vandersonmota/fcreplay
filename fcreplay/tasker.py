@@ -61,6 +61,7 @@ class Tasker:
             del self.started_instances[i]
 
     def launch_fcreplay(self):
+        print("Getting docker env")
         d_client = docker.from_env()
 
         instance_uuid = str(uuid.uuid4().hex)

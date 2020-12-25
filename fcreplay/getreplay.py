@@ -21,7 +21,7 @@ class Getreplay:
             json=query
         )
         if r.status_code == 500:
-            logging.error("500 Code, trying up to 3 times")
+            log.error("500 Code, trying up to 3 times")
             raise IOError("Unable to get data")
         else:
             return r
@@ -54,14 +54,14 @@ class Getreplay:
             p2_rank = '0'
 
         # Insert into database
-        logging.info(f"Looking for {challenge_id}")
+        log.info(f"Looking for {challenge_id}")
 
         # Check if replay exists
         data = self.db.get_single_replay(challenge_id=challenge_id)
         if data is None:
             # Limit the length of videos
             if length > int(self.config['min_replay_length']) and length < int(self.config['max_replay_length']):
-                logging.info(f"Adding {challenge_id} to queue")
+                log.info(f"Adding {challenge_id} to queue")
                 self.db.add_replay(
                     challenge_id=challenge_id,
                     p1_loc=p1_loc,
@@ -83,11 +83,11 @@ class Getreplay:
                 )
                 return('ADDED')
             else:
-                logging.info(f"{challenge_id} is only {length} not adding")
+                log.info(f"{challenge_id} is only {length} not adding")
                 if player_replay:
                     return('TOO_SHORT')
         else:
-            logging.info(f"{challenge_id} already exists")
+            log.info(f"{challenge_id} already exists")
             if player_replay:
                 # Check if the returned replay is a player replay
                 if data.player_requested:
@@ -120,7 +120,7 @@ class Getreplay:
                     player_replay=False
                 )
                 if status != 'ADDED':
-                    logging.info(f'Not adding game, Status: {status}')
+                    log.info(f'Not adding game, Status: {status}')
 
         return("ADDED")
 
@@ -141,7 +141,7 @@ class Getreplay:
 
         for i in replays:
             if i['gameid'] not in self.config['supported_games']:
-                logging.info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
+                log.info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
                 continue
             status = self.add_replay(
                 replay=i,
@@ -150,7 +150,7 @@ class Getreplay:
                 player_replay=False
             )
             if status != 'ADDED':
-                logging.info(f"Not adding replay {i['quarkid']}, Status: {status}")
+                log.info(f"Not adding replay {i['quarkid']}, Status: {status}")
 
         return("ADDED")
 
@@ -189,7 +189,7 @@ class Getreplay:
                     player_replay=False
                 )
                 if status != 'ADDED':
-                    logging.info(f'Not adding game, Status: {status}')
+                    log.info(f'Not adding game, Status: {status}')
 
         return("ADDED")
 
@@ -208,7 +208,7 @@ class Getreplay:
         emulator = url.split('/')[3]
         game = url.split('/')[4]
         challenge_id = url.split('/')[5]
-        logging.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
+        log.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
 
         if game not in self.config['supported_games']:
             return('UNSUPPORTED_GAME')
@@ -230,3 +230,21 @@ class Getreplay:
                     player_replay=player_requested
                 )
         return False
+
+    def update_video_status(self):
+        """Update the status for videos uploaded to archive.org
+        """
+        log.info("Checking status for completed videos")
+
+        # Get all replays that are completed, where video_processed is false
+        to_check = self.db.get_unprocessed_replays()
+
+        for replay in to_check:
+            # Check if replay has embeded video link. Easy way to do this is to check
+            # if a thumbnail is created
+            log.info(f"Checking: {replay.id}")
+            r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+
+            log.info(f"ID: {replay.id}, Status: {r.status_code}")
+            if r.status_code == 200:
+                self.db.set_replay_processed(challenge_id=replay.id)

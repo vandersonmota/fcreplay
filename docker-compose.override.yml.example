@@ -18,3 +18,9 @@ services:
       - ROMS=/path/to/ROMs
       - YOUTUBE_UPLOAD_CREDENTIALS=/path/to/.youtube-upload-credentials.json
       - AVI_TEMP_DIR=/path/to/large/avi_storage_temp
+  
+  postgres:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres

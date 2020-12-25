@@ -7,6 +7,8 @@ Usage:
   fcreplay get game <gameid>
   fcreplay get ranked <gameid> [--playerid=<playerid>] [--pages=<pages>]
   fcreplay get replay <url> [--playerrequested]
+  fcreplay get weekly
+  fcreplay get update_video_status
   fcreplay instance [--debug]
   fcreplay (-h | --help)
   fcreplay --version
@@ -65,6 +67,12 @@ def main():
                 url=args['<url>'],
                 player_requested=args['--playerrequested']
             )
+
+        if args['weekly']:
+            Getreplay().get_top_weekly()
+
+        if args['update_video_status']:
+            Getreplay().update_video_status()
 
     elif args['instance']:
         i = Instance()

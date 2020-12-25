@@ -22,3 +22,24 @@ services:
       - /path/to/config.json:/root/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/large/avi_storage_temp:/avi_storage_temp
+    networks:
+      - postgres
+      - world
+
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  world:
+  postgres:
+    internal: true
