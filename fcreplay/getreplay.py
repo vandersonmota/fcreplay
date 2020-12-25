@@ -1,18 +1,24 @@
+from datetime import timedelta
 from fcreplay.config import Config
 from fcreplay.database import Database
 from retrying import retry
 import datetime
+import json
 import logging
+import pkg_resources
 import re
 import requests
-from datetime import timedelta
 
 log = logging.getLogger('fcreplay')
+
 
 class Getreplay:
     def __init__(self):
         self.config = Config().config
         self.db = Database()
+
+        with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
+            self.supported_games = json.load(f)
 
     @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
     def get_data(self, query):
@@ -104,7 +110,7 @@ class Getreplay:
         Args:
             game (String): Gameid
         """
-        if game not in self.config['supported_games']:
+        if game not in self.supported_games:
             return('UNSUPPORTED_GAME')
 
         query = {'req': 'searchquarks', 'gameid': game}
@@ -140,7 +146,7 @@ class Getreplay:
             replays += r.json()['results']['results']
 
         for i in replays:
-            if i['gameid'] not in self.config['supported_games']:
+            if i['gameid'] not in self.supported_games:
                 log.info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
                 continue
             status = self.add_replay(
@@ -161,7 +167,7 @@ class Getreplay:
             game (String): Gameid
             username (String, optional): Player profile name. Defaults to None.
         """
-        if game not in self.config['supported_games']:
+        if game not in self.supported_games:
             return('UNSUPPORTED_GAME')
 
         query = {"req": "searchquarks", "best": True, "gameid": game}
@@ -210,7 +216,7 @@ class Getreplay:
         challenge_id = url.split('/')[5]
         log.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
 
-        if game not in self.config['supported_games']:
+        if game not in self.supported_games:
             return('UNSUPPORTED_GAME')
 
         # Get play replays

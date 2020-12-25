@@ -39,12 +39,6 @@
     "remove_generated_files": true,
     "sql_baseurl": "postgres://user:pass@address:port",
     "secret_key": "some_random_data",
-    "supported_games": {
-        "sfiii3nr1": {
-            "character_detect": true,
-            "game_name": "Street Fighter III: 3rd Strike"
-        }
-    },
     "upload_to_ia": false,
     "upload_to_yt": false,
     "youtube_credentials": "/home/fcrecorder/.youtube-upload-credentials.json",

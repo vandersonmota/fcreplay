@@ -208,18 +208,6 @@ class Config:
                     'description': 'URL of database'
                 }
             },
-            'supported_games': {
-                'type': 'dict',
-                'required': True,
-                'meta': {
-                    'default': {
-                        "gameid": {
-                            "character_detect": False,
-                            "game_name": "Full Game NAme"
-                        },
-                    },
-                }
-            },
             'upload_to_ia': {
                 'type': 'boolean',
                 'required': True,

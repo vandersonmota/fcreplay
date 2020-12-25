@@ -15,6 +15,9 @@ import pytz
 app = Blueprint('blueprint', __name__, static_folder='static')
 config = Config().config
 
+with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
+    supported_games = json.load(f)
+
 
 @app.route('/')
 def index():
@@ -29,7 +32,7 @@ def index():
     ).order_by(Replays.date_added.desc()).paginate(page, per_page=9)
     replays = pagination.items
 
-    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
 
 
 @app.route('/api/videolinks', methods=['POST'])
@@ -53,7 +56,7 @@ def videolinks():
 
 @app.route('/api/supportedgames')
 def supportedgames():
-    return jsonify(config['supported_games'])
+    return jsonify(supported_games)
 
 
 @app.route('/submit')
@@ -98,12 +101,12 @@ def send_js(path):
 def about():
     searchForm = SearchForm()
 
-    sortedGames = sorted(config['supported_games'].items(), key=lambda item: item[1]['game_name'])
+    sortedGames = sorted(supported_games.items(), key=lambda item: item[1]['game_name'])
     supportedGames = {}
     for game in sortedGames:
         supportedGames[game[0]] = {
-            'game_name': config['supported_games'][game[0]]['game_name'],
-            'character_detect': config['supported_games'][game[0]]['character_detect']
+            'game_name': supported_games[game[0]]['game_name'],
+            'character_detect': supported_games[game[0]]['character_detect']
         }
         supportedGames[game[0]]['count'] = db.session.execute(f"select count(id) from replays where created = true and game = '{game[0]}'").first()[0]
 
@@ -210,7 +213,7 @@ def advancedSearchResult():
     pagination = Replays.query.filter(*replay_query).order_by(order).paginate(page, per_page=9)
     replays = pagination.items
 
-    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
 
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -270,7 +273,7 @@ def search():
     pagination = replay_query.paginate(page, per_page=9)
     replays = pagination.items
 
-    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=config['supported_games'])
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
 
 
 @app.route('/robots.txt')
@@ -313,4 +316,4 @@ def videopage(challenge_id):
 
     logging.debug(
         f"Video page, replay: {replay}, characters: {characters}, seek: {seek}")
-    return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm, games=config['supported_games'])
+    return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm, games=supported_games)

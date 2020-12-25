@@ -1,8 +1,13 @@
 from fcreplay.config import Config
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
+import json
+import pkg_resources
 
 config = Config().config
+
+with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
+    supported_games = json.load(f)
 
 
 class AdvancedSearchForm(FlaskForm):
@@ -51,7 +56,7 @@ class AdvancedSearchForm(FlaskForm):
         ('Any', 'Any')
     )
 
-    for game in sorted(config['supported_games'].items(), key=lambda item: item[1]['game_name']):
+    for game in sorted(supported_games.items(), key=lambda item: item[1]['game_name']):
         game_list.append(
             (game[0], game[1]['game_name'])
         )
@@ -84,7 +89,7 @@ class SearchForm(FlaskForm):
     game_list.append(
         ('Any', 'Any')
     )
-    for game in sorted(config['supported_games'].items(), key=lambda item: item[1]['game_name']):
+    for game in sorted(supported_games.items(), key=lambda item: item[1]['game_name']):
         game_list.append(
             (game[0], game[1]['game_name'])
         )

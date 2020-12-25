@@ -1,0 +1,371 @@
+{
+  "2020bb": {
+    "character_detect": false,
+    "game_name": "2020 Super Baseball",
+    "HAte": false
+  },
+  "3countb": {
+    "character_detect": false,
+    "game_name": "3 Count Bout"
+  },
+  "aodk": {
+    "character_detect": false,
+    "game_name": "Aggressors of Dark Kombat"
+  },
+  "aof": {
+    "character_detect": false,
+    "game_name": "Art of Fighting"
+  },
+  "aof2": {
+    "character_detect": false,
+    "game_name": "Art of Fighting 2"
+  },
+  "aof3": {
+    "character_detect": false,
+    "game_name": "Art of Fighting 3"
+  },
+  "bangbead": {
+    "character_detect": false,
+    "game_name": "Bang Bead"
+  },
+  "breakers": {
+    "character_detect": false,
+    "game_name": "Breakers"
+  },
+  "breakrev": {
+    "character_detect": false,
+    "game_name": "Breakers Revenge"
+  },
+  "bstars2": {
+    "character_detect": false,
+    "game_name": "Baseball Stars 2"
+  },
+  "cybots": {
+    "character_detect": false,
+    "game_name": "Cyberbots - fullmetal madness"
+  },
+  "doubledr": {
+    "character_detect": false,
+    "game_name": "Double Dragon"
+  },
+  "fatfursp": {
+    "character_detect": false,
+    "game_name": "Fatal Fury Special"
+  },
+  "fbfrenzy": {
+    "character_detect": false,
+    "game_name": "Football Frenzy"
+  },
+  "flipshot": {
+    "character_detect": false,
+    "game_name": "Battle Flip Shot"
+  },
+  "galaxyfg": {
+    "character_detect": false,
+    "game_name": "Galaxy Fight - Universal Warriors"
+  },
+  "garou": {
+    "character_detect": false,
+    "game_name": "Garou - Mark of the Wolves"
+  },
+  "goalx3": {
+    "character_detect": false,
+    "game_name": "Goal! Goal! Goal!"
+  },
+  "gowcaizr": {
+    "character_detect": false,
+    "game_name": "Voltage Fighter - Gowcaizer"
+  },
+  "hsf2": {
+    "character_detect": false,
+    "game_name": "Hyper Street Fighter II: The Anniversary Edition"
+  },
+  "jojobanr1": {
+    "character_detect": false,
+    "game_name": "JoJo's Bizarre Adventure: Heritage for the Future"
+  },
+  "kabukikl": {
+    "character_detect": false,
+    "game_name": "Kabuki Klash - Far East of Eden"
+  },
+  "karnovr": {
+    "character_detect": false,
+    "game_name": "Karnov's Revenge"
+  },
+  "kizuna": {
+    "character_detect": false,
+    "game_name": "Kizuna Encounter - Super Tag Battle"
+  },
+  "kof2000": {
+    "character_detect": false,
+    "game_name": "The King of Fighters 2000"
+  },
+  "kof2001": {
+    "character_detect": false,
+    "game_name": "The King of Fighters 2001"
+  },
+  "kof2002": {
+    "character_detect": false,
+    "game_name": "The King of Fighters 2002"
+  },
+  "kof2003": {
+    "character_detect": false,
+    "game_name": "The King of Fighters 2003"
+  },
+  "kof95": {
+    "character_detect": false,
+    "game_name": "The King of Fighters '95"
+  },
+  "kof96": {
+    "character_detect": false,
+    "game_name": "The King of Fighters '96"
+  },
+  "kof97": {
+    "character_detect": false,
+    "game_name": "The King of Fighters '97"
+  },
+  "kof98": {
+    "character_detect": false,
+    "game_name": "The King of Fighters '98 - The Slugfest"
+  },
+  "kof99": {
+    "character_detect": false,
+    "game_name": "The King of Fighters '99"
+  },
+  "lastblad": {
+    "character_detect": false,
+    "game_name": "The Last Blade"
+  },
+  "lastbld2": {
+    "character_detect": false,
+    "game_name": "The Last Blade 2"
+  },
+  "lbowling": {
+    "character_detect": false,
+    "game_name": "League Bowling"
+  },
+  "magdrop3": {
+    "character_detect": false,
+    "game_name": "Magical Drop 3"
+  },
+  "matrim": {
+    "character_detect": false,
+    "game_name": "Matrimelee"
+  },
+  "miexchng": {
+    "character_detect": false,
+    "game_name": "Money Puzzle Exchanger"
+  },
+  "mk": {
+    "character_detect": false,
+    "game_name": "Mortal Kombat"
+  },
+  "mk2": {
+    "character_detect": false,
+    "game_name": "Mortal Kombat II"
+  },
+  "mk3": {
+    "character_detect": false,
+    "game_name": "Mortal Kombat 3"
+  },
+  "msh": {
+    "character_detect": false,
+    "game_name": "Marvel Super Heroes"
+  },
+  "mshvsf": {
+    "character_detect": false,
+    "game_name": "Marvel Super Heroes vs Street Fighter"
+  },
+  "mvsc": {
+    "character_detect": false,
+    "game_name": "Marvel vs Capcom - clash of super heroes"
+  },
+  "neocup98": {
+    "character_detect": false,
+    "game_name": "Neo-Geo Cup '98 - The Road to the Victory"
+  },
+  "ninjamas": {
+    "character_detect": false,
+    "game_name": "Ninja Master's"
+  },
+  "pce_finalmt": {
+    "character_detect": false,
+    "game_name": "Final Match Tennis"
+  },
+  "pgoal": {
+    "character_detect": false,
+    "game_name": "Pleasure Goal"
+  },
+  "rbff1": {
+    "character_detect": false,
+    "game_name": "Real Bout Fatal Fury"
+  },
+  "rbff2h": {
+    "character_detect": false,
+    "game_name": "Real Bout Fatal Fury 2"
+  },
+  "rbffspec": {
+    "character_detect": false,
+    "game_name": "Real Bout Fatal Fury Special"
+  },
+  "redearth": {
+    "character_detect": false,
+    "game_name": "Red Earth"
+  },
+  "ringdest": {
+    "character_detect": false,
+    "game_name": "Ring of Destruction - slammasters II"
+  },
+  "rotd": {
+    "character_detect": false,
+    "game_name": "Rage of the Dragons"
+  },
+  "samsh5sp": {
+    "character_detect": false,
+    "game_name": "Samurai Shodown V Special"
+  },
+  "samsho2": {
+    "character_detect": false,
+    "game_name": "Samurai Shodown II"
+  },
+  "samsho3": {
+    "character_detect": false,
+    "game_name": "Samurai Shodown III"
+  },
+  "samsho4": {
+    "character_detect": false,
+    "game_name": "Samurai Shodown IV"
+  },
+  "savagere": {
+    "character_detect": false,
+    "game_name": "Savage Reign"
+  },
+  "sdodgeb": {
+    "character_detect": false,
+    "game_name": "Super Dodge Ball"
+  },
+  "sf2ce": {
+    "character_detect": false,
+    "game_name": "Street Fighter II' - Champion Edition"
+  },
+  "sf2hf": {
+    "character_detect": false,
+    "game_name": "Street Fighter II': Hyper Fighting"
+  },
+  "sfa2": {
+    "character_detect": false,
+    "game_name": "Street Fighter Alpha 2"
+  },
+  "sfa2u": {
+    "character_detect": false,
+    "game_name": "Street Fighter Alpha 2 (960430 USA)"
+  },
+  "sfa3": {
+    "character_detect": false,
+    "game_name": "Street Fighter Alpha 3"
+  },
+  "sfiii3nr1": {
+    "character_detect": true,
+    "game_name": "Street Fighter III: 3rd Strike"
+  },
+  "sgemf": {
+    "character_detect": false,
+    "game_name": "Super Gem Fighter Mini Mix"
+  },
+  "sftm": {
+    "character_detect": false,
+    "game_name": "Street Fighter: The Movie"
+  },
+  "slammast": {
+    "character_detect": false,
+    "game_name": "Saturday Night Slam Masters"
+  },
+  "socbrawl": {
+    "character_detect": false,
+    "game_name": "Soccer Brawl"
+  },
+  "spf2t": {
+    "character_detect": false,
+    "game_name": "Super Puzzle Fighter II Turbo"
+  },
+  "ssf2xjr1": {
+    "character_detect": false,
+    "game_name": "Super Street Fighter II X: Grand Master Challenge"
+  },
+  "ssideki": {
+    "character_detect": false,
+    "game_name": "Super Sidekicks"
+  },
+  "ssideki2": {
+    "character_detect": false,
+    "game_name": "Super Sidekicks 2 - The World Championship"
+  },
+  "ssideki3": {
+    "character_detect": false,
+    "game_name": "Super Sidekicks 3 - The Next Glory"
+  },
+  "ssideki4": {
+    "character_detect": false,
+    "game_name": "The Ultimate 11 - The SNK Football Championship"
+  },
+  "strhoop": {
+    "character_detect": false,
+    "game_name": "Street Hoop"
+  },
+  "svc": {
+    "character_detect": false,
+    "game_name": "SNK vs. Capcom - SVC Chaos"
+  },
+  "svcplus": {
+    "character_detect": false,
+    "game_name": "SNK vs. Capcom - SVC Chaos Plus"
+  },
+  "turfmast": {
+    "character_detect": false,
+    "game_name": "Neo Turf Masters"
+  },
+  "twinspri": {
+    "character_detect": false,
+    "game_name": "Twinkle Star Sprites"
+  },
+  "umk3": {
+    "character_detect": false,
+    "game_name": "Ultimate Mortal Kombat 3"
+  },
+  "vsavj": {
+    "character_detect": false,
+    "game_name": "Vampire Savior - the lord of vampire"
+  },
+  "wakuwak7": {
+    "character_detect": false,
+    "game_name": "Waku Waku 7"
+  },
+  "wh1": {
+    "character_detect": false,
+    "game_name": "World Heroes"
+  },
+  "wh2": {
+    "character_detect": false,
+    "game_name": "World Heroes 2"
+  },
+  "wh2j": {
+    "character_detect": false,
+    "game_name": "World Heroes 2 Jet"
+  },
+  "whp": {
+    "character_detect": false,
+    "game_name": "World Heroes Perfect"
+  },
+  "wjammers": {
+    "character_detect": false,
+    "game_name": "Windjammers"
+  },
+  "xmcota": {
+    "character_detect": false,
+    "game_name": "X-Men - children of the atom"
+  },
+  "xmvsf": {
+    "character_detect": false,
+    "game_name": "X-Men vs Street Fighter"
+  }
+}
