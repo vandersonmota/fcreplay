@@ -69,6 +69,9 @@ class Tasker:
         if 'FCREPLAY_NETWORK' not in os.environ:
             os.environ['FCREPLAY_NETWORK'] = 'bridge'
 
+        # Get fcreplay network list
+        networks = os.environ['FCREPLAY_NETWORK'].split(',')
+
         print(f"Starting new instance with temp dir: '{os.environ['AVI_TEMP_DIR']}/{instance_uuid}'")
         c_instance = d_client.containers.run(
             'fcreplay/image:latest',
@@ -76,7 +79,7 @@ class Tasker:
             cpu_count=int(os.environ['CPUS']),
             detach=True,
             mem_limit=str(os.environ['MEMORY']),
-            network=os.environ['FCREPLAY_NETWORK'],
+            network=networks[0],
             remove=True,
             name=f"fcreplay-instance-{instance_uuid}",
             volumes={
@@ -89,6 +92,12 @@ class Tasker:
                 f"{os.environ['AVI_TEMP_DIR']}/{instance_uuid}": {'bind': '/Fightcade/emulator/fbneo/avi', 'mode': 'rw'}
             }
         )
+
+        if len(networks) > 1:
+            for n in networks[1:]:
+                print(f"Adding container to network {n}")
+                d_net = d_client.networks.get(n)
+                d_net.connect(c_instance)
 
         print("Getting instance uuid")
         self.started_instances[c_instance.attrs['Config']['Hostname']] = instance_uuid

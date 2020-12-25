@@ -55,7 +55,7 @@ def main():
 
     elif args['get']:
         if args['game']:
-            Getreplay().get_game_replays(game=args['<gameid'])
+            Getreplay().get_game_replays(game=args['<gameid>'])
         if args['ranked']:
             Getreplay().get_ranked_replays(
                 game=args['<gameid>'],
