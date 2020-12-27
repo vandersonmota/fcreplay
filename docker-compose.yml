@@ -1,11 +1,27 @@
 version: "3.8"
 services:
+  fcreplay-site:
+    image: fcreplay/site:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.site
+    networks:
+      - postgres
+      - world
+    volumes:
+      - /path/to/config.json:/fcreplay/config.json
+    environment:
+      - FCREPLAY_CONFIG=/app/config.json
+      - APP_MODULE=fcreplay.site.app:app
+    depends_on:
+      - postgres
+
   fcreplay-tasker:
     image: fcreplay/image:latest
     build:
       context: .
       dockerfile: Dockerfile
-    command: "fcreplay tasker"
+    command: "fcreplay tasker start"
     environment:
       - CLIENT_SECRETS=/path/to/.client_secrets.json
       - CONFIG=/path/to/config.json

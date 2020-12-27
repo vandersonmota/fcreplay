@@ -1,5 +1,9 @@
 version: "3.8"
 services:
+  fcreplay-site:
+    volumes:
+      - /path/to/config.json:/app/config.json:ro
+
   fcreplay-tasker:
     command: 'tasker'
     volumes:

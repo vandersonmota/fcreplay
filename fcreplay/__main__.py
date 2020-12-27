@@ -1,14 +1,14 @@
 """fcreplay.
 
 Usage:
-  fcreplay tasker [--instances=<instances>]
+  fcreplay tasker start [--max_instances=<instances>]
+  fcreplay tasker update_video_status
   fcreplay config validate <config.json>
   fcreplay config generate
   fcreplay get game <gameid>
   fcreplay get ranked <gameid> [--playerid=<playerid>] [--pages=<pages>]
   fcreplay get replay <url> [--playerrequested]
   fcreplay get weekly
-  fcreplay get update_video_status
   fcreplay instance [--debug]
   fcreplay (-h | --help)
   fcreplay --version
@@ -42,10 +42,13 @@ def main():
         fclogging.setup_logger()
 
     if args['tasker']:
-        if '--instances' in args:
-            Tasker().main(instances=args['--instances'])
-        else:
-            Tasker().main()
+        if args['start']:
+            if '--max_instances' in args:
+                Tasker().main(max_instances=args['--max_instances'])
+            else:
+                Tasker().main()
+        if args['update_video_status']:
+            Tasker().update_video_status()
 
     elif args['config']:
         if args['validate']:
@@ -70,9 +73,6 @@ def main():
 
         if args['weekly']:
             Getreplay().get_top_weekly()
-
-        if args['update_video_status']:
-            Getreplay().update_video_status()
 
     elif args['instance']:
         i = Instance()

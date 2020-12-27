@@ -52,6 +52,7 @@ lxml = "~=4.6"
 numpy = "~=1.19"
 docker = "~=4.4.0"
 python-logging-loki = "*"
+schedule = "*"
 
 [requires]
 python_version = "3.8"

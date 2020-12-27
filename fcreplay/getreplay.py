@@ -236,21 +236,3 @@ class Getreplay:
                     player_replay=player_requested
                 )
         return False
-
-    def update_video_status(self):
-        """Update the status for videos uploaded to archive.org
-        """
-        log.info("Checking status for completed videos")
-
-        # Get all replays that are completed, where video_processed is false
-        to_check = self.db.get_unprocessed_replays()
-
-        for replay in to_check:
-            # Check if replay has embeded video link. Easy way to do this is to check
-            # if a thumbnail is created
-            log.info(f"Checking: {replay.id}")
-            r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
-
-            log.info(f"ID: {replay.id}, Status: {r.status_code}")
-            if r.status_code == 200:
-                self.db.set_replay_processed(challenge_id=replay.id)
