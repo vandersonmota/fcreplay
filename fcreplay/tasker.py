@@ -109,6 +109,17 @@ class Tasker:
         print("Getting instance uuid")
         self.started_instances[c_instance.attrs['Config']['Hostname']] = instance_uuid
 
+    def check_for_docker_network(self):
+        d_client = docker.from_env()
+        d_net = d_client.networks.list()
+        networks = os.environ['FCREPLAY_NETWORK'].split(',')
+
+        if set(networks) <= set([i.name for i in d_net]) is False:
+            print(f"The folling networks don't exist: {set(networks) - set([i.name for i in d_net])}")
+            return False
+
+        return True
+
     def update_video_status(self):
         """Update the status for videos uploaded to archive.org
         """
@@ -128,6 +139,9 @@ class Tasker:
                 self.db.set_replay_processed(challenge_id=replay.id)
 
     def main(self, max_instances=1):
+        if self.check_for_docker_network() is False:
+            return False
+
         schedule.every(10).to(30).seconds.do(self.remove_temp_dirs)
         schedule.every(30).to(60).seconds.do(self.check_for_replay)
         schedule.every(1).hour.do(self.update_video_status)

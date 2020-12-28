@@ -5,7 +5,7 @@ services:
       - /path/to/config.json:/app/config.json:ro
 
   fcreplay-tasker:
-    command: 'tasker'
+    command: 'fcreplay tasker start'
     volumes:
       - /path/to/config.json:/root/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock
