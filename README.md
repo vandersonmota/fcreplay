@@ -25,11 +25,8 @@ A desctiption is generated that contains:
 Fcreplay uses sqlalchemy and has been tested with postgres and is used store any replay metadata
 Docker and docker-compose is required to run the application
 
-## Optional: Google cloud
-Fcreplay has some scheduled jobs for checking the status of encoded videos. To be migrated to docker at some point
-
 ### A few more notes:
-To trigger recording the file `started.inf` is checked. If the file exists then pyautogui is used to start recording the avi file(s)
+To trigger recording, the file `started.inf` is checked. If the file exists then pyautogui is used to start recording the avi file(s)
 
 The i3 window manager is used to ensure that the fcadefbneo window is always in the same place.
 
@@ -59,10 +56,9 @@ To upload files to archive.org, set the configuration key `upload_to_ia` to `tru
 ## Configuration
 The defaults should work if you follow the guide below.
 
-If you are using the ansible playbook, you will also want to have ready the following files:
+You will also want to have the following files:
  - Configuration file: `config.json`
  - Appened description: `description_append.txt`
- - Google cloud storage credentials: `.stroage_creds.json`
  - Google api client secrets: `.client_secrets.json`
  - Youtube upload credentials: `.youtube-upload-credentials.json`
  - Archive.org secrets: `.ia`
@@ -81,21 +77,11 @@ The typical useage of fcreplay is to run `docker-compose up` to start the task s
 ## Validating your config
 This command will do a basic check on your config:
 ```commandline
-docker-compose run --rm fcreplay-tasker validate /root/config.json
+docker-compose run --rm -v /path/to/config.json:/root/config.json:ro fcreplay-tasker fcreplay config validate /root/config.json
+```
 
 ## Getting replays
 This will download a replay, and place it in the database
 ```commandline
-docker-compose run --rm fcreplay-tasker fcreplayget --help
+docker-compose run --rm -v /path/to/config.json:/root/config.json:ro fcreplay-tasker fcreplayget --help
 ```
-
-## Google cloud
-# Site
-To test the site with flask:
-
-```commandline
-export FLASK_APP=fcreplay/site/app.py
-export FLASK_ENVIRONMENT=development
-```
-
-This requires you to have a valide config_dev.json file
