@@ -1,3 +1,4 @@
+from unittest import mock
 import pytest
 import sys
 from unittest.mock import patch, MagicMock
@@ -7,11 +8,10 @@ from fcreplay.database import Database
 
 
 class TestDatabase:
-    @patch('fcreplay.logging.Config')
     @patch('fcreplay.database.create_engine')
     @patch('fcreplay.database.func')
     @patch('fcreplay.database.Config')
-    def setUp(self, mock_config, mock_func, mock_create_engine, mock_logging_config):
+    def setUp(self, mock_config, mock_func, mock_create_engine):
         db = Database()
 
         mock_create_engine.assert_called(), 'Database should call create_engine'

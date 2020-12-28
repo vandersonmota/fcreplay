@@ -1,0 +1,33 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: REPLACEME
+
+scrape_configs:
+  - job_name: fcreplay
+    pipeline_stages:
+    - match:
+        selector: '{job="fcreplay"}'
+        stages:
+        - regex:
+            expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\s(?P<hostname>[\w-]*)\s(?P<source>\w*)\s(?P<level>\w*):\s(?P<message>.*)$'
+        - labels:
+            timestamp:
+            hostname:
+            source:
+            level:
+            message:
+        - timestamp:
+            format: '2006-01-02 15:04:05'
+            source: timestamp
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: fcreplay
+        __path__: /home/fcrecorder/fcreplay/fcreplay.log

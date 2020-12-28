@@ -1,14 +1,3 @@
-#!/usr/bin/env python
-"""fcreplayconfig.
-
-Usage:
-  fcreplayconfig validate <config.json>
-  fcreplayconfig (-h | --help)
-
-Options:
-  -h --help         Show this screen.
-"""
-from docopt import docopt
 from cerberus import Validator
 import base64
 import json
@@ -24,14 +13,14 @@ class Config:
                 'required': True,
                 'meta': {
                     'description': "Enable description to be appended from file",
-                    'default': [False, '/path/to/description_file.txt'],
+                    'default': [False, '/root/description_file.txt'],
                 }
             },
             'fcadefbneo_path': {
                 'type': 'string',
                 'required': True,
                 'meta': {
-                    'default': '/home/fcrecorder/fcreplay/Fightcade/emulator/fbneo',
+                    'default': '/Fightcade/emulator/fbneo',
                     'description': 'Path to fcadefbneo'
                 },
             },
@@ -39,7 +28,7 @@ class Config:
                 'type': 'string',
                 'required': True,
                 'meta': {
-                    'default': '/home/fcrecorder/fcreplay',
+                    'default': '/root',
                     'description': 'Path of where to run fcreplay',
                 }
             },
@@ -48,20 +37,6 @@ class Config:
                 'meta': {
                     'default': 'some-service-account123@project.iam.gserviceaccount.com',
                     'description': 'Google cloud service account email address'
-                }
-            },
-            'gcloud_destroy_on_fail': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Destroy google cloud instance on recording failure',
-                }
-            },
-            'gcloud_destroy_when_stopped': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Destroy stopped cloud instances when cloud function is run',
                 }
             },
             'gcloud_instance_max': {
@@ -83,13 +58,6 @@ class Config:
                 'meta': {
                     'default': 'some-region',
                     'description': 'Google cloud region'
-                }
-            },
-            'gcloud_shutdown_instance': {
-                'type': 'boolean',
-                'meta': {
-                    'default': True,
-                    'description': 'Shutdown instance once instance has finished'
                 }
             },
             'gcloud_zone': {
@@ -147,6 +115,19 @@ class Config:
                     'description': 'Dictionary of Internet Archive settings'
                 }
             },
+            'logging_loki': {
+                'type': 'dict',
+                'required': True,
+                'meta': {
+                    'default': {
+                        'enabled': False,
+                        'password': 'password',
+                        'url': 'https://my-loki-instance:1234/loki/api/v1/push',
+                        'username': 'username'
+                    },
+                    'description': 'Enables logging to a loki endpoint'
+                }
+            },
             'logfile': {
                 'type': 'string',
                 'meta': {
@@ -156,7 +137,7 @@ class Config:
             },
             'loglevel': {
                 'type': 'string',
-                'allowed': ['INFO', 'DEBUG'],
+                'allowed': ['ERROR', 'INFO', 'DEBUG'],
                 'required': True,
                 'meta': {
                     'default': 'INFO',
@@ -223,20 +204,8 @@ class Config:
                 'type': 'string',
                 'required': True,
                 'meta': {
-                    'default': 'postgres://username:password@url.com:1234',
+                    'default': 'postgres://username:password@postgres:5432',
                     'description': 'URL of database'
-                }
-            },
-            'supported_games': {
-                'type': 'dict',
-                'required': True,
-                'meta': {
-                    'default': {
-                        "gameid": {
-                            "character_detect": False,
-                            "game_name": "Full Game NAme"
-                        },
-                    },
                 }
             },
             'upload_to_ia': {
@@ -258,7 +227,7 @@ class Config:
             'youtube_credentials': {
                 'type': 'string',
                 'meta': {
-                    'default': '/path/to/youtube-upload-credentials.json',
+                    'default': '/root/.youtube-upload-credentials.json',
                     'description': 'Path to youtube-upload-credentials.json file'
                 }
             },
@@ -272,7 +241,7 @@ class Config:
             'youtube_secrets': {
                 'type': 'string',
                 'meta': {
-                    'default': '/path/to/youtube-secrets.json',
+                    'default': '/root/.youtube-secrets.json',
                     'description': 'Path to youtube-secrets.json file'
                 }
             },
@@ -308,37 +277,27 @@ class Config:
                     return json.load(json_data_file)
 
         except FileNotFoundError as e:
-            default_json = {}
-            for k in self.schema:
-                print(self.schema[k])
-                if 'default' in self.schema[k]['meta']:
-                    default_json[k] = self.schema[k]['meta']['default']
-
-            with open(e.filename, 'w') as f:
-                json.dump(default_json, f, indent=4)
-
-            print(f"Unable to find config, default config written to {e.filename}")
-            print("Adjust default values and run again")
+            print("Unable to find config file, please generate one using `fcreplay config generate`")
             sys.exit(1)
 
     def validate_config(self, config, schema):
         v = Validator()
         if v.validate(config, schema) is False:
             print(json.dumps(v.errors, indent=4))
-            raise LookupError
+            print("\nConfig is invalid. Please fix the above errors")
+            sys.exit(1)
+        else:
+            return True
 
+    def validate_config_file(self, config_file):
+        with open(config_file) as f:
+            if self.validate_config(json.load(f), self.schema):
+                print('Config file is valid')
 
-def console():
-    arguments = docopt(__doc__, version='fcreplayconfig')
-    if '<config.json>' in arguments:
-        os.environ['FCREPLAY_CONFIG'] = arguments['<config.json>']
+    def generate_config(self):
+        default_json = {}
+        for k in self.schema:
+            if 'default' in self.schema[k]['meta']:
+                default_json[k] = self.schema[k]['meta']['default']
 
-        # Try to validate config file
-        Config().config
-
-        # If this works, then print success
-        print("Configuration validated successfuly")
-
-
-if __name__ == "__main__":
-    console()
+        print(json.dumps(default_json, indent=4))

@@ -5,10 +5,8 @@
     ],
     "fcadefbneo_path": "/home/fcrecorder/fcreplay/Fightcade/emulator/fbneo",
     "fcreplay_dir": "/home/fcrecorder/fcreplay",
-    "gcloud_destroy_on_fail": true,
     "gcloud_instance_max": 5,
     "gcloud_project": "gcloud project id",
-    "gcloud_shutdown_instance": false,
     "gcloud_region": "gcloud region",
     "gcloud_zone": "gcloud zone id",
     "gcloud_compute_service_account": "gcloud compute service account email",
@@ -26,6 +24,12 @@
         ]
     },
     "logfile": "/home/fcrecorder/fcreplay/fcreplay.log",
+    "logging_loki": {
+        "enabled": false,
+        "password": "securepassword",
+        "url": "http://some.loki:3100/loki/api/v1/push",
+        "username": "someusername"
+    },
     "loglevel": "DEBUG",
     "max_replay_length": 10800,
     "min_replay_length": 60,
@@ -35,12 +39,6 @@
     "remove_generated_files": true,
     "sql_baseurl": "postgres://user:pass@address:port",
     "secret_key": "some_random_data",
-    "supported_games": {
-        "sfiii3nr1": {
-            "character_detect": true,
-            "game_name": "Street Fighter III: 3rd Strike"
-        }
-    },
     "upload_to_ia": false,
     "upload_to_yt": false,
     "youtube_credentials": "/home/fcrecorder/.youtube-upload-credentials.json",

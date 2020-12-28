@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ $# -eq 0 ]; then
-  functions="check_for_replay destroy_fcreplay_instance video_status check_environment get_top_weekly"
+  functions="video_status check_environment get_top_weekly"
 else
   functions=$1
 fi

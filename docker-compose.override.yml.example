@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  fcreplay-site:
+    volumes:
+      - /path/to/config.json:/app/config.json:ro
+
+  fcreplay-tasker:
+    command: 'fcreplay tasker start'
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /path/to/large/avi_storage_temp:/avi_storage_temp
+    environment:
+      - CLIENT_SECRETS=/path/to/.client_secrets.json
+      - CONFIG=/path/to/config.json
+      - CPUS=4
+      - DESCRIPTION_APPEND=/path/to/description_append.txt
+      - FCREPLAY_NETWORK=some_docker_network
+      - IA=/path/to/.ia
+      - MAX_INSTANCES=1
+      - MEMORY=4g
+      - ROMS=/path/to/ROMs
+      - YOUTUBE_UPLOAD_CREDENTIALS=/path/to/.youtube-upload-credentials.json
+      - AVI_TEMP_DIR=/path/to/large/avi_storage_temp
+
+  postgres:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres

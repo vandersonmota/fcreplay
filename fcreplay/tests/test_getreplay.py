@@ -8,11 +8,9 @@ from fcreplay.getreplay import Getreplay
 
 class TestGetreplay:
 
-    @patch('fcreplay.gcloud.Database')
-    @patch('fcreplay.gcloud.Config')
     @patch('debugpy.wait_for_client')
     @patch('debugpy.listen')
-    def setUp(self, mock_debugpy_listen, mock_debugpy_wait_for_client, mock_config, mock_database):
+    def setUp(self, mock_debugpy_listen, mock_debugpy_wait_for_client):
         with patch.dict('os.environ', {'REMOTE_DEBUG': 'True'}):
             getreplay = Getreplay()
             assert mock_debugpy_listen.called

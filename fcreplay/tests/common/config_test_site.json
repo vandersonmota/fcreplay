@@ -6,11 +6,8 @@
   "fcadefbneo_path": "UNUSED",
   "fcreplay_dir": "UNUSED",
   "gcloud_compute_service_account": "UNUSED",
-  "gcloud_destroy_on_fail": false,
-  "gcloud_destroy_when_stopped": false,
   "gcloud_instance_max": 4,
   "gcloud_project": "UNUSED",
-  "gcloud_shutdown_instance": false,
   "gcloud_region": "UNUSED",
   "gcloud_zone": "UNUSED",
   "ia_settings": {
@@ -22,6 +19,12 @@
     "subject": ["UNUSED"]
   },
   "logfile": "/tmp/fcreplay_site_test.log",
+  "logging_loki": {
+      "enabled": false,
+      "password": "securepassword",
+      "url": "http://some.loki:3100/loki/api/v1/push",
+      "username": "someusername"
+  },
   "loglevel": "DEBUG",
   "max_replay_length": 10800,
   "min_replay_length": 60,
@@ -31,184 +34,6 @@
   "remove_generated_files": false,
   "secret_key": "SOME_TEST_SECERT_KEY",
   "sql_baseurl": "",
-  "supported_games": {
-    "aof3": {
-      "character_detect": false,
-      "game_name": "Art of Fighting 3"
-    },
-    "breakrev": {
-      "character_detect": false,
-      "game_name": "Breakers Revenge"
-    },
-    "fatfursp": {
-      "character_detect": false,
-      "game_name": "Fatal Fury Special"
-    },
-    "garou": {
-      "character_detect": false,
-      "game_name": "Garou - Mark of the Wolves"
-    },
-    "jojobanr1": {
-      "character_detect": false,
-      "game_name": "JoJo's Bizarre Adventure: Heritage for the Future"
-    },
-    "karnovr": {
-      "character_detect": false,
-      "game_name": "Karnov's Revenge"
-    },
-    "kof2000": {
-      "character_detect": false,
-      "game_name": "The King of Fighters 2000"
-    },
-    "kof2001": {
-      "character_detect": false,
-      "game_name": "The King of Fighters 2001"
-    },
-    "kof2002": {
-      "character_detect": false,
-      "game_name": "The King of Fighters 2002"
-    },
-    "kof2003": {
-      "character_detect": false,
-      "game_name": "The King of Fighters 2003"
-    },
-    "kof95": {
-      "character_detect": false,
-      "game_name": "The King of Fighters '95"
-    },
-    "kof96": {
-      "character_detect": false,
-      "game_name": "The King of Fighters '96"
-    },
-    "kof97": {
-      "character_detect": false,
-      "game_name": "The King of Fighters '97"
-    },
-    "kof98": {
-      "character_detect": false,
-      "game_name": "The King of Fighters '98 - The Slugfest"
-    },
-    "kof99": {
-      "character_detect": false,
-      "game_name": "The King of Fighters '99"
-    },
-    "lastbld2": {
-      "character_detect": false,
-      "game_name": "The Last Blade 2"
-    },
-    "magdrop3": {
-      "character_detect": false,
-      "game_name": "Magical Drop 3"
-    },
-    "matrim": {
-      "character_detect": false,
-      "game_name": "Matrimelee"
-    },
-    "miexchng": {
-      "character_detect": false,
-      "game_name": "Money Puzzle Exchanger"
-    },
-    "rbff1": {
-      "character_detect": false,
-      "game_name": "Real Bout Fatal Fury"
-    },
-    "rbff2h": {
-      "character_detect": false,
-      "game_name": "Real Bout Fatal Fury 2"
-    },
-    "rbffspec": {
-      "character_detect": false,
-      "game_name": "Real Bout Fatal Fury Special"
-    },
-    "ringdest": {
-      "character_detect": false,
-      "game_name": "Ring of Destruction - slammasters II"
-    },
-    "rotd": {
-      "character_detect": false,
-      "game_name": "Rage of the Dragons"
-    },
-    "samsh5sp": {
-      "character_detect": false,
-      "game_name": "Samurai Shodown V Special"
-    },
-    "samsho2": {
-      "character_detect": false,
-      "game_name": "Samurai Shodown II"
-    },
-    "samsho3": {
-      "character_detect": false,
-      "game_name": "Samurai Shodown III"
-    },
-    "samsho4": {
-      "character_detect": false,
-      "game_name": "Samurai Shodown IV"
-    },
-    "sdodgeb": {
-      "character_detect": false,
-      "game_name": "Super Dodge Ball"
-    },
-    "sf2ce": {
-      "character_detect": false,
-      "game_name": "Street Fighter II' - Champion Edition"
-    },
-    "sf2hf": {
-      "character_detect": false,
-      "game_name": "Street Fighter II': Hyper Fighting"
-    },
-    "sfa2": {
-      "character_detect": false,
-      "game_name": "Street Fighter Alpha 2"
-    },
-    "sfa3": {
-      "character_detect": false,
-      "game_name": "Street Fighter Alpha 3"
-    },
-    "sfiii3nr1": {
-      "character_detect": true,
-      "game_name": "Street Fighter III: 3rd Strike"
-    },
-    "sftm": {
-      "character_detect": false,
-      "game_name": "Street Fighter: The Movie"
-    },
-    "slammast": {
-      "character_detect": false,
-      "game_name": "Saturday Night Slam Masters"
-    },
-    "ssf2xjr1": {
-      "character_detect": false,
-      "game_name": "Super Street Fighter II X: Grand Master Challenge"
-    },
-    "svc": {
-      "character_detect": false,
-      "game_name": "SNK vs. Capcom - SVC Chaos"
-    },
-    "svcplus": {
-      "character_detect": false,
-      "game_name": "SNK vs. Capcom - SVC Chaos Plus"
-    },
-    "twinspri": {
-      "character_detect": false,
-      "game_name": "Twinkle Star Sprites"
-    },
-    "umk3": {
-      "character_detect": false,
-      "game_name": "Ultimate Mortal Kombat 3"
-    },
-    "vsavj": {
-      "character_detect": false,
-      "game_name": "Vampire Savior - the lord of vampire"
-    },
-    "wakuwak7": {
-      "character_detect": false,
-      "game_name": "Waku Waku 7"
-    },
-    "wjammers": {
-      "character_detect": false,
-      "game_name": "Windjammers"
-    }
-  },
   "upload_to_ia": false,
   "upload_to_yt": false,
   "youtube_credentials": "UNUSED",
