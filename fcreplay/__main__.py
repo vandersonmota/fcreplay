@@ -1,15 +1,16 @@
 """fcreplay.
 
 Usage:
-  fcreplay tasker start [--max_instances=<instances>]
-  fcreplay tasker update_video_status
-  fcreplay config validate <config.json>
   fcreplay config generate
+  fcreplay config validate <config.json>
   fcreplay get game <gameid>
   fcreplay get ranked <gameid> [--playerid=<playerid>] [--pages=<pages>]
   fcreplay get replay <url> [--playerrequested]
   fcreplay get weekly
   fcreplay instance [--debug]
+  fcreplay tasker start check_top_weekly
+  fcreplay tasker start check_video_status
+  fcreplay tasker start recorder [--max_instances=<instances>]
   fcreplay (-h | --help)
   fcreplay --version
 
@@ -43,12 +44,15 @@ def main():
 
     if args['tasker']:
         if args['start']:
-            if '--max_instances' in args:
-                Tasker().main(max_instances=args['--max_instances'])
-            else:
-                Tasker().main()
-        if args['update_video_status']:
-            Tasker().update_video_status()
+            if args['recorder']:
+                if '--max_instances' in args:
+                    Tasker().recorder(max_instances=args['--max_instances'])
+                else:
+                    Tasker().recorder()
+            if args['check_top_weekly']:
+                Tasker().check_top_weekly()
+            if args['check_video_status']:
+                Tasker().check_video_status()
 
     elif args['config']:
         if args['validate']:

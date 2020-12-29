@@ -80,6 +80,10 @@
     "character_detect": false,
     "game_name": "Hyper Street Fighter II: The Anniversary Edition"
   },
+  "jchan2": {
+    "character_detect": false,
+    "game_name": "Jackie Chan in Fists of Fire"
+  },
   "jojobanr1": {
     "character_detect": false,
     "game_name": "JoJo's Bizarre Adventure: Heritage for the Future"
@@ -224,6 +228,10 @@
     "character_detect": false,
     "game_name": "Samurai Shodown V Special"
   },
+  "samsho": {
+    "character_detect": false,
+    "game_name": "Samurai Shodown"
+  },
   "samsho2": {
     "character_detect": false,
     "game_name": "Samurai Shodown II"
@@ -319,6 +327,10 @@
   "svcplus": {
     "character_detect": false,
     "game_name": "SNK vs. Capcom - SVC Chaos Plus"
+  },
+  "tgm2p": {
+    "character_detect": false,
+    "game_name": "Tetris the Absolute The Grand Master 2 PLUS"
   },
   "turfmast": {
     "character_detect": false,

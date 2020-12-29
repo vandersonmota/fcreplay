@@ -3,28 +3,41 @@ services:
   fcreplay-site:
     volumes:
       - /path/to/config.json:/app/config.json:ro
+    ports:
+      - 80:80
 
   fcreplay-tasker:
-    command: 'fcreplay tasker start'
+    command: 'fcreplay tasker start recorder'
     volumes:
       - /path/to/config.json:/root/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/large/avi_storage_temp:/avi_storage_temp
+    ports:
+      - 5678:5678
     environment:
       - CLIENT_SECRETS=/path/to/.client_secrets.json
       - CONFIG=/path/to/config.json
       - CPUS=4
       - DESCRIPTION_APPEND=/path/to/description_append.txt
-      - FCREPLAY_NETWORK=some_docker_network
       - IA=/path/to/.ia
+      - FCREPLAY_NETWORK=fcreplay_postgres,fcreplay_world
       - MAX_INSTANCES=1
       - MEMORY=4g
       - ROMS=/path/to/ROMs
       - YOUTUBE_UPLOAD_CREDENTIALS=/path/to/.youtube-upload-credentials.json
       - AVI_TEMP_DIR=/path/to/large/avi_storage_temp
+      #- REMOTE_DEBUG=true # Setting this to anything enables debug
+
+  fcreplay-tasker-check_top_weekly:
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
+
+  fcreplay-tasker-check_video_status:
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
 
   postgres:
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_USER: fcreplay
+      POSTGRES_PASSWORD: somesecurepassword
       PGDATA: /data/postgres

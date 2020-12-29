@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from fcreplay.database import Database
+from fcreplay.getreplay import Getreplay
 import docker
 import os
 import requests
@@ -138,19 +139,33 @@ class Tasker:
             if r.status_code == 200:
                 self.db.set_replay_processed(challenge_id=replay.id)
 
-    def main(self, max_instances=1):
+    def recorder(self, max_instances=1):
         if self.check_for_docker_network() is False:
             return False
 
         schedule.every(10).to(30).seconds.do(self.remove_temp_dirs)
         schedule.every(30).to(60).seconds.do(self.check_for_replay)
-        schedule.every(1).hour.do(self.update_video_status)
 
         self.max_instances = max_instances
 
         if 'MAX_INSTANCES' in os.environ:
             self.max_instances = int(os.environ['MAX_INSTANCES'])
 
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def check_top_weekly(self):
+        g = Getreplay()
+        schedule.every(1).hour.do(g.get_top_weekly)
+
+        g.get_top_weekly()
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def check_video_status(self):
+        schedule.every(1).hour.do(self.update_video_status)
         while True:
             schedule.run_pending()
             time.sleep(1)

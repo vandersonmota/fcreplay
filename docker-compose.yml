@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: "fcreplay tasker start"
+    command: "fcreplay tasker start recorder"
     environment:
       - CLIENT_SECRETS=/path/to/.client_secrets.json
       - CONFIG=/path/to/config.json
@@ -38,6 +38,28 @@ services:
       - /path/to/config.json:/root/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/large/avi_storage_temp:/avi_storage_temp
+    networks:
+      - postgres
+      - world
+    depends_on:
+      - postgres
+
+  fcreplay-tasker-check_top_weekly:
+    image: fcreplay/image:latest
+    command: "fcreplay tasker start check_top_weekly"
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
+    networks:
+      - postgres
+      - world
+    depends_on:
+      - postgres
+
+  fcreplay-tasker-check_video_status:
+    image: fcreplay/image:latest
+    command: "fcreplay tasker start check_video_status"
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
     networks:
       - postgres
       - world
