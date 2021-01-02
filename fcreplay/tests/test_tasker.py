@@ -1,6 +1,6 @@
-from pytest import fixture
 from unittest.mock import patch
 from fcreplay.tasker import Tasker
+
 
 class TestTasker:
     @patch('fcreplay.tasker.Database')

@@ -1,7 +1,7 @@
-from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
 from fcreplay.config import Config
-from fcreplay.site.models import Replays, Descriptions, Character_detect
+from fcreplay.site import queries
 from fcreplay.site.database import db
+from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
 
 from flask import Blueprint
 from flask import abort, jsonify, render_template, request, session, redirect, send_from_directory, url_for
@@ -23,13 +23,7 @@ with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json
 def index():
     searchForm = SearchForm()
     page = request.args.get('page', 1, type=int)
-    pagination = Replays.query.filter(
-        Replays.created == 'yes'
-    ).filter(
-        Replays.failed == 'no'
-    ).filter(
-        Replays.video_processed == True
-    ).order_by(Replays.date_added.desc()).paginate(page, per_page=9)
+    pagination = queries.all_replays().paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
@@ -40,12 +34,7 @@ def videolinks():
     if 'ids' not in request.json:
         abort(404)
 
-    replays = Replays.query.filter(
-        Replays.created == True,
-        Replays.failed == False,
-        Replays.video_processed == True,
-        Replays.id.in_(request.json['ids'])
-    ).all()
+    replays = queries.multiple_replays(request.json['ids'])
 
     replay_data = {}
     for i in replays:
@@ -155,62 +144,13 @@ def advancedSearchResult():
 
     page = request.args.get('page', 1, type=int)
 
-    if order_by == 'date_replay':
-        order = Replays.date_replay.desc()
-    elif order_by == 'date_added':
-        order = Replays.date_added.desc()
-    elif order_by == 'length':
-        order = Replays.length.desc()
-    else:
-        raise LookupError
-
-    if char1 == 'Any':
-        char1 = '%'
-    if char2 == 'Any':
-        char2 = '%'
-
-    if game == 'Any':
-        game = '%'
-
-    if p1_rank == 'any':
-        p1_rank = '%'
-    if p2_rank == 'any':
-        p2_rank = '%'
-
-    replay_query = [
-        Replays.created == True,
-        Replays.failed == False,
-        Replays.game.ilike(f'{game}'),
-        Replays.p1_rank.ilike(f'{p1_rank}'),
-        Replays.p2_rank.ilike(f'{p2_rank}'),
-        Replays.id.in_(
-            Descriptions.query.with_entities(Descriptions.id).filter(
-                Descriptions.description.ilike(f'%{search_query}%')
-            )
-        ),
-        Replays.video_processed == True
-    ]
-
-    with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
-        character_dict = json.load(json_data_file)
-
-    if game in character_dict:
-        replay_query.append(
-            Replays.id.in_(
-                Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                    Character_detect.p1_char.ilike(
-                        f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
-                ).union(
-                    Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                        Character_detect.p1_char.ilike(
-                            f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
-                    )
-                )
-            )
-        )
-
-    logging.debug(Replays.query.filter(*replay_query))
-    pagination = Replays.query.filter(*replay_query).order_by(order).paginate(page, per_page=9)
+    pagination = queries.advanced_search(game,
+                                         p1_rank,
+                                         p2_rank,
+                                         search_query,
+                                         order_by,
+                                         char1,
+                                         char2).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
@@ -241,36 +181,10 @@ def search():
 
     page = request.args.get('page', 1, type=int)
 
-    if order_by == 'date_replay':
-        order = Replays.date_replay.desc()
-    elif order_by == 'date_added':
-        order = Replays.date_added.desc()
-    elif order_by == 'length':
-        order = Replays.length.desc()
-    else:
-        raise LookupError
-
     if game == 'Any':
         game = '%'
 
-    replay_query = Replays.query.filter(
-        Replays.created == True
-    ).filter(
-        Replays.failed == False
-    ).filter(
-        Replays.game.ilike(f'{game}')
-    ).filter(
-        Replays.id.in_(
-            Descriptions.query.with_entities(Descriptions.id).filter(
-                Descriptions.description.ilike(f'%{search_query}%')
-            )
-        )
-    ).filter(
-        Replays.video_processed == True
-    ).order_by(order)
-
-    logging.debug(replay_query)
-    pagination = replay_query.paginate(page, per_page=9)
+    pagination = queries.basic_search(game, search_query, order_by).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
@@ -294,12 +208,9 @@ def sitemap():
 def videopage(challenge_id):
     searchForm = SearchForm()
 
-    replay = Replays.query.filter(
-        Replays.id == challenge_id
-    ).first()
-    char_detect = Character_detect.query.filter(
-        Character_detect.challenge_id == challenge_id
-    ).all()
+    replay = queries.single_replay(challenge_id)
+
+    char_detect = queries.character_detect(challenge_id)
 
     characters = []
     for c in char_detect:

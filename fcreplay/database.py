@@ -21,7 +21,7 @@ class Database:
 
         # Create Engine
         try:
-            log.info(f"Creating DB Instance with: {config['sql_baseurl']}")
+            log.debug(f"Creating DB Instance with: {config['sql_baseurl']}")
             self.engine = create_engine(config['sql_baseurl'], echo=sql_echo, pool_pre_ping=True)
             Base.metadata.create_all(self.engine)
         except Exception as e:
@@ -54,50 +54,50 @@ class Database:
         session.commit()
         session.close()
 
-    def get_single_replay(self, **kwargs):
+    def get_single_replay(self, challenge_id):
         session = self.Session()
         replay = session.query(Replays).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).first()
         session.close()
 
         return(replay)
 
-    def update_player_requested(self, **kwargs):
+    def update_player_requested(self, challenge_id):
         session = self.Session()
         session.query(Replays).filter_by(
-            id=kwargs['challenge_id'],
+            id=challenge_id,
         ).update(
             {'player_requested': True}
         )
         session.commit()
         session.close()
 
-    def add_detected_characters(self, **kwargs):
+    def add_detected_characters(self, challenge_id, p1_char, p2_char, vid_time):
         session = self.Session()
         session.add(Character_detect(
-            challenge_id=kwargs['challenge_id'],
-            p1_char=kwargs['p1_char'],
-            p2_char=kwargs['p2_char'],
-            vid_time=kwargs['vid_time']
+            challenge_id=challenge_id,
+            p1_char=p1_char,
+            p2_char=p2_char,
+            vid_time=vid_time
         ))
         session.commit()
         session.close()
 
-    def add_job(self, **kwargs):
+    def add_job(self, challenge_id, start_time, length):
         session = self.Session()
         session.add(Job(
-            id=kwargs['challenge_id'],
-            start_time=kwargs['start_time'],
-            instance=kwargs['length']
+            id=challenge_id,
+            start_time=start_time,
+            instance=length
         ))
         session.commit()
         session.close()
 
-    def remove_job(self, **kwargs):
+    def remove_job(self, challenge_id):
         session = self.Session()
         session.query(Job).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).delete()
         session.commit()
         session.close()
@@ -117,33 +117,53 @@ class Database:
         count = session.execute('select count(id) from job').first()[0]
         return count
 
-    def update_status(self, **kwargs):
+    def get_all_count(self):
+        session = self.Session()
+        count = session.execute('select count(id) from replays').first()[0]
+        return count
+
+    def get_failed_count(self):
+        session = self.Session()
+        count = session.execute('select count(id) from replays where failed = true').first()[0]
+        return count
+
+    def get_pending_count(self):
+        session = self.Session()
+        count = session.execute("select count(id) from replays where created = false and failed = false").first()[0]
+        return count
+
+    def get_finished_count(self):
+        session = self.Session()
+        count = session.execute("select count(id) from replays where created = true and failed = false").first()[0]
+        return count
+
+    def update_status(self, challenge_id, status):
         session = self.Session()
         session.query(Replays).filter_by(
-            id=kwargs['challenge_id'],
+            id=challenge_id,
         ).update(
-            {'status': kwargs['status']}
+            {'status': status}
         )
         session.commit()
         session.close()
 
-    def add_description(self, **kwargs):
+    def add_description(self, challenge_id, description):
         session = self.Session()
         session.add(Descriptions(
-            id=kwargs['challenge_id'],
-            description=kwargs['description']
+            id=challenge_id,
+            description=description
         ))
         session.commit()
         session.close()
 
-    def update_youtube_day_log_count(self, **kwargs):
+    def update_youtube_day_log_count(self, count, date):
         session = self.Session()
         session.query(Youtube_day_log).filter_by(
             id='count'
         ).update(
             {
-                'count': kwargs['count'],
-                'date': kwargs['date']
+                'count': count,
+                'date': date
             }
         )
         session.commit()
@@ -165,12 +185,9 @@ class Database:
         replay = session.query(
             Replays
         ).filter_by(
-            player_requested=True
-        ).filter_by(
-            created=False
-        ).filter_by(
-            failed=False
-        ).filter_by(
+            player_requested=True,
+            created=False,
+            failed=False,
             status='ADDED'
         ).order_by(
             Replays.date_added.desc()
@@ -183,10 +200,8 @@ class Database:
         replay = session.query(
             Replays
         ).filter_by(
-            failed=False
-        ).filter_by(
-            created=False
-        ).filter_by(
+            failed=False,
+            created=False,
             status='ADDED'
         ).order_by(
             func.random()
@@ -200,10 +215,8 @@ class Database:
         replay = session.query(
             Replays
         ).filter_by(
-            failed=False
-        ).filter_by(
-            created=False
-        ).filter_by(
+            failed=False,
+            created=False,
             status='ADDED'
         ).order_by(
             Replays.date_added.desc()
@@ -212,10 +225,10 @@ class Database:
 
         return replay
 
-    def update_failed_replay(self, **kwargs):
+    def update_failed_replay(self, challenge_id):
         session = self.Session()
         session.query(Replays).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).update(
             {
                 'failed': True
@@ -224,10 +237,10 @@ class Database:
         session.commit()
         session.close()
 
-    def update_created_replay(self, **kwargs):
+    def update_created_replay(self, challenge_id):
         session = self.Session()
         session.query(Replays).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).update(
             {
                 'created': True
@@ -241,10 +254,8 @@ class Database:
         replays = session.query(
             Replays
         ).filter_by(
-            player_requested=True
-        ).filter_by(
-            failed=False
-        ).filter_by(
+            player_requested=True,
+            failed=False,
             created=False
         ).order_by(
             Replays.date_added.asc()
@@ -257,31 +268,29 @@ class Database:
         replays = session.query(
             Replays
         ).filter_by(
-            failed=False
-        ).filter_by(
-            created=True
-        ).filter_by(
+            failed=False,
+            created=True,
             video_processed=False
         ).all()
         return replays
 
-    def set_replay_processed(self, **kwargs):
+    def set_replay_processed(self, challenge_id):
         session = self.Session()
         session.query(Replays).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).update(
             {'video_processed': True, "date_added": datetime.datetime.now()}
         )
         session.commit()
         session.close()
 
-    def rerecord_replay(self, **kwargs):
+    def rerecord_replay(self, challenge_id):
         """Sets replay to be rerecorded
         """
         session = self.Session()
         # Set replay to original status
         session.query(Replays).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).update(
             {'failed': False, 'created': False, 'status': 'ADDED'}
         )
@@ -289,20 +298,68 @@ class Database:
 
         # Remove description if it exists
         session.query(Descriptions).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).delete()
         session.commit()
 
         # Remove job if it exists
         session.query(Job).filter_by(
-            id=kwargs['challenge_id']
+            id=challenge_id
         ).delete()
         session.commit()
 
         # Remove character detection if it exists
         session.query(Character_detect).filter_by(
-            challenge_id=kwargs['challenge_id']
+            challenge_id=challenge_id
+        ).delete()
+        session.commit()
+        session.close()
+
+    def delete_replay(self, challenge_id):
+        session = self.Session()
+        # Remove replay if it exists
+        session.query(Replays).filter_by(
+            id=challenge_id,
         ).delete()
         session.commit()
 
-        session.close()
+        # Remove description if it exists
+        session.query(Descriptions).filter_by(
+            id=challenge_id
+        ).delete()
+        session.commit()
+
+        # Remove job if it exists
+        session.query(Job).filter_by(
+            id=challenge_id
+        ).delete()
+        session.commit()
+
+        # Remove character detection if it exists
+        session.query(Character_detect).filter_by(
+            challenge_id=challenge_id
+        ).delete()
+        session.commit()
+
+    def get_all_failed_replays(self, limit=10):
+        session = self.Session()
+        failed_replays = session.query(Replays).filter_by(
+            failed=True,
+        ).limit(limit).all()
+        return failed_replays
+
+    def get_all_finished_replays(self, limit=10):
+        session = self.Session()
+        replays = session.query(Replays).filter_by(
+            failed=False,
+            created=True
+        ).limit(limit).all()
+        return replays
+
+    def get_all_queued_replays(self, limit=10):
+        session = self.Session()
+        replays = session.query(Replays).filter_by(
+            failed=False,
+            created=False
+        ).limit(limit).all()
+        return replays
