@@ -41,7 +41,7 @@ class UpdateThumbnail:
         else:
             return fontsize
 
-    def _add_flags(self, im, p1_country: str, p2_country: str, rank_text_height: int):
+    def _add_flags(self, im, p1_country: str, p2_country: str, vs_font_height: int, p1_rank_length: int, p2_rank_length: int):
         p1_country = p1_country.lower()
         p2_country = p2_country.lower()
 
@@ -66,14 +66,15 @@ class UpdateThumbnail:
         p1_flag = ImageOps.expand(p1_flag, border=10, fill='black')
         p2_flag = ImageOps.expand(p2_flag, border=10, fill='black')
 
-        y = (im.size[1] - (rank_text_height + p1_flag.size[1] + 10))
-        p2_x = (im.size[0] - (p1_flag.size[0] + 10))
+        y = (25 + vs_font_height + 25)
+        p1_x = (15 + p1_rank_length + 15)
+        p2_x = (im.size[0] - (p1_flag.size[0] + 15 + p2_rank_length + 15))
 
-        im.paste(p1_flag, (10, y))
+        im.paste(p1_flag, (p1_x, y))
         im.paste(p2_flag, (p2_x, y))
         return im
 
-    def _add_rank_text(self, im, p1_rank, p2_rank):
+    def _add_rank_text(self, im, p1_rank, p2_rank, vs_font_height):
         ranks = {
             '0': {
                 'text': '?',
@@ -116,13 +117,11 @@ class UpdateThumbnail:
         p1_rank_color = tuple(int(ranks[p1_rank]['color'][i: i + 2], 16) for i in (0, 2, 4))
         p2_rank_color = tuple(int(ranks[p2_rank]['color'][i: i + 2], 16) for i in (0, 2, 4))
 
-        # Place text at bottom of image, get font height
-        vs_font_height = max([rank_font.getsize(p1_rank_text)[1], rank_font.getsize(p2_rank_text)[1]])
-
         # Get p2_rank length
+        p1_rank_length = rank_font.getsize(p2_rank_text)[0]
         p2_rank_length = rank_font.getsize(p2_rank_text)[0]
 
-        y = (im.size[1] - vs_font_height) - 15
+        y = (25 + vs_font_height + 25)
         p1_x = 15
         p2_x = (im.size[0] - p2_rank_length) - 15
 
@@ -130,7 +129,7 @@ class UpdateThumbnail:
         draw.text((p1_x, y), p1_rank_text, font=rank_font, fill=p1_rank_color, stroke_width=10, stroke_fill=stroke_color)
         draw.text((p2_x, y), p2_rank_text, font=rank_font, fill=p2_rank_color, stroke_width=10, stroke_fill=stroke_color)
 
-        return [im, vs_font_height]
+        return [im, p1_rank_length, p2_rank_length]
 
     def _add_vs_text(self, im, p1_name, p2_name):
         draw = ImageDraw.Draw(im)
@@ -145,9 +144,11 @@ class UpdateThumbnail:
         w = im.size[0]
         x = (w - vs_font.getsize(vs_text)[0]) / 2
 
+        vs_font_height = vs_font.getsize(vs_text)[1]
+
         # put the text on the image
         draw.text((x, 25), vs_text, font=vs_font, fill=fill_color, stroke_width=10, stroke_fill=stroke_color)
-        return im
+        return [im, vs_font_height]
 
     def _resize_image(self, im):
         crop_y = 75
@@ -163,12 +164,12 @@ class UpdateThumbnail:
         im = self._resize_image(im)
 
         log.info("Adding VS text to thumbnail")
-        im = self._add_vs_text(im, p1_name=replay.p1, p2_name=replay.p2)
+        im, vs_font_height = self._add_vs_text(im, p1_name=replay.p1, p2_name=replay.p2)
 
         log.info("Adding rank text to thumbnail")
-        im, rank_text_height = self._add_rank_text(im, replay.p1_rank, replay.p2_rank)
+        im, p1_rank_width, p2_rank_width = self._add_rank_text(im, replay.p1_rank, replay.p2_rank, vs_font_height)
 
         log.info("Adding flags to thumbnail")
-        im = self._add_flags(im, replay.p1_loc, replay.p2_loc, rank_text_height)
+        im = self._add_flags(im, replay.p1_loc, replay.p2_loc, vs_font_height, p1_rank_width, p2_rank_width)
 
         im.save(thumbnail)
