@@ -312,7 +312,7 @@ class Replay:
         self.update_status(status.UPLOADING_TO_IA)
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}.mkv"
+        filename = f"{self.replay.id}-lossy.mkv"
         date_short = str(self.replay.date_replay)[10]
 
         # Make identifier for Archive.org
@@ -344,7 +344,7 @@ class Replay:
         self.update_status(status.UPLOADING_TO_YOUTUBE)
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}.mkv"
+        filename = f"{self.replay.id}-lossy.mkv"
         import_format = '%Y-%m-%d %H:%M:%S'
         date_raw = datetime.datetime.strptime(
             str(self.replay.date_replay), import_format)
