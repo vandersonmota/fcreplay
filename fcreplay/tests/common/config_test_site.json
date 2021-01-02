@@ -31,7 +31,6 @@
   "player_replay_first": true,
   "random_replay": false,
   "record_timeout": 120,
-  "remove_generated_files": false,
   "secret_key": "SOME_TEST_SECERT_KEY",
   "sql_baseurl": "",
   "upload_to_ia": false,

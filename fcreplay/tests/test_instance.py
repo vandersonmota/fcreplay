@@ -89,7 +89,7 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             instance.debug = True
 
             instance.main()
@@ -103,26 +103,12 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': True, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': False, 'upload_to_yt': True, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             instance.debug = True
 
             instance.main()
 
             assert mock_replay.upload_to_yt.called, "Should upload to YT when upload_to_yt is true"
-            assert e.type == SystemExit, "Should exit with no errors"
-
-    @patch('fcreplay.instance.Config')
-    @patch('fcreplay.instance.Replay', )
-    def test_remove_files(self, mock_replay, mock_config):
-        with pytest.raises(SystemExit) as e:
-            temp_dir = tempfile.TemporaryDirectory()
-            instance = Instance()
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': True, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
-            instance.debug = True
-
-            instance.main()
-
-            assert mock_replay.remove_generated_files.called, "Should remove generated files when remove_generated_files is true"
             assert e.type == SystemExit, "Should exit with no errors"
 
     @patch('fcreplay.instance.Config')
@@ -134,7 +120,7 @@ class TestInstance:
 
             instance = Instance()
 
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': False, 'remove_generated_files': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': False, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             instance.debug = True
 
             instance.main()

@@ -427,20 +427,6 @@ class Replay:
             raise ModuleNotFoundError
 
     @handle_fail
-    def remove_generated_files(self):
-        """Remove generated files
-
-        Generated files are thumbnail and videofile
-        """
-        log.info("Removing generated files")
-        for f in os.listdir(f"{self.config['fcadefbneo_path']}/avi/"):
-            os.remove(f"{self.config['fcadefbneo_path']}/avi/{f}")
-        os.remove(f"{self.config['fcreplay_dir']}/tmp/thumbnail.jpg")
-
-        self.update_status(status.REMOVED_GENERATED_FILES)
-        log.info("Finished removing files")
-
-    @handle_fail
     def set_created(self):
         self.update_status(status.FINISHED)
         self.db.update_created_replay(challenge_id=self.replay.id)

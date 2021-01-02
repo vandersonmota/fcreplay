@@ -55,9 +55,6 @@ class Instance:
             if self.config['upload_to_yt']:
                 replay.upload_to_yt()
 
-            if self.config['remove_generated_files']:
-                replay.remove_generated_files()
-
             replay.remove_job()
 
             replay.db.update_created_replay(challenge_id=replay.replay.id)

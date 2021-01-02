@@ -184,14 +184,6 @@ class Config:
                     'description': 'Time in seconds before marking a replay as failed if start not detected'
                 }
             },
-            'remove_generated_files': {
-                'type': 'boolean',
-                'required': True,
-                'meta': {
-                    'default': True,
-                    'description': 'Delete generated files after finished recording'
-                }
-            },
             'secret_key': {
                 'type': 'string',
                 'required': True,

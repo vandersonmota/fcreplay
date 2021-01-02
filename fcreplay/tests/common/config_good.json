@@ -36,7 +36,6 @@
     "player_replay_first": true,
     "random_replay": true,
     "record_timeout": 120,
-    "remove_generated_files": true,
     "sql_baseurl": "postgres://user:pass@address:port",
     "secret_key": "some_random_data",
     "upload_to_ia": false,
