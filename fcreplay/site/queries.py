@@ -55,7 +55,7 @@ def basic_search(game_id, search_query, order_string):
             )
         ),
         Replays.video_processed == True
-    ).order_by(_order())
+    ).order_by(_order(order_string))
 
 
 def advanced_search(game_id, p1_rank, p2_rank, search_query, order_by, char1='Any', char2='Any'):
