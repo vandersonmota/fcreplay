@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y \
   git \
   i3 \
   i3status \
-  mencoder \
   pulseaudio \
   software-properties-common \
   wget \
@@ -22,6 +21,30 @@ RUN apt-get update && apt-get install -y \
 
 RUN apt-add-repository contrib && \
   apt-add-repository non-free
+
+# Newer version of mplayer
+RUN apt-get update && apt-get install -y \
+  libaa1-dev libasound2-dev libcaca-dev libcdparanoia-dev libdca-dev \
+  libdirectfb-dev libenca-dev libfontconfig1-dev libfreetype6-dev \
+  libfribidi-dev libgif-dev libgl1-mesa-dev libjack-jackd2-dev libopenal1 libpulse-dev \
+  libsdl1.2-dev libvdpau-dev libxinerama-dev libxv-dev libxvmc-dev libxxf86dga-dev \
+  libxxf86vm-dev librtmp-dev libsctp-dev libass-dev libfaac-dev libsmbclient-dev libtheora-dev \
+  libogg-dev libxvidcore-dev libspeex-dev libvpx-dev libdv4-dev \
+  libopencore-amrnb-dev libopencore-amrwb-dev libmp3lame-dev liblivemedia-dev libtwolame-dev \
+  libmad0-dev libgsm1-dev libbs2b-dev liblzo2-dev ladspa-sdk libfaad-dev \
+  libmpg123-dev libopus-dev libbluray-dev libaacs-dev \
+  yasm build-essential
+
+RUN cd /opt && \
+  wget http://www.mplayerhq.hu/MPlayer/releases/MPlayer-1.4.tar.xz && \
+  tar xvf MPlayer-1.4.tar.xz && \
+  cd /opt/MPlayer-1.4 && \
+  ./configure --prefix=/opt/mplayer && \
+  make && \
+  make install && \
+  rm -rf /opt/MPlayer-1.4.tar.xz && \
+  cd /opt && \
+  rm -rf /opt/MPlayer-1.4
 
 RUN dpkg --add-architecture i386 && \
   apt update && \
@@ -48,6 +71,16 @@ RUN cd / && \
   mkdir -p /Fightcade/emulator/fbneo/config && \
   mkdir -p /Fightcade/emulator/fbneo/ROMs && \
   rm -rf /linux
+
+# Download flag icons for thumbnails
+RUN cd /opt && \
+  wget https://github.com/lipis/flag-icon-css/archive/3.5.0.zip && \
+  unzip 3.5.0.zip && \
+  rm -rf 3.5.0.zip
+
+# Add fonts for thumbnails
+RUN cd /opt && \
+  git clone https://github.com/grays/droid-fonts.git
 
 # Download and install youtube-dl
 RUN cd /root && \

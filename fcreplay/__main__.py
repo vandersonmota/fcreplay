@@ -1,6 +1,7 @@
 """fcreplay.
 
 Usage:
+  fcreplay cli
   fcreplay config generate
   fcreplay config validate <config.json>
   fcreplay get game <gameid>
@@ -22,10 +23,12 @@ Options:
 from fcreplay.tasker import Tasker
 from docopt import docopt
 from fcreplay import fclogging
+from fcreplay.cli import Cli
 from fcreplay.config import Config
 from fcreplay.getreplay import Getreplay
 from fcreplay.instance import Instance
 import os
+import sys
 
 
 def main():
@@ -53,6 +56,10 @@ def main():
                 Tasker().check_top_weekly()
             if args['check_video_status']:
                 Tasker().check_video_status()
+
+    elif args['cli']:
+        c = Cli()
+        sys.exit(c.cmdloop())
 
     elif args['config']:
         if args['validate']:
