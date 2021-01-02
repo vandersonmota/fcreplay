@@ -49,13 +49,15 @@ class UpdateThumbnail:
             with open(f"{self.flag_path}/{p1_country}.svg") as p1_svg:
                 cairosvg.svg2png(file_obj=p1_svg, write_to='/tmp/p1_country.png', scale=0.2)
         except Exception:
-            print(f"Unable to find flag svg for p1: {p1_country}")
+            log.info(f"Unable to find flag svg for p1: {p1_country}")
+            raise FileNotFoundError
 
         try:
             with open(f"/{self.flag_path}/{p2_country}.svg") as p2_svg:
                 cairosvg.svg2png(file_obj=p2_svg, write_to='/tmp/p2_country.png', scale=0.2)
         except Exception:
-            print(f"Unable to find flag svg for p1: {p2_country}")
+            log.info(f"Unable to find flag svg for p1: {p2_country}")
+            raise FileNotFoundError
 
         # Add border to flags
         p1_flag = Image.open('/tmp/p1_country.png')
