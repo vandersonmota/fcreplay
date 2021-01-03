@@ -58,7 +58,11 @@ class Record:
 
     def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
         log.info('Starting pulseaudio')
-        pulseaudio_rc = subprocess.Popen(['pulseaudio', '-v', '--exit-idle-time=-1'],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        pulseaudio_rc = subprocess.Popen(
+            ['pulseaudio', '-v', '--exit-idle-time=-1'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
         # Get start time
         begin_time = datetime.datetime.now()
