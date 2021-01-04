@@ -9,10 +9,6 @@ class TestSupprtedGames:
             'game_ids': {
                 'type': 'dict',
                 'schema': {
-                    'character_detect': {
-                        'type': 'boolean',
-                        'required': True,
-                    },
                     'game_name': {
                         'type': 'string',
                         'required': True,

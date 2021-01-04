@@ -52,7 +52,8 @@ class TestDatabase:
             challenge_id=MagicMock(),
             p1_char=MagicMock(),
             p2_char=MagicMock(),
-            vid_time=MagicMock()
+            vid_time=MagicMock(),
+            game=MagicMock()
         )
         db.add_job(
             challenge_id=MagicMock(),

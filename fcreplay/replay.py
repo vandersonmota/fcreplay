@@ -4,6 +4,7 @@ from fcreplay.record import Record
 from fcreplay.status import status
 from fcreplay.thumbnail import Thumbnail
 from fcreplay.updatethumbnail import UpdateThumbnail
+from fcreplay.character_detection import CharacterDetection
 
 from internetarchive import get_item
 from retrying import retry
@@ -32,6 +33,7 @@ class Replay:
         self.db = Database()
         self.replay = self.get_replay()
         self.description_text = ""
+        self.detected_characters = []
 
         with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
             self.supported_games = json.load(f)
@@ -79,6 +81,22 @@ class Replay:
             replay = self.db.get_oldest_replay()
 
         return replay
+
+    @handle_fail
+    def get_characters(self):
+        """Get characters (if they exist) from pickle file
+        """
+        c = CharacterDetection()
+        self.detected_characters = c.get_characters()
+
+        for i in self.detected_characters:
+            self.db.add_detected_characters(
+                challenge_id=self.replay.id,
+                p1_char=i[0],
+                p2_char=i[1],
+                vid_time=i[2],
+                game=self.replay.game
+            )
 
     @handle_fail
     def add_job(self):
@@ -130,13 +148,11 @@ class Replay:
             fc_time={self.replay.length},
             kill_time={self.config['record_timeout']},
             fcadefbneo_path={self.config['fcadefbneo_path']},
-            fcreplay_path={self.config['fcreplay_dir']},
             game_name={self.replay.game}""")
         record_status = Record().main(fc_challange_id=self.replay.id,
                                       fc_time=self.replay.length,
                                       kill_time=self.config['record_timeout'],
                                       fcadefbneo_path=self.config['fcadefbneo_path'],
-                                      fcreplay_path=self.config['fcreplay_dir'],
                                       game_name=self.replay.game
                                       )
 
@@ -178,7 +194,12 @@ class Replay:
     def encode_lossless(self):
         log.info("Encoding lossless file")
 
-        avi_files_list = os.listdir(f"{self.config['fcadefbneo_path']}/avi")
+        avi_files_list_glob = glob.glob(f"{self.config['fcadefbneo_path']}/avi/*.avi")
+        avi_files_list = []
+
+        for f in avi_files_list_glob:
+            avi_files_list.append(os.path.basename(f))
+
         log.info(f"List of files is: {avi_files_list}")
 
         # Sort files
@@ -254,9 +275,18 @@ class Replay:
         """
         log.info("Creating description")
 
-        self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
-                                f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
-                                f"\nFightcade replay id: {self.replay.id}"
+        if len(self.detected_characters) > 0:
+            self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
+                f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
+                f"\nFightcade replay id: {self.replay.id}"
+
+            for match in self.detected_characters:
+                self.description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
+                    f"\n{match[0]} vs {match[1]}"
+        else:
+            self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
+                                    f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
+                                    f"\nFightcade replay id: {self.replay.id}"
 
         # Read the append file:
         if self.config['description_append_file'][0] is True:

@@ -32,7 +32,31 @@ render_field, render_form_row %}{% block content %}
             </div>
           </div>
 
-          <div class="input-group top-buffer" id="charSelectGroup" style="visibility: hidden;">
+          <script type="text/javascript" language="javascript">
+            //Get Select data
+            function gameSelect(sel) {
+              var game = sel.value;
+              //var game_data = JSON.parse("{{ character_dict }}");
+              var game_data = {{ character_dict|tojson }};
+              if (game in game_data) {
+                // Populate fields
+                var chars = game_data[game];
+                var innerHTML;
+                innerHTML += '<option value=\'Any\'>Any</option>'
+                for (const c of chars) {
+                  innerHTML += '<option value=\'' + c + '\'>' + c + '</option>'
+                }
+                document.getElementById("char1").innerHTML = innerHTML;
+                document.getElementById("char2").innerHTML = innerHTML;
+              } else {
+                innerHTML += '<option value=\'Any\'>Any</option>'
+                document.getElementById("char1").innerHTML = innerHTML;
+                document.getElementById("char2").innerHTML = innerHTML;
+              }
+            };
+          </script>
+
+          <div class="input-group top-buffer" id="charSelectGroup">
             <div class="row">
               <div class="col">
                 {{ render_field(advancedSearchForm.char1) }}
@@ -42,39 +66,6 @@ render_field, render_form_row %}{% block content %}
               </div>
             </div>
           </div>
-
-          <!-- Only show when a supported game is selected -->
-          <script type="text/javascript" language="javascript">
-            //Get Select data
-            function gameSelect(sel) {
-              var game = sel.value;
-              var game_data = JSON.parse(localStorage.getItem("character_detect"));
-              if (game in game_data) {
-                // Populate fields
-                var chars = game_data[game]['characters'];
-                var innerHTML;
-                for (const c of chars) {
-                  innerHTML += '<option value=\'' + c + '\'>' + c + '</option>'
-                }
-                document.getElementById("char1").innerHTML = innerHTML;
-                document.getElementById("char2").innerHTML = innerHTML;
-                
-                // Make Element Visible
-                document.getElementById("charSelectGroup").style.visibility = 'visible';
-                document.getElementById("CharacterHelp").style.visibility = 'visible';
-              } else {
-                // Hide Element
-                document.getElementById("charSelectGroup").style.visibility = 'hidden';
-                document.getElementById("CharacterHelp").style.visibility = 'hidden';
-              }
-            };
-
-            // Load supported characters
-            let url = './assets/character_detect.json';
-            fetch(url)
-              .then(response => response.json())
-              .then(data => localStorage.setItem('character_detect', JSON.stringify(data)));
-          </script>
 
           <div class="row">
             <small id="CharacterHelp" class="text-muted" style="visibility: hidden;">

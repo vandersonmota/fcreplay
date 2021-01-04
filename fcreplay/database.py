@@ -73,13 +73,14 @@ class Database:
         session.commit()
         session.close()
 
-    def add_detected_characters(self, challenge_id, p1_char, p2_char, vid_time):
+    def add_detected_characters(self, challenge_id, p1_char, p2_char, vid_time, game):
         session = self.Session()
         session.add(Character_detect(
             challenge_id=challenge_id,
             p1_char=p1_char,
             p2_char=p2_char,
-            vid_time=vid_time
+            vid_time=vid_time,
+            game=game
         ))
         session.commit()
         session.close()

@@ -89,7 +89,7 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
             instance.debug = True
 
             instance.main()

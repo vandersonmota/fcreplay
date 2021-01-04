@@ -72,9 +72,6 @@ def advanced_search(game_id, p1_rank, p2_rank, search_query, order_by, char1='An
     if p2_rank == 'any':
         p2_rank = '%'
 
-    with open(pkg_resources.resource_filename('fcreplay', 'data/character_detect.json')) as json_data_file:
-        character_dict = json.load(json_data_file)
-
     query = [
         Replays.created == True,
         Replays.failed == False,
@@ -89,19 +86,18 @@ def advanced_search(game_id, p1_rank, p2_rank, search_query, order_by, char1='An
         Replays.video_processed == True
     ]
 
-    if game_id in character_dict:
-        query.append(
-            Replays.id.in_(
+    query.append(
+        Replays.id.in_(
+            Character_detect.query.with_entities(Character_detect.challenge_id).filter(
+                Character_detect.p1_char.ilike(
+                    f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
+            ).union(
                 Character_detect.query.with_entities(Character_detect.challenge_id).filter(
                     Character_detect.p1_char.ilike(
-                        f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
-                ).union(
-                    Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                        Character_detect.p1_char.ilike(
-                            f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
-                    )
+                        f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
                 )
             )
         )
+    )
 
     return Replays.query.filter(*query).order_by(_order(order_by))

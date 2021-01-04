@@ -43,6 +43,7 @@ class Instance:
         if replay.replay is not None:
             replay.add_job()
             replay.record()
+            replay.get_characters()
             replay.encode_lossless()
             replay.remove_old_avi_files()
             replay.create_thumbnail()

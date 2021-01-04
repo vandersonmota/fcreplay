@@ -31,3 +31,4 @@ class Character_detect(db.Model):
     p1_char = db.Column(db.String)
     p2_char = db.Column(db.String)
     vid_time = db.Column(db.String)
+    game = db.Column(db.String)
