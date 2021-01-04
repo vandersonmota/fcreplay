@@ -94,7 +94,8 @@ class Replay:
                 challenge_id=self.replay.id,
                 p1_char=i[0],
                 p2_char=i[1],
-                vid_time=i[2]
+                vid_time=i[2],
+                game=self.replay.game
             )
 
     @handle_fail

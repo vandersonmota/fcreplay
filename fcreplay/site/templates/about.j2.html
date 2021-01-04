@@ -22,9 +22,6 @@
               <th>
                 Number of Replays
               </th>
-              <th>
-                Character Detection
-              </th>
             </thread>
             <tbody>
               {% for game in supportedGames.values() -%}
@@ -34,9 +31,6 @@
                 </td>
                 <td>
                   {{ game.count }}
-                </td>
-                <td>
-                  {{ game.character_detect }}
                 </td>
               </tr>
               {% endfor -%}

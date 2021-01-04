@@ -95,7 +95,6 @@ def about():
     for game in sortedGames:
         supportedGames[game[0]] = {
             'game_name': supported_games[game[0]]['game_name'],
-            'character_detect': supported_games[game[0]]['character_detect']
         }
         supportedGames[game[0]]['count'] = db.session.execute(f"select count(id) from replays where created = true and game = '{game[0]}'").first()[0]
 
@@ -110,7 +109,18 @@ def about():
 def advancedSearch():
     searchForm = SearchForm()
     advancedSearchForm = AdvancedSearchForm()
-    return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm)
+
+    all_characters_sql = db.session.execute('select p1_char as char,game from character_detect union select p2_char as char,game from character_detect')
+    all_characters_dict = {}
+
+    for row in all_characters_sql:
+        if row.game not in all_characters_dict:
+            all_characters_dict[row.game] = []
+        all_characters_dict[row.game].append(row.char)
+
+    #all_characters_dict = json.dumps(all_characters_dict)
+
+    return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm, character_dict=all_characters_dict)
 
 
 @app.route('/advancedSearchResult', methods=['POST', 'GET'])

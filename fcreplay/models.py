@@ -58,3 +58,4 @@ class Character_detect(Base):
     p1_char = Column(String)
     p2_char = Column(String)
     vid_time = Column(String)
+    game = Column(String)

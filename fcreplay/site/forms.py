@@ -13,25 +13,7 @@ with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json
 class AdvancedSearchForm(FlaskForm):
     characters = [
         ('Any', 'Any'),
-        ('alex', 'alex'),
-        ('akuma', 'akuma'),
-        ('chunli', 'chunli'),
-        ('dudley', 'dudley'),
-        ('elena', 'elena'),
-        ('hugo', 'hugo'),
-        ('ibuki', 'ibuki'),
-        ('ken', 'ken'),
-        ('makoto', 'makoto'),
-        ('necro', 'necro'),
-        ('oro', 'oro'),
-        ('q', 'q'),
-        ('remy', 'remy'),
-        ('ryu', 'ryu'),
-        ('sean', 'sean'),
-        ('twelve', 'twelve'),
-        ('urien', 'urien'),
-        ('yang', 'yang'),
-        ('yun', 'yun')]
+    ]
 
     orderby_list = [
         ('date_added', 'Date Added'),
