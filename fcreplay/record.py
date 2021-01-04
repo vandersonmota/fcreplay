@@ -8,6 +8,7 @@ import threading
 import time
 
 from fcreplay.config import Config
+from fcreplay.overlay_detection import OverlayDetection
 
 if 'DISPLAY' in os.environ:
     import pyautogui
@@ -56,7 +57,7 @@ class Record:
                     return True
         return False
 
-    def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, fcreplay_path=None, game_name=None):
+    def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, game_name=None):
         log.info('Starting pulseaudio')
         pulseaudio_rc = subprocess.Popen(
             ['pulseaudio', '-v', '--exit-idle-time=-1'],
@@ -65,7 +66,7 @@ class Record:
         )
 
         # Get start time
-        begin_time = datetime.datetime.now()
+        self.begin_time = datetime.datetime.now()
 
         # Make sure 'started.inf' is missing
         if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
@@ -80,10 +81,15 @@ class Record:
         ggpo_thread.start()
         log.info("Started ggpofbneo")
 
+        # This requires the 'fightcade' directory exists inside the fbneo directory
+        # if it doesn't exists, then this will fail
+        overlay_detection = OverlayDetection()
+        overlay_detection.start()
+
         # Check to see if fcadefbneo has started playing
         log.info('Checking to see if replay has started')
         while True:
-            running_time = (datetime.datetime.now() - begin_time).seconds
+            running_time = (datetime.datetime.now() - self.begin_time).seconds
 
             if os.path.exists(f"{fcadefbneo_path}/fightcade/started.inf"):
                 log.info('First frame displayed. Looking for recording dialog')
@@ -97,11 +103,11 @@ class Record:
                 return "FailTimeout"
             time.sleep(0.1)
 
-        begin_time = datetime.datetime.now()
+        self.begin_time = datetime.datetime.now()
         minute_count = -1
 
         while True:
-            running_time = (datetime.datetime.now() - begin_time).seconds
+            running_time = (datetime.datetime.now() - self.begin_time).seconds
 
             # Log what minute we are on
             if (running_time % 60) == 0 and int(running_time / 60) != minute_count:
@@ -110,6 +116,8 @@ class Record:
 
             # Finished recording video
             if running_time > fc_time:
+                overlay_detection.stop()
+
                 # We need to manually stop the recording. Move the mouse into the
                 # fcadefbneo window, press alt, then down*7, then enter/return.
                 pyautogui.moveTo(700, 384)

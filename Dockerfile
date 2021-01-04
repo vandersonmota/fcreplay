@@ -72,6 +72,9 @@ RUN cd / && \
   mkdir -p /Fightcade/emulator/fbneo/ROMs && \
   rm -rf /linux
 
+# Pre-create 'fightcade' directory
+RUN mkdir /Fightcade/emulator/fbneo/fightcade
+
 # Download flag icons for thumbnails
 RUN cd /opt && \
   wget https://github.com/lipis/flag-icon-css/archive/3.5.0.zip && \

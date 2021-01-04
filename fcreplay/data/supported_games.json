@@ -180,6 +180,30 @@
     "character_detect": false,
     "game_name": "Marvel Super Heroes vs Street Fighter"
   },
+  "mslug": {
+    "character_detect": false,
+    "game_name": "Metal Slug - Super Vehicle-001"
+  },
+  "mslugx": {
+    "character_detect": false,
+    "game_name": "Metal Slug X - Super Vehicle-001"
+  },
+  "mslug2": {
+    "character_detect": false,
+    "game_name": "Metal Slug 2 - Super Vehicle-001/II"
+  },
+  "mslug3": {
+    "character_detect": false,
+    "game_name": "Metal Slug 3"
+  },
+  "mslug4": {
+    "character_detect": false,
+    "game_name": "Metal Slug 4"
+  },
+  "mslug5": {
+    "character_detect": false,
+    "game_name": "Metal Slug 5"
+  },
   "mvsc": {
     "character_detect": false,
     "game_name": "Marvel vs Capcom - clash of super heroes"
@@ -319,6 +343,10 @@
   "strhoop": {
     "character_detect": false,
     "game_name": "Street Hoop"
+  },
+  "svg": {
+    "character_detect": false,
+    "game_name": "S.V.G. - Spectral vs Generation"
   },
   "svc": {
     "character_detect": false,
