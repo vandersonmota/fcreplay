@@ -281,7 +281,7 @@ class Replay:
                 f"\nFightcade replay id: {self.replay.id}"
 
             for match in self.detected_characters:
-                self.description_text += f"{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
+                self.description_text += f"\n{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
                     f"\n{match[0]} vs {match[1]}"
         else:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
