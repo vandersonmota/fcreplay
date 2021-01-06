@@ -115,6 +115,14 @@ class Config:
                     'description': 'Dictionary of Internet Archive settings'
                 }
             },
+            'kill_all': {
+                'type': 'boolean',
+                'required': True,
+                'meta': {
+                    'default': False,
+                    'description': 'Kill all running processes on failure, useful for docker containers'
+                }
+            },
             'logging_loki': {
                 'type': 'dict',
                 'required': True,

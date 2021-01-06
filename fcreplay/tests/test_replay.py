@@ -6,6 +6,9 @@ from unittest.mock import patch, MagicMock
 sys.modules['pyautogui'] = MagicMock()
 from fcreplay.replay import Replay
 
+# Note for future self: decorator @handle_fail does a kill_all if
+# config['kill_all'] is set
+
 
 class TestReplay:
     @patch('fcreplay.replay.subprocess')
@@ -89,4 +92,3 @@ class TestReplay:
 
         sorted_list = r.sort_files(single_list)
         assert sorted_list == good_list, 'List with single file should be sorted'
-

@@ -55,6 +55,8 @@ class Replay:
                 self.db.update_failed_replay(challenge_id=self.replay.id)
                 self.update_status(status.FAILED)
 
+                if self.config['kill_all']:
+                    subprocess.run('killall5')
                 sys.exit(1)
 
         return failed

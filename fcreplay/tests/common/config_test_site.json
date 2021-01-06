@@ -18,6 +18,7 @@
     "mediatype": "UNUSED",
     "subject": ["UNUSED"]
   },
+  "kill_all": false,
   "logfile": "/tmp/fcreplay_site_test.log",
   "logging_loki": {
       "enabled": false,

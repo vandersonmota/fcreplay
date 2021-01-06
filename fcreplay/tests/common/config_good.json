@@ -23,6 +23,7 @@
             "fightcade"
         ]
     },
+    "kill_all": false,
     "logfile": "/home/fcrecorder/fcreplay/fcreplay.log",
     "logging_loki": {
         "enabled": false,
