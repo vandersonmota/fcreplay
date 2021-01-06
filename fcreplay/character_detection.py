@@ -6,6 +6,7 @@ class CharacterDetection:
     def __init__(self):
         self.pickle_path = '/Fightcade/emulator/fbneo/avi/overlay.pickle'
         self.video_start_time = None
+        self.timeline = []
 
     def _load_overlay_pickle(self) -> dict:
         """Returns a dict containing overlay data
@@ -37,8 +38,32 @@ class CharacterDetection:
         Returns:
             str: String format of video time h:mm:ss
         """
-        time_seconds = (detection_time - self.video_start_time).total_seconds()
-        return str(datetime.timedelta(seconds=int(time_seconds)))
+        time_seconds = int((detection_time - self.video_start_time).total_seconds())
+        formatted_time = str(datetime.timedelta(seconds=time_seconds))
+        if self._time_too_soon(time_seconds):
+            del self.timeline[-1]
+            return formatted_time
+        else:
+            return formatted_time
+
+    def _time_too_soon(self, new_time):
+        """Checks time against previous time, if it's within a 5 seconds, then return true else return false
+
+        Args:
+            new_time (int): <seconds>
+        """
+        if len(self.timeline) == 0:
+            return False
+
+        pt_list = self.timeline[-1][2].split(':')
+        pt_list = list(map(int, pt_list))
+
+        pt_seconds = (((pt_list[0] * 60) + pt_list[1]) * 60) + pt_list[2]
+
+        if (new_time - pt_seconds) < 5:
+            return True
+        else:
+            return False
 
     def _create_timeline(self) -> list:
         """Creates a timeline of character changes
@@ -49,7 +74,6 @@ class CharacterDetection:
         p1character = None
         p2character = None
         overlay_time = None
-        timeline = []
 
         for event in self.overlay_data:
             set_characters = [p1character, p2character]
@@ -63,9 +87,9 @@ class CharacterDetection:
                 overlay_time = event['date']
 
             if (None not in [p1character, p2character, overlay_time]) and [p1character, p2character] != set_characters:
-                timeline.append([p1character, p2character, self._get_video_time(overlay_time)])
+                self.timeline.append([p1character, p2character, self._get_video_time(overlay_time)])
 
-        return timeline
+        return self.timeline
 
     def get_characters(self):
         self.overlay_data = self._load_overlay_pickle()
