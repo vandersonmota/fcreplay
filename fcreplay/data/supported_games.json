@@ -203,17 +203,35 @@
 	"mslug": {
 		"game_name": "Metal Slug - Super Vehicle-001"
 	},
+	"mslugdg": {
+		"game_name": "Metal Slug (Multifunction Hack)"
+	},
 	"mslug2": {
 		"game_name": "Metal Slug 2 - Super Vehicle-001/II"
+	},
+	"mslug2dg": {
+		"game_name": "Metal Slug 2 - Super Vehicle-001/II (Multifunction Hack)"
+	},
+	"mslug2t": {
+		"game_name": "Metal Slug 2 Turbo"
 	},
 	"mslug3": {
 		"game_name": "Metal Slug 3"
 	},
+	"mslug3g": {
+		"game_name": "Metal Slug 3 (Multifunction Hack)"
+	},
 	"mslug4": {
 		"game_name": "Metal Slug 4"
 	},
+	"mslug4dg": {
+		"game_name": "Metal Slug 4 (Multifunction Hack)"
+	},
 	"mslug5": {
 		"game_name": "Metal Slug 5"
+	},
+	"mslug5g": {
+		"game_name": "Metal Slug 5 (Multifunction Hack)"
 	},
 	"mslugx": {
 		"game_name": "Metal Slug X - Super Vehicle-001"
