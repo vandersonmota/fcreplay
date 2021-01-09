@@ -48,6 +48,22 @@ def supportedgames():
     return jsonify(supported_games)
 
 
+@app.route('/api/playerlist')
+def playerList():
+    playerlist = queries.playerlist()
+    playerlist = sorted(playerlist)
+    return jsonify(playerlist)
+
+
+@app.route('/api/playerlist/search', methods=['POST'])
+def playerListSearch():
+    if 'player_id' not in request.json:
+        abort(404)
+    playerlist = queries.playerlist_search(request.json['player_id'])
+    playerlist = sorted(playerlist)
+    return jsonify(playerlist)
+
+
 @app.route('/submit')
 def submit():
     searchForm = SearchForm()
@@ -118,9 +134,13 @@ def advancedSearch():
             all_characters_dict[row.game] = []
         all_characters_dict[row.game].append(row.char)
 
-    #all_characters_dict = json.dumps(all_characters_dict)
+    players_list = queries.playerlist()
+    players_list = sorted(players_list)
 
-    return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm, character_dict=all_characters_dict)
+    advancedSearchForm.p1_name.choices = players_list
+    advancedSearchForm.p2_name.choices = players_list
+
+    return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm, character_dict=all_characters_dict, players_list=players_list)
 
 
 @app.route('/advancedSearchResult', methods=['POST', 'GET'])
@@ -131,6 +151,8 @@ def advancedSearchResult():
         result = AdvancedSearchForm(request.form)
 
         session['search'] = result.search.data
+        session['p1_name'] = result.p1_name.data
+        session['p2_name'] = result.p2_name.data
         session['char1'] = result.char1.data
         session['char2'] = result.char2.data
         session['p1_rank'] = result.p1_rank.data
@@ -143,6 +165,8 @@ def advancedSearchResult():
         if 'search' not in session:
             return index()
         search_query = session['search']
+        p1_name = session['p1_name']
+        p2_name = session['p2_name']
         char1 = session['char1']
         char2 = session['char2']
         p1_rank = session['p1_rank']
@@ -154,13 +178,16 @@ def advancedSearchResult():
 
     page = request.args.get('page', 1, type=int)
 
-    pagination = queries.advanced_search(game,
-                                         p1_rank,
-                                         p2_rank,
-                                         search_query,
-                                         order_by,
-                                         char1,
-                                         char2).paginate(page, per_page=9)
+    pagination = queries.advanced_search(game_id=game,
+                                         p1_rank=p1_rank,
+                                         p2_rank=p2_rank,
+                                         search_query=search_query,
+                                         order_by=order_by,
+                                         char1=char1,
+                                         char2=char2,
+                                         p1_name=p1_name,
+                                         p2_name=p2_name
+                                         ).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)

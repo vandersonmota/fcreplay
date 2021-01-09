@@ -1,308 +1,425 @@
 {
-  "2020bb": {
-    "game_name": "2020 Super Baseball"
-  },
-  "3countb": {
-    "game_name": "3 Count Bout"
-  },
-  "aodk": {
-    "game_name": "Aggressors of Dark Kombat"
-  },
-  "aof": {
-    "game_name": "Art of Fighting"
-  },
-  "aof2": {
-    "game_name": "Art of Fighting 2"
-  },
-  "aof3": {
-    "game_name": "Art of Fighting 3"
-  },
-  "bangbead": {
-    "game_name": "Bang Bead"
-  },
-  "breakers": {
-    "game_name": "Breakers"
-  },
-  "breakrev": {
-    "game_name": "Breakers Revenge"
-  },
-  "bstars2": {
-    "game_name": "Baseball Stars 2"
-  },
-  "cybots": {
-    "game_name": "Cyberbots - fullmetal madness"
-  },
-  "doubledr": {
-    "game_name": "Double Dragon"
-  },
-  "fatfursp": {
-    "game_name": "Fatal Fury Special"
-  },
-  "fbfrenzy": {
-    "game_name": "Football Frenzy"
-  },
-  "flipshot": {
-    "game_name": "Battle Flip Shot"
-  },
-  "galaxyfg": {
-    "game_name": "Galaxy Fight - Universal Warriors"
-  },
-  "garou": {
-    "game_name": "Garou - Mark of the Wolves"
-  },
-  "goalx3": {
-    "game_name": "Goal! Goal! Goal!"
-  },
-  "gowcaizr": {
-    "game_name": "Voltage Fighter - Gowcaizer"
-  },
-  "hsf2": {
-    "game_name": "Hyper Street Fighter II: The Anniversary Edition"
-  },
-  "jchan2": {
-    "game_name": "Jackie Chan in Fists of Fire"
-  },
-  "jojobanr1": {
-    "game_name": "JoJo's Bizarre Adventure: Heritage for the Future"
-  },
-  "kabukikl": {
-    "game_name": "Kabuki Klash - Far East of Eden"
-  },
-  "karnovr": {
-    "game_name": "Karnov's Revenge"
-  },
-  "kizuna": {
-    "game_name": "Kizuna Encounter - Super Tag Battle"
-  },
-  "kof2000": {
-    "game_name": "The King of Fighters 2000"
-  },
-  "kof2001": {
-    "game_name": "The King of Fighters 2001"
-  },
-  "kof2002": {
-    "game_name": "The King of Fighters 2002"
-  },
-  "kof2003": {
-    "game_name": "The King of Fighters 2003"
-  },
-  "kof95": {
-    "game_name": "The King of Fighters '95"
-  },
-  "kof96": {
-    "game_name": "The King of Fighters '96"
-  },
-  "kof97": {
-    "game_name": "The King of Fighters '97"
-  },
-  "kof98": {
-    "game_name": "The King of Fighters '98 - The Slugfest"
-  },
-  "kof99": {
-    "game_name": "The King of Fighters '99"
-  },
-  "lastblad": {
-    "game_name": "The Last Blade"
-  },
-  "lastbld2": {
-    "game_name": "The Last Blade 2"
-  },
-  "lbowling": {
-    "game_name": "League Bowling"
-  },
-  "magdrop3": {
-    "game_name": "Magical Drop 3"
-  },
-  "matrim": {
-    "game_name": "Matrimelee"
-  },
-  "miexchng": {
-    "game_name": "Money Puzzle Exchanger"
-  },
-  "mk": {
-    "game_name": "Mortal Kombat"
-  },
-  "mk2": {
-    "game_name": "Mortal Kombat II"
-  },
-  "mk3": {
-    "game_name": "Mortal Kombat 3"
-  },
-  "msh": {
-    "game_name": "Marvel Super Heroes"
-  },
-  "mshvsf": {
-    "game_name": "Marvel Super Heroes vs Street Fighter"
-  },
-  "mslug": {
-    "game_name": "Metal Slug - Super Vehicle-001"
-  },
-  "mslugx": {
-    "game_name": "Metal Slug X - Super Vehicle-001"
-  },
-  "mslug2": {
-    "game_name": "Metal Slug 2 - Super Vehicle-001/II"
-  },
-  "mslug3": {
-    "game_name": "Metal Slug 3"
-  },
-  "mslug4": {
-    "game_name": "Metal Slug 4"
-  },
-  "mslug5": {
-    "game_name": "Metal Slug 5"
-  },
-  "mvsc": {
-    "game_name": "Marvel vs Capcom - clash of super heroes"
-  },
-  "neocup98": {
-    "game_name": "Neo-Geo Cup '98 - The Road to the Victory"
-  },
-  "ninjamas": {
-    "game_name": "Ninja Master's"
-  },
-  "pce_finalmt": {
-    "game_name": "Final Match Tennis"
-  },
-  "pgoal": {
-    "game_name": "Pleasure Goal"
-  },
-  "rbff1": {
-    "game_name": "Real Bout Fatal Fury"
-  },
-  "rbff2h": {
-    "game_name": "Real Bout Fatal Fury 2"
-  },
-  "rbffspec": {
-    "game_name": "Real Bout Fatal Fury Special"
-  },
-  "redearth": {
-    "game_name": "Red Earth"
-  },
-  "ringdest": {
-    "game_name": "Ring of Destruction - slammasters II"
-  },
-  "rotd": {
-    "game_name": "Rage of the Dragons"
-  },
-  "samsh5sp": {
-    "game_name": "Samurai Shodown V Special"
-  },
-  "samsho": {
-    "game_name": "Samurai Shodown"
-  },
-  "samsho2": {
-    "game_name": "Samurai Shodown II"
-  },
-  "samsho3": {
-    "game_name": "Samurai Shodown III"
-  },
-  "samsho4": {
-    "game_name": "Samurai Shodown IV"
-  },
-  "savagere": {
-    "game_name": "Savage Reign"
-  },
-  "sdodgeb": {
-    "game_name": "Super Dodge Ball"
-  },
-  "sf2ce": {
-    "game_name": "Street Fighter II' - Champion Edition"
-  },
-  "sf2hf": {
-    "game_name": "Street Fighter II': Hyper Fighting"
-  },
-  "sfa2": {
-    "game_name": "Street Fighter Alpha 2"
-  },
-  "sfa2u": {
-    "game_name": "Street Fighter Alpha 2 (960430 USA)"
-  },
-  "sfa3": {
-    "game_name": "Street Fighter Alpha 3"
-  },
-  "sfiii3nr1": {
-    "game_name": "Street Fighter III: 3rd Strike"
-  },
-  "sgemf": {
-    "game_name": "Super Gem Fighter Mini Mix"
-  },
-  "sftm": {
-    "game_name": "Street Fighter: The Movie"
-  },
-  "slammast": {
-    "game_name": "Saturday Night Slam Masters"
-  },
-  "socbrawl": {
-    "game_name": "Soccer Brawl"
-  },
-  "spf2t": {
-    "game_name": "Super Puzzle Fighter II Turbo"
-  },
-  "ssf2xjr1": {
-    "game_name": "Super Street Fighter II X: Grand Master Challenge"
-  },
-  "ssideki": {
-    "game_name": "Super Sidekicks"
-  },
-  "ssideki2": {
-    "game_name": "Super Sidekicks 2 - The World Championship"
-  },
-  "ssideki3": {
-    "game_name": "Super Sidekicks 3 - The Next Glory"
-  },
-  "ssideki4": {
-    "game_name": "The Ultimate 11 - The SNK Football Championship"
-  },
-  "strhoop": {
-    "game_name": "Street Hoop"
-  },
-  "svg": {
-    "game_name": "S.V.G. - Spectral vs Generation"
-  },
-  "svc": {
-    "game_name": "SNK vs. Capcom - SVC Chaos"
-  },
-  "svcplus": {
-    "game_name": "SNK vs. Capcom - SVC Chaos Plus"
-  },
-  "tgm2p": {
-    "game_name": "Tetris the Absolute The Grand Master 2 PLUS"
-  },
-  "turfmast": {
-    "game_name": "Neo Turf Masters"
-  },
-  "twinspri": {
-    "game_name": "Twinkle Star Sprites"
-  },
-  "umk3": {
-    "game_name": "Ultimate Mortal Kombat 3"
-  },
-  "vsavj": {
-    "game_name": "Vampire Savior - the lord of vampire"
-  },
-  "wakuwak7": {
-    "game_name": "Waku Waku 7"
-  },
-  "wh1": {
-    "game_name": "World Heroes"
-  },
-  "wh2": {
-    "game_name": "World Heroes 2"
-  },
-  "wh2j": {
-    "game_name": "World Heroes 2 Jet"
-  },
-  "whp": {
-    "game_name": "World Heroes Perfect"
-  },
-  "wjammers": {
-    "game_name": "Windjammers"
-  },
-  "xmcota": {
-    "game_name": "X-Men - children of the atom"
-  },
-  "xmvsf": {
-    "game_name": "X-Men vs Street Fighter"
-  }
+	"2020bb": {
+		"game_name": "2020 Super Baseball"
+	},
+	"3countb": {
+		"game_name": "3 Count Bout"
+	},
+	"3wonders": {
+		"game_name": "Three Wonders"
+	},
+	"altbeast": {
+		"game_name": "Altered Beast"
+	},
+	"aodk": {
+		"game_name": "Aggressors of Dark Kombat"
+	},
+	"aof": {
+		"game_name": "Art of Fighting"
+	},
+	"aof2": {
+		"game_name": "Art of Fighting 2"
+	},
+	"aof3": {
+		"game_name": "Art of Fighting 3"
+	},
+	"armwar": {
+		"game_name": "Armored Warriors"
+	},
+	"asterix": {
+		"game_name": "Asterix"
+	},
+	"avsp": {
+		"game_name": "Alien vs Predator"
+	},
+	"bangbead": {
+		"game_name": "Bang Bead"
+	},
+	"batcir": {
+		"game_name": "Battle Circuit"
+	},
+	"breakers": {
+		"game_name": "Breakers"
+	},
+	"breakrev": {
+		"game_name": "Breakers Revenge"
+	},
+	"bstars2": {
+		"game_name": "Baseball Stars 2"
+	},
+	"bucky": {
+		"game_name": "Bucky O'Hare"
+	},
+	"burningf": {
+		"game_name": "Burning Fight"
+	},
+	"captcomm": {
+		"game_name": "Captain Commando"
+	},
+	"crimfght": {
+		"game_name": "Crime Fighters"
+	},
+	"crsword": {
+		"game_name": "Crossed Swords"
+	},
+	"cybots": {
+		"game_name": "Cyberbots - fullmetal madness"
+	},
+	"ddragon": {
+		"game_name": "Double Dragon - Beat 'em up"
+	},
+	"ddragon2": {
+		"game_name": "Double Dragon II - The Revenge"
+	},
+	"ddragon3": {
+		"game_name": "Double Dragon 3 - The Rosetta Stone (US)"
+	},
+	"ddragon3j": {
+		"game_name": "Double Dragon 3 - The Rosetta Stone (Japan)"
+	},
+	"ddtod": {
+		"game_name": "Dungeons & Dragons - tower of doom"
+	},
+	"dino": {
+		"game_name": "Cadillacs & Dinosaurs"
+	},
+	"doubledr": {
+		"game_name": "Double Dragon - Fighting"
+	},
+	"fatfursp": {
+		"game_name": "Fatal Fury Special"
+	},
+	"fbfrenzy": {
+		"game_name": "Football Frenzy"
+	},
+	"ffight": {
+		"game_name": "Final Fight"
+	},
+	"flipshot": {
+		"game_name": "Battle Flip Shot"
+	},
+	"galaxyfg": {
+		"game_name": "Galaxy Fight - Universal Warriors"
+	},
+	"garou": {
+		"game_name": "Garou - Mark of the Wolves"
+	},
+	"goalx3": {
+		"game_name": "Goal! Goal! Goal!"
+	},
+	"goldnaxe": {
+		"game_name": "Golden Axe"
+	},
+	"gowcaizr": {
+		"game_name": "Voltage Fighter - Gowcaizer"
+	},
+	"hsf2": {
+		"game_name": "Hyper Street Fighter II: The Anniversary Edition"
+	},
+	"jchan2": {
+		"game_name": "Jackie Chan in Fists of Fire"
+	},
+	"jojobanr1": {
+		"game_name": "JoJo's Bizarre Adventure: Heritage for the Future"
+	},
+	"kabukikl": {
+		"game_name": "Kabuki Klash - Far East of Eden"
+	},
+	"karnovr": {
+		"game_name": "Karnov's Revenge"
+	},
+	"kizuna": {
+		"game_name": "Kizuna Encounter - Super Tag Battle"
+	},
+	"knights": {
+		"game_name": "Knights of the Round"
+	},
+	"kod": {
+		"game_name": "The King of Dragons"
+	},
+	"kof2000": {
+		"game_name": "The King of Fighters 2000"
+	},
+	"kof2001": {
+		"game_name": "The King of Fighters 2001"
+	},
+	"kof2002": {
+		"game_name": "The King of Fighters 2002"
+	},
+	"kof2003": {
+		"game_name": "The King of Fighters 2003"
+	},
+	"kof95": {
+		"game_name": "The King of Fighters '95"
+	},
+	"kof96": {
+		"game_name": "The King of Fighters '96"
+	},
+	"kof97": {
+		"game_name": "The King of Fighters '97"
+	},
+	"kof98": {
+		"game_name": "The King of Fighters '98 - The Slugfest"
+	},
+	"kof99": {
+		"game_name": "The King of Fighters '99"
+	},
+	"lastblad": {
+		"game_name": "The Last Blade"
+	},
+	"lastbld2": {
+		"game_name": "The Last Blade 2"
+	},
+	"lbowling": {
+		"game_name": "League Bowling"
+	},
+	"magdrop3": {
+		"game_name": "Magical Drop 3"
+	},
+	"matrim": {
+		"game_name": "Matrimelee"
+	},
+	"metamrphj": {
+		"game_name": "Metamorphic Force"
+	},
+	"miexchng": {
+		"game_name": "Money Puzzle Exchanger"
+	},
+	"mk": {
+		"game_name": "Mortal Kombat"
+	},
+	"mk2": {
+		"game_name": "Mortal Kombat II"
+	},
+	"mk3": {
+		"game_name": "Mortal Kombat 3"
+	},
+	"msh": {
+		"game_name": "Marvel Super Heroes"
+	},
+	"mshvsf": {
+		"game_name": "Marvel Super Heroes vs Street Fighter"
+	},
+	"mslug": {
+		"game_name": "Metal Slug - Super Vehicle-001"
+	},
+	"mslug2": {
+		"game_name": "Metal Slug 2 - Super Vehicle-001/II"
+	},
+	"mslug3": {
+		"game_name": "Metal Slug 3"
+	},
+	"mslug4": {
+		"game_name": "Metal Slug 4"
+	},
+	"mslug5": {
+		"game_name": "Metal Slug 5"
+	},
+	"mslugx": {
+		"game_name": "Metal Slug X - Super Vehicle-001"
+	},
+	"msword": {
+		"game_name": "Magic Sword - heroic fantasy"
+	},
+	"mutnat": {
+		"game_name": "Mutation Nation"
+	},
+	"mvsc": {
+		"game_name": "Marvel vs Capcom - clash of super heroes"
+	},
+	"nbbatman": {
+		"game_name": "Ninja Baseball Batman"
+	},
+	"nemo": {
+		"game_name": "Nemo"
+	},
+	"neocup98": {
+		"game_name": "Neo-Geo Cup '98 - The Road to the Victory"
+	},
+	"ninjamas": {
+		"game_name": "Ninja Master's"
+	},
+	"pce_finalmt": {
+		"game_name": "Final Match Tennis"
+	},
+	"pgoal": {
+		"game_name": "Pleasure Goal"
+	},
+	"punisher": {
+		"game_name": "The Punisher"
+	},
+	"rbff1": {
+		"game_name": "Real Bout Fatal Fury"
+	},
+	"rbff2h": {
+		"game_name": "Real Bout Fatal Fury 2"
+	},
+	"rbffspec": {
+		"game_name": "Real Bout Fatal Fury Special"
+	},
+	"redearth": {
+		"game_name": "Red Earth"
+	},
+	"ringdest": {
+		"game_name": "Ring of Destruction - slammasters II"
+	},
+	"roboarmy": {
+		"game_name": "Robo Army"
+	},
+	"rotd": {
+		"game_name": "Rage of the Dragons"
+	},
+	"samsh5sp": {
+		"game_name": "Samurai Shodown V Special"
+	},
+	"samsho": {
+		"game_name": "Samurai Shodown"
+	},
+	"samsho2": {
+		"game_name": "Samurai Shodown II"
+	},
+	"samsho3": {
+		"game_name": "Samurai Shodown III"
+	},
+	"samsho4": {
+		"game_name": "Samurai Shodown IV"
+	},
+	"savagere": {
+		"game_name": "Savage Reign"
+	},
+	"sdodgeb": {
+		"game_name": "Super Dodge Ball"
+	},
+	"sengoku": {
+		"game_name": "Sengoku"
+	},
+	"sengoku2": {
+		"game_name": "Sengoku 2"
+	},
+	"sengoku3": {
+		"game_name": "Sengoku 3"
+	},
+	"sf2ce": {
+		"game_name": "Street Fighter II' - Champion Edition"
+	},
+	"sf2hf": {
+		"game_name": "Street Fighter II': Hyper Fighting"
+	},
+	"sfa2": {
+		"game_name": "Street Fighter Alpha 2"
+	},
+	"sfa2u": {
+		"game_name": "Street Fighter Alpha 2 (960430 USA)"
+	},
+	"sfa3": {
+		"game_name": "Street Fighter Alpha 3"
+	},
+	"sfiii3nr1": {
+		"game_name": "Street Fighter III: 3rd Strike"
+	},
+	"sftm": {
+		"game_name": "Street Fighter: The Movie"
+	},
+	"sgemf": {
+		"game_name": "Super Gem Fighter Mini Mix"
+	},
+	"simpsons2p": {
+		"game_name": "The Simpsons"
+	},
+	"slammast": {
+		"game_name": "Saturday Night Slam Masters"
+	},
+	"socbrawl": {
+		"game_name": "Soccer Brawl"
+	},
+	"spf2t": {
+		"game_name": "Super Puzzle Fighter II Turbo"
+	},
+	"ssf2xjr1": {
+		"game_name": "Super Street Fighter II X: Grand Master Challenge"
+	},
+	"ssideki": {
+		"game_name": "Super Sidekicks"
+	},
+	"ssideki2": {
+		"game_name": "Super Sidekicks 2 - The World Championship"
+	},
+	"ssideki3": {
+		"game_name": "Super Sidekicks 3 - The Next Glory"
+	},
+	"ssideki4": {
+		"game_name": "The Ultimate 11 - The SNK Football Championship"
+	},
+	"strhoop": {
+		"game_name": "Street Hoop"
+	},
+	"svc": {
+		"game_name": "SNK vs. Capcom - SVC Chaos"
+	},
+	"svcplus": {
+		"game_name": "SNK vs. Capcom - SVC Chaos Plus"
+	},
+	"svg": {
+		"game_name": "S.V.G. - Spectral vs Generation"
+	},
+	"tgm2p": {
+		"game_name": "Tetris the Absolute The Grand Master 2 PLUS"
+	},
+	"tmnt22pu": {
+		"game_name": "Teenage Mutant Ninja Turtles - Turtles in Time"
+	},
+	"tmnt2po": {
+		"game_name": "Teenage Mutant Ninja Turtles"
+	},
+	"turfmast": {
+		"game_name": "Neo Turf Masters"
+	},
+	"twinspri": {
+		"game_name": "Twinkle Star Sprites"
+	},
+	"uccopsar": {
+		"game_name": "Undercover Cops"
+	},
+	"umk3": {
+		"game_name": "Ultimate Mortal Kombat 3"
+	},
+	"vendetta2pw": {
+		"game_name": "Vendetta"
+	},
+	"viostorm": {
+		"game_name": "Violent Storm"
+	},
+	"vsavj": {
+		"game_name": "Vampire Savior - the lord of vampire"
+	},
+	"wakuwak7": {
+		"game_name": "Waku Waku 7"
+	},
+	"wh1": {
+		"game_name": "World Heroes"
+	},
+	"wh2": {
+		"game_name": "World Heroes 2"
+	},
+	"wh2j": {
+		"game_name": "World Heroes 2 Jet"
+	},
+	"whp": {
+		"game_name": "World Heroes Perfect"
+	},
+	"wjammers": {
+		"game_name": "Windjammers"
+	},
+	"wof": {
+		"game_name": "Warriors of Fate"
+	},
+	"xmcota": {
+		"game_name": "X-Men - children of the atom"
+	},
+	"xmen2pe": {
+		"game_name": "X-Men"
+	},
+	"xmvsf": {
+		"game_name": "X-Men vs Street Fighter"
+	}
 }

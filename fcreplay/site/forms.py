@@ -46,14 +46,16 @@ class AdvancedSearchForm(FlaskForm):
     search = StringField()
     game = SelectField('Game', choices=game_list,
                        render_kw={'class': 'fixed', 'onChange': 'gameSelect(this)', 'id': 'game'})
+    p1_name = StringField(render_kw={'class': 'advancedAutoComplete', 'autocomplete': 'off'})
+    p2_name = StringField(render_kw={'class': 'advancedAutoComplete', 'autocomplete': 'off'})
     p1_rank = SelectField('P1 Rank', choices=rank_list,
                           render_kw={'class': 'fixed', 'style': 'width:75px'})
     p2_rank = SelectField('P2 Rank', choices=rank_list,
                           render_kw={'class': 'fixed', 'style': 'width:75px'})
     char1 = SelectField('Character1', choices=characters,
-                        render_kw={'class': 'fixed'})
+                        render_kw={'class': 'fixed', 'style': 'width:75px'})
     char2 = SelectField('Character2', choices=characters,
-                        render_kw={'class': 'fixed'})
+                        render_kw={'class': 'fixed', 'style': 'width:75px'})
     order_by = SelectField('Order by', choices=orderby_list,
                            render_kw={'class': 'fixed'})
     submit = SubmitField('Search')

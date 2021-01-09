@@ -22,3 +22,14 @@ class TestSupprtedGames:
 
         v = Validator(allow_unknown=True)
         assert v.validate(supported_games, schema)
+
+    def test_duplicated_games(self):
+        with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
+            supported_games = json.load(f)
+
+        game_names = []
+        for gameid in supported_games:
+            if supported_games[gameid]['game_name'] in game_names:
+                raise ValueError(f"Duplicate game name '{gameid}': '{supported_games[gameid]['game_name']}'")
+
+            game_names.append(supported_games[gameid]['game_name'])
