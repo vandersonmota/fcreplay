@@ -35,3 +35,6 @@ fcreplay.log
 
 # Avi files
 avi/
+
+# Savestates
+files/savestates/*.fs

@@ -75,6 +75,9 @@ RUN cd / && \
 # Pre-create 'fightcade' directory
 RUN mkdir /Fightcade/emulator/fbneo/fightcade
 
+# Copy any 'custom/missing' savestates
+COPY ./files/savestates/* /Fightcade/emulator/fbneo/savestates/
+
 # Download flag icons for thumbnails
 RUN cd /opt && \
   wget https://github.com/lipis/flag-icon-css/archive/3.5.0.zip && \
