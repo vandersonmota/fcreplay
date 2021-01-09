@@ -1,10 +1,11 @@
 {% extends 'dashboard.j2.html' %}{% from 'bootstrap/form.html' import
 render_field, render_form_row %}{% block content %}
+<script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
 <div class="container-fluid">
   <div class="card">
     <div class="card-header card-header-primary">
       <h4 class="card-title">
-        About
+        Advanced Search
       </h4>
     </div>
     <div class="card-body">
@@ -20,6 +21,41 @@ render_field, render_form_row %}{% block content %}
           <div class="input-group top-buffer">
             {{ render_field(advancedSearchForm.game) }}
           </div>
+
+          <div class="input-group top-buffer">
+            <div class="row">
+              <div class="col">
+                {{ render_field(advancedSearchForm.p1_name)}}
+              </div>
+              <div class="col">
+                {{ render_field(advancedSearchForm.p2_name)}}
+              </div>
+            </div>
+          </div>
+
+          <script>
+          $(function () {
+            $('.advancedAutoComplete').autoComplete({
+              resolver: 'custom',
+              events: {
+                search: function (qry, callback) {
+                  // let's do a custom ajax call
+                  $.ajax(
+                    'api/playerlist/search',
+                    {
+                      type: 'POST',
+                      contentType: 'application/json; charset=utf-8',
+                      dataType: 'json',
+                      data: JSON.stringify({ 'player_id': qry })
+                    }
+                  ).done(function (res) {
+                    callback(res)
+                  });
+                }
+              }
+            });
+          });
+          </script>
 
           <div class="input-group top-buffer">
             <div class="row">
