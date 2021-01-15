@@ -112,26 +112,13 @@ def advanced_search(game_id, p1_rank, p2_rank, search_query, order_by, char1='An
         Replays.created == True,
         Replays.failed == False,
         Replays.game.ilike(f'{game_id}'),
-        Replays.p1_rank.ilike(f'{p1_rank}'),
-        Replays.p2_rank.ilike(f'{p2_rank}'),
-        Replays.id.in_(
-            Descriptions.query.with_entities(Descriptions.id).filter(
-                Descriptions.description.ilike(f'%{search_query}%')
-            )
-        ),
         Replays.video_processed == True
     ]
 
     query.append(
         Replays.id.in_(
-            Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                Character_detect.p1_char.ilike(
-                    f'{char1}') & Character_detect.p2_char.ilike(f'{char2}')
-            ).union(
-                Character_detect.query.with_entities(Character_detect.challenge_id).filter(
-                    Character_detect.p1_char.ilike(
-                        f'{char2}') & Character_detect.p2_char.ilike(f'{char1}')
-                )
+            Descriptions.query.with_entities(Descriptions.id).filter(
+                Descriptions.description.ilike(f'%{search_query}%')
             )
         )
     )
@@ -139,15 +126,45 @@ def advanced_search(game_id, p1_rank, p2_rank, search_query, order_by, char1='An
     query.append(
         Replays.id.in_(
             Replays.query.with_entities(Replays.id).filter(
-                Replays.p1.ilike(
-                    f'{p1_name}') & Replays.p2.ilike(f'{p2_name}')
+                Replays.p1_rank.ilike(f'{p1_rank}'),
+                Replays.p2_rank.ilike(f'{p2_rank}')
             ).union(
                 Replays.query.with_entities(Replays.id).filter(
-                    Replays.p1.ilike(
-                        f'{p2_name}') & Replays.p2.ilike(f'{p1_name}')
+                    Replays.p1_rank.ilike(f'{p2_rank}'),
+                    Replays.p2_rank.ilike(f'{p1_rank}')
                 )
             )
         )
     )
 
-    return Replays.query.filter(*query).order_by(_order(order_by))
+    if char1 != '%' or char2 != '%':
+        query.append(
+            Replays.id.in_(
+                Character_detect.query.with_entities(Character_detect.challenge_id).filter(
+                    Character_detect.p1_char.ilike(f'{char1}'),
+                    Character_detect.p2_char.ilike(f'{char2}')
+                ).union(
+                    Character_detect.query.with_entities(Character_detect.challenge_id).filter(
+                        Character_detect.p1_char.ilike(f'{char2}'),
+                        Character_detect.p2_char.ilike(f'{char1}')
+                    )
+                )
+            )
+        )
+
+    query.append(
+        Replays.id.in_(
+            Replays.query.with_entities(Replays.id).filter(
+                Replays.p1.ilike(f'{p1_name}'),
+                Replays.p2.ilike(f'{p2_name}')
+            ).union(
+                Replays.query.with_entities(Replays.id).filter(
+                    Replays.p1.ilike(f'{p2_name}'),
+                    Replays.p2.ilike(f'{p1_name}')
+                )
+            )
+        )
+    )
+
+    built_query = Replays.query.filter(*query)
+    return built_query.order_by(_order(order_by))

@@ -6,12 +6,5 @@ if get_debug_flag() or get_env != "production":
     CONFIG = DevConfig
 else:
     CONFIG = ProdConfig
-    try:
-        import googleclouddebugger
-        googleclouddebugger.enable(
-            breakpoint_enable_canary=True
-        )
-    except ImportError:
-        pass
 
 app = create_app(CONFIG)

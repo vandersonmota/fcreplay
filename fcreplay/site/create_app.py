@@ -11,11 +11,15 @@ import os
 
 def create_app(app_config):
     if 'REMOTE_DEBUG' in os.environ:
+        print("Starting remote debugger on port 5678")
         import debugpy
-        debugpy.listen(("0.0.0.0", 5678))
-        debugpy.wait_for_client()
+        import logging
 
-    #app = Flask(__name__, static_folder='static')
+        debugpy.listen(("0.0.0.0", 5678))
+        print("Waiting for connection...")
+        debugpy.wait_for_client()
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+
     app = Flask(__name__)
 
     # Get flask config from object
