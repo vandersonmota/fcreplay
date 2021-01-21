@@ -65,6 +65,12 @@
 	"cybots": {
 		"game_name": "Cyberbots - fullmetal madness"
 	},
+	"dankuga": {
+ 	   "game_name": "Dan-Ku-Ga"
+	},
+	"daraku": {
+		"game_name": "Daraku Tenshi - The Fallen Angels"
+	}, 
 	"ddragon": {
 		"game_name": "Double Dragon - Beat 'em up"
 	},
@@ -373,6 +379,9 @@
     },
 	"strhoop": {
 		"game_name": "Street Hoop"
+	},
+	"sdodgeb": {
+		"game_name": "Super Dodge Ball"
 	},
 	"svc": {
 		"game_name": "SNK vs. Capcom - SVC Chaos"
