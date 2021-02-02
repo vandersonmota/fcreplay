@@ -18,7 +18,7 @@ class CharacterDetection:
         return overlay_data
 
     def _characters_exist(self) -> bool:
-        """Check to se if p1character or p2character exists in overlay data
+        """Check to see if p1character or p2character exists in overlay data
 
         Returns:
             bool
