@@ -381,6 +381,8 @@ class Replay:
         date_raw = datetime.datetime.strptime(
             str(self.replay.date_replay), import_format)
 
+        log.info(f"Title is: {title}")
+
         # YYYY-MM-DDThh:mm:ss.sZ
         youtube_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S.0Z')
 
