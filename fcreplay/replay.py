@@ -381,6 +381,8 @@ class Replay:
         date_raw = datetime.datetime.strptime(
             str(self.replay.date_replay), import_format)
 
+        if len(title) > 100:
+            title = title[:99]
         log.info(f"Title is: {title}")
 
         # YYYY-MM-DDThh:mm:ss.sZ
