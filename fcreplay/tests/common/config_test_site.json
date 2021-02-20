@@ -38,7 +38,5 @@
   "upload_to_yt": false,
   "youtube_credentials": "UNUSED",
   "youtube_max_daily_uploads": 5,
-  "youtube_secrets": "UNUSED",
-  "yt_max_length": 120,
-  "yt_min_length": 10
+  "youtube_secrets": "UNUSED"
 }

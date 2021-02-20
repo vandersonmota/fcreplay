@@ -285,6 +285,26 @@ class Database:
         session.commit()
         session.close()
 
+    def set_youtube_uploaded(self, challenge_id, yt_bool):
+        session = self.Session()
+        session.query(Replays).filter_by(
+            id=challenge_id
+        ).update(
+            {'video_youtube_uploaded': yt_bool}
+        )
+        session.commit()
+        session.close()
+
+    def set_youtube_id(self, challenge_id, yt_id):
+        session = self.Session()
+        session.query(Replays).filter_by(
+            id=challenge_id
+        ).update(
+            {'video_youtube_id': yt_id}
+        )
+        session.commit()
+        session.close()
+
     def rerecord_replay(self, challenge_id):
         """Sets replay to be rerecorded
         """

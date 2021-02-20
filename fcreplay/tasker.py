@@ -133,7 +133,12 @@ class Tasker:
             # Check if replay has embeded video link. Easy way to do this is to check
             # if a thumbnail is created
             print(f"Checking: {replay.id}")
-            r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+            if replay.video_youtube_uploaded:
+                print(f"Checking url: http://img.youtube.com/vi/{replay.video_youtube_id}/0.jpg")
+                r = requests.get(f"http://img.youtube.com/vi/{replay.video_youtube_id}/0.jpg")
+            else:
+                print(f"Checking url: https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+                r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
 
             print(f"ID: {replay.id}, Status: {r.status_code}")
             if r.status_code == 200:
@@ -165,6 +170,7 @@ class Tasker:
             time.sleep(1)
 
     def check_video_status(self):
+        self.update_video_status()
         schedule.every(1).hour.do(self.update_video_status)
         while True:
             schedule.run_pending()

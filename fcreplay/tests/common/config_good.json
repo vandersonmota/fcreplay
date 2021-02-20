@@ -43,7 +43,5 @@
     "upload_to_yt": false,
     "youtube_credentials": "/home/fcrecorder/.youtube-upload-credentials.json",
     "youtube_max_daily_uploads": 5,
-    "youtube_secrets": "/home/fcrecorder/.client_secrets.json",
-    "yt_max_length": 120,
-    "yt_min_length": 0
+    "youtube_secrets": "/home/fcrecorder/.client_secrets.json"
 }
