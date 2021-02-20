@@ -18,6 +18,8 @@ class Replays(db.Model):
     player_requested = db.Column(db.Boolean)
     game = db.Column(db.String)
     video_processed = db.Column(db.Boolean)
+    video_youtube_uploaded = db.Column(db.Boolean)
+    video_youtube_id = db.Column(db.String)
 
 
 class Descriptions(db.Model):

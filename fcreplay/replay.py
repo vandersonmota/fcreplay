@@ -395,14 +395,6 @@ class Replay:
                 log.error("Youtube secrets don't exist")
                 return False
 
-            # Check min and max length:
-            if (int(self.replay.length) / 60) < int(self.config['yt_min_length']):
-                log.info("Replay is too short. Not uploading to youtube")
-                return False
-            if (int(self.replay.length) / 60) > int(self.config['yt_max_length']):
-                log.info("Replay is too long. Not uploading to youtube")
-                return False
-
             # Find number of uploads today
             day_log = self.db.get_youtube_day_log()
 
@@ -441,7 +433,8 @@ class Replay:
                     f"{self.config['fcadefbneo_path']}/avi/{filename}",
                 ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
-            log.info(yt_rc.stdout.decode())
+            youtube_id = yt_rc.stdout.decode().rstrip()
+            log.info(f"Youtube id: {youtube_id}")
             log.info(yt_rc.stderr.decode())
 
             if not self.replay.player_requested:
@@ -452,6 +445,9 @@ class Replay:
 
             # Remove description file
             os.remove(f"{self.config['fcreplay_dir']}/tmp/description.txt")
+
+            self.db.set_youtube_uploaded(self.replay.id, True)
+            self.db.set_youtube_id(self.replay.id, youtube_id)
 
             self.update_status(status.UPLOADED_TO_YOUTUBE)
             log.info('Finished uploading to Youtube')

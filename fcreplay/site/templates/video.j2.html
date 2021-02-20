@@ -15,6 +15,16 @@
       </p>
     </div>
     <div class="card-body">
+      {% if replay.video_youtube_uploaded -%}
+      <iframe
+        width="100%"
+        height="480"
+        src="https://www.youtube.com/embed/{{ replay.video_youtube_id }}?start={{ (seek)|int }}"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+      {% else -%}
       <iframe
         src="https://archive.org/embed/{{ replay.id.replace('@', '-') }}?start={{seek}}"
         width="100%"
@@ -24,6 +34,7 @@
         mozallowfullscreen="true"
         allowfullscreen>
       </iframe>
+      {% endif -%}
       <p class="card-description">
         <p>
           Length: {{ replay.length|convertLength }}

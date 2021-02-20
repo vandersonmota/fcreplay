@@ -60,9 +60,9 @@ RUN dpkg --add-architecture i386 && \
 RUN pip3 install --upgrade cython pip scikit-build
 
 # Fix wine sound and video recording
-RUN winetricks -q avifil32 && \
-  winetricks -q d3dx9 && \
-  winetricks sound=pulse
+RUN winetricks -q avifil32
+RUN winetricks -q d3dx9
+RUN winetricks sound=pulse
 
 # Download Fightcade linux
 RUN cd / && \

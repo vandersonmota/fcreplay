@@ -245,20 +245,6 @@ class Config:
                     'description': 'Path to youtube-secrets.json file'
                 }
             },
-            'yt_max_length': {
-                'type': 'number',
-                'meta': {
-                    'default': 120,
-                    'description': 'Maximum replay length to upload to youtube in minutes'
-                }
-            },
-            'yt_min_length': {
-                'type': 'number',
-                'meta': {
-                    'default': 10,
-                    'description': 'Minimum replay length to upload to youtube in minutes'
-                }
-            }
         }
         self.config = self.get_config()
         self.validate_config(self.config, self.schema)

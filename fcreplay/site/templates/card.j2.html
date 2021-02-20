@@ -1,7 +1,11 @@
 <div class="col-lg-4 col-md-6">
   <div class="card">
     <a href="/video/{{ replay.id }}">
+      {% if replay.video_youtube_uploaded -%}
+      <img class="card-img-top" src="http://img.youtube.com/vi/{{ replay.video_youtube_id }}/0.jpg" alt=""/>
+      {% else -%}
       <img class="card-img-top" src="https://archive.org/download/{{ replay.id.replace('@', '-') }}/__ia_thumb.jpg" alt=""/>
+      {% endif -%}
     </a>
     <div class="card-body">
       <h4 class="card-title">
