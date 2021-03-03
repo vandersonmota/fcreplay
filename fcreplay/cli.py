@@ -1,4 +1,5 @@
 from fcreplay.database import Database
+from fcreplay.getreplay import Getreplay
 import cmd2
 import pprint
 
@@ -14,6 +15,9 @@ class Cli(cmd2.Cmd):
         self.continuation_prompt = '... '
 
         self.db = Database()
+
+    add_replay_parser = cmd2.Cmd2ArgumentParser(description='Add a new replay')
+    add_replay_parser.add_argument('replay_url', help='Replay url of replay')
 
     delete_failed_parser = cmd2.Cmd2ArgumentParser(description='Delete a failed replay')
     delete_failed_parser.add_argument('challenge_id', help='Challenge id of replay')
@@ -58,6 +62,11 @@ class Cli(cmd2.Cmd):
                 return True
             if reply[:1] == 'n':
                 return False
+
+    @cmd2.with_argparser(add_replay_parser)
+    def do_add_replay(self, args):
+        Getreplay().get_replay(args.replay_url)
+        return
 
     @cmd2.with_argparser(delete_failed_parser)
     def do_delete_failed(self, args):
