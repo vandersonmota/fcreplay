@@ -151,8 +151,8 @@ class UpdateThumbnail:
         return [im, vs_font_height]
 
     def _resize_image(self, im):
-        crop_y = 75
-        im = im.crop((0, crop_y, 800, im.size[1] - crop_y))
+        crop_y = 90
+        im = im.crop((160, crop_y, 1120, im.size[1] - crop_y))
         im = im.resize((1280, 720))
         return im
 

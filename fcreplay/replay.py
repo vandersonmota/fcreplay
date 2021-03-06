@@ -213,7 +213,7 @@ class Replay:
         mencoder_options = [
             '/opt/mplayer/bin/mencoder', '-oac', 'mp3lame', '-lameopts', 'vbr=3',
             '-ovc', 'lavc', '-lavcopts', 'vcodec=ffv1',
-            '-vf', 'flip,scale=800:600,dsize=4/3',
+            '-vf', 'flip,scale=960:720,dsize=4/3,expand=1280:720:160:0::',
             *avi_files,
             '-of', 'lavf',
             '-o', f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mkv"
@@ -240,7 +240,6 @@ class Replay:
 
         ffmpeg_options = [
             'ffmpeg', '-i', f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mkv",
-            '-vf', 'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:-1:-1:color=black',
             '-c:v', 'libx265', '-crf', '26',
             '-preset', 'medium',
             '-c:a', 'copy',
