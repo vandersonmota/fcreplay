@@ -314,9 +314,6 @@
 	"savagere": {
 		"game_name": "Savage Reign"
 	},
-	"sdodgeb": {
-		"game_name": "Super Dodge Ball"
-	},
 	"sengoku": {
 		"game_name": "Sengoku"
 	},
@@ -415,6 +412,9 @@
 	},
 	"viostorm": {
 		"game_name": "Violent Storm"
+	},
+	"vampjr1": {
+		"game_name": "Vampire - the night warriors"
 	},
 	"vsavj": {
 		"game_name": "Vampire Savior - the lord of vampire"
