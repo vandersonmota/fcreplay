@@ -36,10 +36,12 @@ class Record:
 
     def cleanup_tasks(self):
         # Need to kill a bunch of processes and restart pulseaudio
+        log.info("Killing fcadefbneo, wine, system32 and pulseaudio")
         subprocess.run(['pkill', '-9', 'fcadefbneo'])
         subprocess.run(['pkill', '-9', 'wine'])
         subprocess.run(['pkill', '-9', '-f', 'system32'])
         subprocess.run(['/usr/bin/pulseaudio', '-k'])
+        log.info("Tasks killed")
 
     def find_record_dialog(self):
         # Look for recording dialog
@@ -118,6 +120,8 @@ class Record:
             if running_time > fc_time:
                 overlay_detection.stop()
 
+                log.info("Stopping recording")
+
                 # We need to manually stop the recording. Move the mouse into the
                 # fcadefbneo window, press alt, then down*7, then enter/return.
                 pyautogui.moveTo(700, 384)
@@ -145,6 +149,8 @@ class Record:
                 # Sleep for 2 seconds here in case there is some sort of delay writing file
                 time.sleep(2)
                 self.cleanup_tasks()
+
+                log.info("Recording stopped")
                 return "Pass"
 
             # Kill Timeout reached

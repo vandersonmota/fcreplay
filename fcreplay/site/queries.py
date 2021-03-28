@@ -42,6 +42,12 @@ def character_detect(challenge_id):
     ).all()
 
 
+def player_search(player_id):
+    return Replays.query.filter(
+        (Replays.p1 == player_id) | (Replays.p2 == player_id)
+    )
+
+
 def basic_search(game_id, search_query, order_string):
     return Replays.query.filter(
         Replays.created == True,

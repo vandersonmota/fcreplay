@@ -23,10 +23,10 @@
       <h6 class="font-weight-bold mb-1">
         <img src='assets/img/flags/{{ replay.p1_loc.lower() }}.png' alt='{{ replay.p1_loc.lower() }}' title='{{ replay.p1_loc.lower() }}'>
         <img src='assets/img/ranks/rank{{ replay.p1_rank }}-small.png' alt='{{ replay.p1_rank }}' title='{{ replay.p1_rank }}'>
-        {{ replay.p1 }} vs
+        <a href="/search/player/{{ replay.p1 }}">{{ replay.p1 }}</a> vs
         <img src='assets/img/flags/{{ replay.p2_loc.lower() }}.png' alt='{{ replay.p2_loc.lower() }}' title='{{ replay.p2_loc.lower() }}'>
         <img src='assets/img/ranks/rank{{ replay.p2_rank }}-small.png' alt='{{ replay.p2_rank }}' title='{{ replay.p2_rank }}'>
-        {{ replay.p2 }}
+        <a href="/search/player/{{ replay.p2 }}">{{ replay.p2 }}</a> vs
       </h6>
     </div>
   </div>

@@ -227,6 +227,23 @@ def search():
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
 
 
+@app.route('/search/player/<player_name>')
+def search_player_name(player_name):
+    session['player_name'] = player_name
+    return redirect(url_for('blueprint.player_name'))
+
+
+@app.route('/player_name')
+def player_name():
+    searchForm = SearchForm()
+    player_name = session['player_name']
+    page = request.args.get('page', 1, type=int)
+    pagination = queries.player_search(player_name).paginate(page, per_page=9)
+    replays = pagination.items
+
+    return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
+
+
 @app.route('/robots.txt')
 @app.route('/ads.txt')
 def robots():
@@ -241,7 +258,7 @@ def sitemap():
     return render_template('sitemap.j2.xml', update_date=update_date)
 
 
-@app.route('/video/<challenge_id>',)
+@app.route('/video/<challenge_id>')
 def videopage(challenge_id):
     searchForm = SearchForm()
 

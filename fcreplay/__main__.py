@@ -88,7 +88,10 @@ def main():
     elif args['instance']:
         i = Instance()
         i.debug = args['--debug']
-        i.main()
+        try:
+            i.main()
+        except Exception as e:
+            print(f"Unhandled exception: {e}")
 
 
 if __name__ == "__main__":
