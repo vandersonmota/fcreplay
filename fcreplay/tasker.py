@@ -135,10 +135,18 @@ class Tasker:
             print(f"Checking: {replay.id}")
             if replay.video_youtube_uploaded:
                 print(f"Checking url: http://img.youtube.com/vi/{replay.video_youtube_id}/0.jpg")
-                r = requests.get(f"http://img.youtube.com/vi/{replay.video_youtube_id}/0.jpg")
+                try:
+                    r = requests.get(f"http://img.youtube.com/vi/{replay.video_youtube_id}/0.jpg")
+                except Exception as e:
+                    print(f"Caught exception: {e}, when checking {replay.id}")
+                    continue
             else:
                 print(f"Checking url: https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
-                r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+                try:
+                    r = requests.get(f"https://archive.org/download/{replay.id.replace('@', '-')}/__ia_thumb.jpg")
+                except Exception as e:
+                    print(f"Caught exception: {e}, when checking {replay.id}")
+                    continue
 
             print(f"ID: {replay.id}, Status: {r.status_code}")
             if r.status_code == 200:
