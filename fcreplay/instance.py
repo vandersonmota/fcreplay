@@ -44,11 +44,10 @@ class Instance:
             replay.add_job()
             replay.record()
             replay.get_characters()
-            replay.encode_lossless()
+            replay.encode()
             replay.remove_old_avi_files()
             replay.create_thumbnail()
             replay.update_thumbnail()
-            replay.encode()
             replay.set_description()
             if self.config['upload_to_ia']:
                 replay.upload_to_ia()

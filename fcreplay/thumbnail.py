@@ -41,7 +41,7 @@ class Thumbnail:
         Returns:
             [string]: Full path to thumbnail
         """
-        self._create_thumbnails_fullframe(f"{self.config['fcadefbneo_path']}/avi/{replay.id}.mkv")
+        self._create_thumbnails_fullframe(f"{self.config['fcadefbneo_path']}/avi/{replay.id}.mp4")
         thumbnails = self._get_thumbnails()
 
         # Sort files by size. Assuming files that have the largest size have more entpoy

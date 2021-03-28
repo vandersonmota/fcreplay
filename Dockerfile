@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y \
   libogg-dev libxvidcore-dev libspeex-dev libvpx-dev libdv4-dev \
   libopencore-amrnb-dev libopencore-amrwb-dev libmp3lame-dev liblivemedia-dev libtwolame-dev \
   libmad0-dev libgsm1-dev libbs2b-dev liblzo2-dev ladspa-sdk libfaad-dev \
-  libmpg123-dev libopus-dev libbluray-dev libaacs-dev \
+  libmpg123-dev libopus-dev libbluray-dev libaacs-dev libx264-dev \
   yasm build-essential
 
 RUN cd /opt && \

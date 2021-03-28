@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import traceback
+import time
 
 log = logging.getLogger('fcreplay')
 
@@ -57,6 +58,8 @@ class Replay:
 
                 if self.config['kill_all']:
                     subprocess.run('killall5')
+
+                time.sleep(5)
                 sys.exit(1)
 
         return failed
@@ -193,7 +196,7 @@ class Replay:
         return avi_files
 
     @handle_fail
-    def encode_lossless(self):
+    def encode(self):
         log.info("Encoding lossless file")
 
         avi_files_list_glob = glob.glob(f"{self.config['fcadefbneo_path']}/avi/*.avi")
@@ -212,11 +215,11 @@ class Replay:
         # 2. The files that fbneo generates need to be transcoded before they are encoded to h264 (h265 doesn't work well with archive.org)
         mencoder_options = [
             '/opt/mplayer/bin/mencoder', '-oac', 'mp3lame', '-lameopts', 'vbr=3',
-            '-ovc', 'lavc', '-lavcopts', 'vcodec=ffv1',
+            '-ovc', 'x264', '-x264encopts', 'preset=slow:threads=auto',
             '-vf', 'flip,scale=960:720,dsize=4/3,expand=1280:720:160:0::',
             *avi_files,
             '-of', 'lavf',
-            '-o', f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mkv"
+            '-o', f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mp4"
         ]
 
         log.info(f"Running mencoder with: {' '.join(mencoder_options)}")
@@ -230,33 +233,6 @@ class Replay:
             mencoder_rc.check_returncode()
         except subprocess.CalledProcessError as e:
             log.error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {mencoder_rc.stdout}, stderr: {mencoder_rc.stderr}")
-            raise e
-
-    @handle_fail
-    def encode(self):
-        """Encode lossy file for upload
-        """
-        log.info('Encoding lossy file for upload')
-
-        ffmpeg_options = [
-            'ffmpeg', '-i', f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mkv",
-            '-c:v', 'libx264', '-crf', '23',
-            '-preset', 'medium',
-            '-c:a', 'copy',
-            f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}-lossy.mp4",
-        ]
-
-        log.info(f"Running ffmpeg with: {' '. join(ffmpeg_options)}")
-
-        ffmpeg_rc = subprocess.run(
-            ffmpeg_options,
-            capture_output=True
-        )
-
-        try:
-            ffmpeg_rc.check_returncode()
-        except subprocess.CalledProcessError as e:
-            log.error(f"Unable to encode lossy file. Return code: {e.returncode}, stdout: {ffmpeg_rc.stdout}, stderr: {ffmpeg_rc.stderr}")
             raise e
 
     @handle_fail
@@ -344,7 +320,7 @@ class Replay:
         self.update_status(status.UPLOADING_TO_IA)
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}-lossy.mp4"
+        filename = f"{self.replay.id}.mp4"
         date_short = str(self.replay.date_replay)[10]
 
         # Make identifier for Archive.org
@@ -376,7 +352,7 @@ class Replay:
         self.update_status(status.UPLOADING_TO_YOUTUBE)
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}-lossy.mp4"
+        filename = f"{self.replay.id}.mp4"
         import_format = '%Y-%m-%d %H:%M:%S'
         date_raw = datetime.datetime.strptime(
             str(self.replay.date_replay), import_format)
