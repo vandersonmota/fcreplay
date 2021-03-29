@@ -10,7 +10,7 @@ class UpdateThumbnail:
     def __init__(self):
         self.config = Config().config
         self.font_path = "/opt/droid-fonts/droid/DroidSans.ttf"
-        self.flag_path = "/opt/flag-icon-css-3.5.0/flags/4x3"
+        self.flag_path = "/opt/flags/flags/4x3"
 
     def _get_font_size(self, im, text, custom_width=None):
         fontsize = 1  # starting font size
