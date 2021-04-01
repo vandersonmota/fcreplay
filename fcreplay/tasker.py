@@ -164,6 +164,8 @@ class Tasker:
         if 'MAX_INSTANCES' in os.environ:
             self.max_instances = int(os.environ['MAX_INSTANCES'])
 
+        self.check_for_replay()
+
         while True:
             schedule.run_pending()
             time.sleep(1)

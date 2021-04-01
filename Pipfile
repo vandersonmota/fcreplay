@@ -11,6 +11,7 @@ flake8 = "~=3.8"
 pytest = "~=6.1"
 autopep8 = "*"
 coverage = "*"
+bpython = "*"
 
 [packages]
 appdirs = "~=1.4"
@@ -52,7 +53,6 @@ docker = "~=4.4.0"
 python-logging-loki = "*"
 schedule = "*"
 cmd2 = "~=1.5.0"
-cairosvg = "*"
 greenlet = "<0.5"
 
 [requires]

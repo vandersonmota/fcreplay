@@ -1,7 +1,6 @@
 from PIL import Image, ImageFont, ImageDraw, ImageOps
 from fcreplay.config import Config
 import logging
-import cairosvg
 
 log = logging.getLogger('fcreplay')
 
@@ -10,7 +9,7 @@ class UpdateThumbnail:
     def __init__(self):
         self.config = Config().config
         self.font_path = "/opt/droid-fonts/droid/DroidSans.ttf"
-        self.flag_path = "/opt/flags/flags/4x3"
+        self.flag_path = "/opt/flags/png1000px/"
 
     def _get_font_size(self, im, text, custom_width=None):
         fontsize = 1  # starting font size
@@ -42,29 +41,26 @@ class UpdateThumbnail:
             return fontsize
 
     def _add_flags(self, im, p1_country: str, p2_country: str, vs_font_height: int, p1_rank_length: int, p2_rank_length: int):
-        p1_country = p1_country.lower()
-        p2_country = p2_country.lower()
+        p1_country = p1_country.lower().rstrip()
+        p2_country = p2_country.lower().rstrip()
 
         try:
-            with open(f"{self.flag_path}/{p1_country}.svg") as p1_svg:
-                cairosvg.svg2png(file_obj=p1_svg, write_to='/tmp/p1_country.png', scale=0.2)
+            p1_flag = Image.open(f'{self.flag_path}/{p1_country}.png')
+            p1_flag = p1_flag.resize((128, 96))
         except Exception:
-            log.info(f"Unable to find flag svg for p1: {p1_country}")
+            log.error(f"Unable to find flag png for p1: {p1_country}")
             raise FileNotFoundError
 
         try:
-            with open(f"/{self.flag_path}/{p2_country}.svg") as p2_svg:
-                cairosvg.svg2png(file_obj=p2_svg, write_to='/tmp/p2_country.png', scale=0.2)
+            p2_flag = Image.open(f'{self.flag_path}/{p2_country}.png')
+            p2_flag = p2_flag.resize((128, 96))
         except Exception:
-            log.info(f"Unable to find flag svg for p1: {p2_country}")
+            log.error(f"Unable to find flag png for p1: {p2_country}")
             raise FileNotFoundError
 
         # Add border to flags
-        p1_flag = Image.open('/tmp/p1_country.png')
-        p2_flag = Image.open('/tmp/p2_country.png')
-
-        p1_flag = ImageOps.expand(p1_flag, border=10, fill='black')
-        p2_flag = ImageOps.expand(p2_flag, border=10, fill='black')
+        p1_flag = ImageOps.expand(p1_flag.convert('RGB'), border=10, fill='black')
+        p2_flag = ImageOps.expand(p2_flag.convert('RGB'), border=10, fill='black')
 
         y = (25 + vs_font_height + 25)
         p1_x = (15 + p1_rank_length + 15)

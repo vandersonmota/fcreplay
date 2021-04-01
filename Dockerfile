@@ -80,7 +80,7 @@ COPY ./files/savestates/* /Fightcade/emulator/fbneo/savestates/
 
 # Download flag icons for thumbnails
 RUN cd /opt && \
-  git clone https://github.com/lipis/flag-icon-css.git ./flags
+  git clone https://github.com/hampusborgos/country-flags.git ./flags
 
 # Add fonts for thumbnails
 RUN cd /opt && \

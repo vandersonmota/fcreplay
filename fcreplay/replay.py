@@ -56,9 +56,15 @@ class Replay:
                 self.db.update_failed_replay(challenge_id=self.replay.id)
                 self.update_status(status.FAILED)
 
+                # Hacky as hell, but ensures everything gets killed
                 if self.config['kill_all']:
-                    subprocess.run('killall5')
-
+                    subprocess.run(['pkill', '-9', 'fcadefbneo'])
+                    subprocess.run(['pkill', '-9', 'wine'])
+                    subprocess.run(['pkill', '-9', '-f', 'system32'])
+                    subprocess.run(['/usr/bin/pulseaudio', '-k'])
+                    subprocess.run(['pkill', '-9', 'tail'])
+                    subprocess.run(['killall5'])
+                    subprocess.run(['pkill', '-9', 'sh'])
                 time.sleep(5)
                 sys.exit(1)
 
