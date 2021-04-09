@@ -59,9 +59,9 @@ def main():
             if args['check_video_status']:
                 Tasker().check_video_status()
             if args['retry_failed_replays']:
-                Tasker().schedule_retry_failed_replays
+                Tasker().schedule_retry_failed_replays()
             if args['delete_failed_replays']:
-                Tasker().schedule_delete_failed_replays
+                Tasker().schedule_delete_failed_replays()
 
     elif args['cli']:
         c = Cli()
