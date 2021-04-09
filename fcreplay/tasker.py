@@ -211,7 +211,7 @@ class Tasker:
 
     def schedule_delete_failed_replays(self):
         self.delete_failed_videos()
-        schedule.ever(1).hour.do(self.delete_failed_videos)
+        schedule.every(1).hour.do(self.delete_failed_videos)
         while True:
             schedule.run_pending()
             time.sleep(1)
