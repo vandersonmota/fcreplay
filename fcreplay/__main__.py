@@ -11,6 +11,8 @@ Usage:
   fcreplay instance [--debug]
   fcreplay tasker start check_top_weekly
   fcreplay tasker start check_video_status
+  fcreplay tasker start retry_failed_replays
+  fcreplay tasker start delete_failed_replays
   fcreplay tasker start recorder [--max_instances=<instances>]
   fcreplay (-h | --help)
   fcreplay --version
@@ -56,6 +58,10 @@ def main():
                 Tasker().check_top_weekly()
             if args['check_video_status']:
                 Tasker().check_video_status()
+            if args['retry_failed_replays']:
+                Tasker().schedule_retry_failed_replays
+            if args['delete_failed_replays']:
+                Tasker().schedule_delete_failed_replays
 
     elif args['cli']:
         c = Cli()

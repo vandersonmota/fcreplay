@@ -147,7 +147,7 @@ class Cli(cmd2.Cmd):
             if not self.yes_or_no("This will retry all failed replays,"):
                 return
 
-        failed_replays = self.db.get_all_failed_replays()
+        failed_replays = self.db.get_all_failed_replays(limit=1000)
         if failed_replays is None:
             print("No failed replays to retry")
         else:

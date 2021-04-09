@@ -68,6 +68,22 @@ class Tasker:
         for i in remove_instances:
             del self.started_instances[i]
 
+    def retry_failed_videos(self):
+        print('Setting failed videos to retry')
+        failed_replays = self.db.get_all_failed_replays(limit=1000)
+
+        for r in failed_replays:
+            self.db.rerecord_replay(r.id)
+            print(f"Marked failed replay {r.id} to be re-encoded")
+
+    def delete_failed_videos(self):
+        """Delete replays that have failed 5 times to record
+        """
+        failed_replays = self.db.get_all_failed_replays(limit=1000)
+        for r in failed_replays:
+            if r.fail_count >= 5:
+                self.db.delete_replay(r.challenge_id)
+
     def launch_fcreplay(self):
         print("Getting docker env")
         d_client = docker.from_env()
@@ -182,6 +198,20 @@ class Tasker:
     def check_video_status(self):
         self.update_video_status()
         schedule.every(1).hour.do(self.update_video_status)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def schedule_retry_failed_replays(self):
+        self.retry_failed_videos()
+        schedule.every(1).hour.do(self.retry_failed_videos)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def schedule_delete_failed_replays(self):
+        self.delete_failed_videos()
+        schedule.ever(1).hour.do(self.delete_failed_videos)
         while True:
             schedule.run_pending()
             time.sleep(1)

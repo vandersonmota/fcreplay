@@ -66,6 +66,28 @@ services:
     depends_on:
       - postgres
 
+  fcreplay-tasker-retry_failed_replays:
+    image: fcreplay/image:latest
+    command: "fcreplay tasker start retry_failed_replays"
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
+    networks:
+      - postgres
+      - world
+    depends_on:
+      - postgres
+
+  fcreplay-tasker-delete_failed_replays:
+    image: fcreplay/image:latest
+    command: "fcreplay tasker start delete_failed_replays"
+    volumes:
+      - /path/to/config.json:/root/config.json:ro
+    networks:
+      - postgres
+      - world
+    depends_on:
+      - postgres
+
   postgres:
     container_name: postgres_container
     image: postgres
