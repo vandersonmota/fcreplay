@@ -228,11 +228,20 @@ class Database:
 
     def update_failed_replay(self, challenge_id):
         session = self.Session()
+        failed_replay = session.query(Replays).filter_by(
+            id=challenge_id
+        ).first()
+        if not isinstance(failed_replay.fail_count, int):
+            n = 1
+        else:
+            n = failed_replay.fail_count + 1
+
         session.query(Replays).filter_by(
             id=challenge_id
         ).update(
             {
-                'failed': True
+                'failed': True,
+                'fail_count': n
             }
         )
         session.commit()

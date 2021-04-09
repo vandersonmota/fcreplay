@@ -41,6 +41,7 @@ class Replays(Base):
     video_processed = Column(Boolean)
     video_youtube_uploaded = Column(Boolean)
     video_youtube_id = Column(String)
+    fail_count = Column(Integer)
 
 
 class Youtube_day_log(Base):

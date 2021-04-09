@@ -20,6 +20,7 @@ class Replays(db.Model):
     video_processed = db.Column(db.Boolean)
     video_youtube_uploaded = db.Column(db.Boolean)
     video_youtube_id = db.Column(db.String)
+    fail_count = db.Column(db.Integer)
 
 
 class Descriptions(db.Model):
