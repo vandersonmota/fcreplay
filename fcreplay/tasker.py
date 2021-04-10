@@ -15,6 +15,7 @@ class Tasker:
         self.started_instances = {}
         self.db = Database()
         self.max_instances = 1
+        self.max_fails = 5
 
     def check_for_replay(self):
         if self.number_of_instances() >= self.max_instances:
@@ -73,16 +74,17 @@ class Tasker:
         failed_replays = self.db.get_all_failed_replays(limit=1000)
 
         for r in failed_replays:
-            self.db.rerecord_replay(r.id)
-            print(f"Marked failed replay {r.id} to be re-encoded")
+            if r.fail_count < self.max_fails:
+                self.db.rerecord_replay(r.id)
+                print(f"Marked failed replay {r.id} to be re-encoded")
 
     def delete_failed_videos(self):
         """Delete replays that have failed 5 times to record
         """
         failed_replays = self.db.get_all_failed_replays(limit=1000)
         for r in failed_replays:
-            if r.fail_count >= 5:
-                self.db.delete_replay(r.challenge_id)
+            if r.fail_count >= self.max_fails:
+                self.db.delete_replay(r.id)
 
     def launch_fcreplay(self):
         print("Getting docker env")
