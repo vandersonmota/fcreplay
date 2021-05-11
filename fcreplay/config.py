@@ -192,6 +192,14 @@ class Config:
                     'description': 'Time in seconds before marking a replay as failed if start not detected'
                 }
             },
+            'remove_old_avi_files': {
+                'type': 'boolean',
+                'required': True,
+                'meta': {
+                    'default': True,
+                    'description': 'Remove old raw avi files.'
+                }
+            },
             'secret_key': {
                 'type': 'string',
                 'required': True,
