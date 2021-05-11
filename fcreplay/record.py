@@ -6,6 +6,7 @@ import os
 import subprocess
 import threading
 import time
+import collections
 
 from fcreplay.config import Config
 from fcreplay.overlay_detection import OverlayDetection
@@ -29,6 +30,7 @@ class Record:
                 '/usr/bin/wine',
                 f'{fcadefbneo_path}/fcadefbneo.exe',
                 f'quark:stream,{game_name},{fc_challenge_id}.2,7100',
+                'lua\\framecount.lua',
                 '-q'
             ],
             env=running_env
@@ -58,6 +60,10 @@ class Record:
                     pyautogui.click()
                     return True
         return False
+
+    def get_running_time(self, fcadefbneo_path):
+        with open(f"{fcadefbneo_path}/lua/framecount.txt", 'r') as f:
+            return int(f.readline().strip())
 
     def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, game_name=None):
         log.info('Starting pulseaudio')
@@ -108,16 +114,26 @@ class Record:
         self.begin_time = datetime.datetime.now()
         minute_count = -1
 
+        # Initalise the framecount. Do this by setting up a 'queue' with a
+        # maximum length of 10. Then append each time to it. The 'last'
+        # element of the queue is the current time.
+        running_time = collections.deque(maxlen=10)
+
+        # Append two elements so that the queue isn't empty
+        running_time.append(-1)
+        running_time.append(0)
+
         while True:
-            running_time = (datetime.datetime.now() - self.begin_time).seconds
+            # Add the current running time to the queue
+            running_time.append(self.get_running_time(fcadefbneo_path))
 
             # Log what minute we are on
-            if (running_time % 60) == 0 and int(running_time / 60) != minute_count:
-                log.info(f'Minute: {int(running_time/60)} of {int(fc_time/60)}')
-                minute_count = int(running_time / 60)
+            if (running_time[-1] % 60) == 0 and int(running_time[-1] / 60) != minute_count:
+                log.info(f'Minute: {int(running_time[-1]/60)} of {int(fc_time/60)}')
+                minute_count = int(running_time[-1] / 60)
 
-            # Finished recording video
-            if running_time > fc_time:
+            # Finished recording video if all elements of the queue are the same
+            if len(set(running_time)) == 1:
                 overlay_detection.stop()
 
                 log.info("Stopping recording")
@@ -154,6 +170,6 @@ class Record:
                 return "Pass"
 
             # Kill Timeout reached
-            if running_time > (running_time + kill_time):
+            if running_time[-1] > (running_time[-1] + kill_time):
                 return "FailTimeout"
             time.sleep(0.2)

@@ -45,18 +45,16 @@ class Instance:
             replay.record()
             replay.get_characters()
             replay.encode()
-            replay.remove_old_avi_files()
+            if self.config['remove_old_avi_files']:
+                replay.remove_old_avi_files()
             replay.create_thumbnail()
             replay.update_thumbnail()
             replay.set_description()
             if self.config['upload_to_ia']:
                 replay.upload_to_ia()
-
             if self.config['upload_to_yt']:
                 replay.upload_to_yt()
-
             replay.remove_job()
-
             replay.db.update_created_replay(challenge_id=replay.replay.id)
             replay.set_created()
 

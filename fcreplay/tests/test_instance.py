@@ -89,7 +89,7 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'remove_old_avi_files': True}
             instance.debug = True
 
             instance.main()
@@ -103,7 +103,7 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': True, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': False, 'upload_to_yt': True, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'remove_old_avi_files': True}
             instance.debug = True
 
             instance.main()
@@ -120,7 +120,7 @@ class TestInstance:
 
             instance = Instance()
 
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config = {'upload_to_ia': False, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'remove_old_avi_files': True}
             instance.debug = True
 
             instance.main()

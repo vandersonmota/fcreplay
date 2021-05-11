@@ -73,10 +73,19 @@ RUN cd / && \
   rm -rf /linux
 
 # Pre-create 'fightcade' directory
-RUN mkdir /Fightcade/emulator/fbneo/fightcade
+RUN mkdir -p /Fightcade/emulator/fbneo/fightcade
 
 # Copy any 'custom/missing' savestates
 COPY ./files/savestates/* /Fightcade/emulator/fbneo/savestates/
+
+# Pre-create 'lua' direcory
+RUN mkdir -p /Fightcade/emulator/fbneo/lua
+
+# Copy lua script
+COPY ./files/framecount.lua /Fightcade/emulator/fbneo/lua/
+
+# Create empty framecount.txt
+RUN echo 0 > /Fightcade/emulator/fbneo/lua/framecount.txt
 
 # Download flag icons for thumbnails
 RUN cd /opt && \

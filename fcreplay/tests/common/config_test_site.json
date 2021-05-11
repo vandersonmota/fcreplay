@@ -32,6 +32,7 @@
   "player_replay_first": true,
   "random_replay": false,
   "record_timeout": 120,
+  "remove_old_avi_files": true,
   "secret_key": "SOME_TEST_SECERT_KEY",
   "sql_baseurl": "",
   "upload_to_ia": false,
