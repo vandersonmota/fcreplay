@@ -63,7 +63,13 @@ class Record:
 
     def get_running_time(self, fcadefbneo_path):
         with open(f"{fcadefbneo_path}/lua/framecount.txt", 'r') as f:
-            return int(f.readline().strip())
+            running_time = f.readline().strip()
+
+        if not isinstance(running_time, int):
+            log.error(f"Running time is not an integer. Running time: {running_time}")
+            raise TypeError
+
+        return running_time
 
     def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, game_name=None):
         log.info('Starting pulseaudio')
