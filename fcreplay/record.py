@@ -65,9 +65,19 @@ class Record:
         with open(f"{fcadefbneo_path}/lua/framecount.txt", 'r') as f:
             running_time = f.readline().strip()
 
-        if not isinstance(running_time, int):
-            log.error(f"Running time is not an integer. Running time: {running_time}")
-            raise TypeError
+        retry = 5
+
+        while retry >= 1:
+            try:
+                running_time = int(running_time)
+                break
+            except Exception as e:
+                retry -= 1
+                if retry <= 0:
+                    log.error(f"Running time is not an integer. Running time: {running_time}, exception: {e}")
+                    raise TypeError
+                time.sleep(0.1)
+                continue
 
         return running_time
 
