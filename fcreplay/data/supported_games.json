@@ -122,6 +122,9 @@
 	"hsf2": {
 		"game_name": "Hyper Street Fighter II: The Anniversary Edition"
 	},
+	"jchan": {
+		"game_name": "Jackie Chan - The Kung-Fu Master"
+	},
 	"jchan2": {
 		"game_name": "Jackie Chan in Fists of Fire"
 	},
@@ -322,6 +325,9 @@
 	},
 	"sengoku3": {
 		"game_name": "Sengoku 3"
+	},
+	"sf": {
+		"game_name": "Street Fighter"
 	},
 	"sf2ce": {
 		"game_name": "Street Fighter II' - Champion Edition"
