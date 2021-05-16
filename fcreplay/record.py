@@ -62,12 +62,11 @@ class Record:
         return False
 
     def get_running_time(self, fcadefbneo_path):
-        with open(f"{fcadefbneo_path}/lua/framecount.txt", 'r') as f:
-            running_time = f.readline().strip()
-
         retry = 5
-
         while retry >= 1:
+            with open(f"{fcadefbneo_path}/lua/framecount.txt", 'r') as f:
+                running_time = f.readline().strip()
+
             try:
                 running_time = int(running_time)
                 break
