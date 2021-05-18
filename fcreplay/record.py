@@ -25,7 +25,7 @@ class Record:
         log.info(f"/usr/bin/wine {fcadefbneo_path}/fcadefbneo.exe quark:stream,{game_name},{fc_challenge_id}.2,7100 -q")
         running_env = os.environ.copy()
         running_env['WINEDLLOVERRIDES'] = "avifil32=n,b"
-        fbneo_rc = subprocess.run(
+        subprocess.run(
             [
                 '/usr/bin/wine',
                 f'{fcadefbneo_path}/fcadefbneo.exe',
@@ -82,7 +82,7 @@ class Record:
 
     def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, game_name=None):
         log.info('Starting pulseaudio')
-        pulseaudio_rc = subprocess.Popen(
+        subprocess.Popen(
             ['pulseaudio', '-v', '--exit-idle-time=-1'],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL

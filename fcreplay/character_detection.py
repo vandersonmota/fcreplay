@@ -1,16 +1,24 @@
+"""Character Detection.
+
+This class is used to take the overlay data from a pickle file
+and generate a list of times characters were detected
+"""
+
 import pickle
 import datetime
 
 
 class CharacterDetection:
+    """Character detection class from pickle file."""
+
     def __init__(self):
+        """Initiliser."""
         self.pickle_path = '/Fightcade/emulator/fbneo/avi/overlay.pickle'
         self.video_start_time = None
         self.timeline = []
 
     def _load_overlay_pickle(self) -> dict:
-        """Returns a dict containing overlay data
-        """
+        """Return a dict containing overlay data."""
         with open(self.pickle_path, 'rb') as f:
             overlay_data = pickle.load(f)
             self.video_start_time = overlay_data.pop(0)['start_time']
@@ -18,7 +26,7 @@ class CharacterDetection:
         return overlay_data
 
     def _characters_exist(self) -> bool:
-        """Check to see if p1character or p2character exists in overlay data
+        """Check to see if p1character or p2character exists in overlay data.
 
         Returns:
             bool
@@ -30,7 +38,7 @@ class CharacterDetection:
         return False
 
     def _get_video_time(self, detection_time) -> str:
-        """Returns the video time return as a string
+        """Return the video time return as a string.
 
         Args:
             detection_time (Datetime): Datetime of when a detection event happened
@@ -47,7 +55,7 @@ class CharacterDetection:
             return formatted_time
 
     def _time_too_soon(self, new_time):
-        """Checks time against previous time, if it's within a 5 seconds, then return true else return false
+        """Check time against previous time, if it's within a 5 seconds, then return true else return false.
 
         Args:
             new_time (int): <seconds>
@@ -66,7 +74,7 @@ class CharacterDetection:
             return False
 
     def _create_timeline(self) -> list:
-        """Creates a timeline of character changes
+        """Create a timeline of character changes.
 
         Returns:
             list: [[str: p1character, str: p2character, str: time]...]
@@ -92,6 +100,12 @@ class CharacterDetection:
         return self.timeline
 
     def get_characters(self):
+        """Get characters.
+
+        Returns:
+            list: Returns a nested list of characters and the time they were discovered,
+                  eg: [['p1char', 'p2char', '0:01']]
+        """
         self.overlay_data = self._load_overlay_pickle()
 
         if self._characters_exist():

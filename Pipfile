@@ -12,6 +12,9 @@ pytest = "~=6.1"
 autopep8 = "*"
 coverage = "*"
 bpython = "*"
+pydocstyle = "*"
+pycodestyle = "*"
+mypy = "*"
 
 [packages]
 appdirs = "~=1.4"
