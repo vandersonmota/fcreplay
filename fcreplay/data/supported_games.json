@@ -650,6 +650,13 @@
             3
         ]
     },
+	"raiden2": {
+		"game_name": "Raiden II (US, set 1)",
+		"aspect_ratio": [
+			3,
+			4
+		]
+	},
     "rbff1": {
         "game_name": "Real Bout Fatal Fury",
         "aspect_ratio": [
