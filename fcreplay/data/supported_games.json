@@ -1,4 +1,25 @@
 {
+    "1941": {
+        "game_name": "1941 - Counter Attack",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
+    "1943": {
+        "game_name": "1943: The Battle of Midway",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
+    "19xx": {
+        "game_name": "19XX - the war against destiny",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "2020bb": {
         "game_name": "2020 Super Baseball",
         "aspect_ratio": [
@@ -18,6 +39,13 @@
         "aspect_ratio": [
             4,
             3
+        ]
+    },
+    "agallet": {
+        "game_name": "Air Gallet",
+        "aspect_ratio": [
+            3,
+            4
         ]
     },
     "altbeast": {
@@ -90,6 +118,13 @@
             3
         ]
     },
+    "batsugun": {
+        "game_name": "Batsugun",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "breakers": {
         "game_name": "Breakers",
         "aspect_ratio": [
@@ -132,6 +167,13 @@
             3
         ]
     },
+    "cawing": {
+        "game_name": "Carrier Air Wing / US Navy",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "crimfght": {
         "game_name": "Crime Fighters",
         "aspect_ratio": [
@@ -165,6 +207,41 @@
         "aspect_ratio": [
             4,
             3
+        ]
+    },
+    "darius": {
+        "game_name": "Darius",
+        "aspect_ratio": [
+            12,
+            3
+        ]
+    },
+    "darius2": {
+        "game_name": "Darius II (Triple Screen)",
+        "aspect_ratio": [
+            12,
+            3
+        ]
+    },
+    "dariusg": {
+        "game_name": "Darius Gaiden - Silver Hawk",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "dariusgx": {
+        "game_name": "Darius Gaiden - Silver Hawk Extra Version",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "ddonpach": {
+        "game_name": "DoDonPachi",
+        "aspect_ratio": [
+            3,
+            4
         ]
     },
     "ddragon": {
@@ -216,6 +293,27 @@
             3
         ]
     },
+    "ecofghtr": {
+        "game_name": "Eco Fighters",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "esprade": {
+        "game_name": "ESP Ra.De",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
+    "exedexes": {
+        "game_name": "Exed Exes",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "fatfursp": {
         "game_name": "Fatal Fury Special",
         "aspect_ratio": [
@@ -237,8 +335,22 @@
             3
         ]
     },
+    "fireshrk": {
+        "game_name": "Fire Shark",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "flipshot": {
         "game_name": "Battle Flip Shot",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "forgottn": {
+        "game_name": "Forgotten Worlds",
         "aspect_ratio": [
             4,
             3
@@ -253,6 +365,13 @@
     },
     "garou": {
         "game_name": "Garou - Mark of the Wolves",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "gigawing": {
+        "game_name": "Giga Wing",
         "aspect_ratio": [
             4,
             3
@@ -279,8 +398,22 @@
             3
         ]
     },
+    "guwange": {
+        "game_name": "Guwange",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "hsf2": {
         "game_name": "Hyper Street Fighter II: The Anniversary Edition",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "inthunt": {
+        "game_name": "In The Hunt",
         "aspect_ratio": [
             4,
             3
@@ -319,6 +452,13 @@
         "aspect_ratio": [
             4,
             3
+        ]
+    },
+    "ket": {
+        "game_name": "Ketsui Kizuna Jigoku Tachi",
+        "aspect_ratio": [
+            3,
+            4
         ]
     },
     "kizuna": {
@@ -419,11 +559,25 @@
             3
         ]
     },
+    "lastduel": {
+        "game_name": "Last Duel",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "lbowling": {
         "game_name": "League Bowling",
         "aspect_ratio": [
             4,
             3
+        ]
+    },
+    "lwings": {
+        "game_name": "Legendary Wings",
+        "aspect_ratio": [
+            3,
+            4
         ]
     },
     "magdrop3": {
@@ -475,6 +629,13 @@
             3
         ]
     },
+    "mmatrix": {
+        "game_name": "Mars Matrix",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "msh": {
         "game_name": "Marvel Super Heroes",
         "aspect_ratio": [
@@ -491,13 +652,6 @@
     },
     "mslug": {
         "game_name": "Metal Slug - Super Vehicle-001",
-        "aspect_ratio": [
-            4,
-            3
-        ]
-    },
-    "mslugdg": {
-        "game_name": "Metal Slug (Multifunction Hack)",
         "aspect_ratio": [
             4,
             3
@@ -561,6 +715,13 @@
     },
     "mslug5g": {
         "game_name": "Metal Slug 5 (Multifunction Hack)",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslugdg": {
+        "game_name": "Metal Slug (Multifunction Hack)",
         "aspect_ratio": [
             4,
             3
@@ -643,6 +804,13 @@
             3
         ]
     },
+    "progear": {
+        "game_name": "Progear",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "punisher": {
         "game_name": "The Punisher",
         "aspect_ratio": [
@@ -650,13 +818,27 @@
             3
         ]
     },
-	"raiden2": {
-		"game_name": "Raiden II (US, set 1)",
-		"aspect_ratio": [
-			3,
-			4
-		]
-	},
+    "raiden": {
+        "game_name": "Raiden",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
+    "raiden2": {
+        "game_name": "Raiden II (US, set 1)",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
+    "raidendx": {
+        "game_name": "Raiden DX",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "rbff1": {
         "game_name": "Real Bout Fatal Fury",
         "aspect_ratio": [
@@ -706,6 +888,20 @@
             3
         ]
     },
+    "rtypeleo": {
+        "game_name": "R-Type Leo",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "salamand": {
+        "game_name": "Salamander",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "samsh5sp": {
         "game_name": "Samurai Shodown V Special",
         "aspect_ratio": [
@@ -743,6 +939,13 @@
     },
     "savagere": {
         "game_name": "Savage Reign",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "sdodgeb": {
+        "game_name": "Super Dodge Ball",
         "aspect_ratio": [
             4,
             3
@@ -832,6 +1035,13 @@
             3
         ]
     },
+    "sidearms": {
+        "game_name": "Side Arms - Hyper Dyne",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "simpsons2p": {
         "game_name": "The Simpsons",
         "aspect_ratio": [
@@ -851,6 +1061,13 @@
         "aspect_ratio": [
             4,
             3
+        ]
+    },
+    "spcinv95": {
+        "game_name": "Space Invaders '95: The Attack Of Lunar Loonies",
+        "aspect_ratio": [
+            3,
+            4
         ]
     },
     "spf2t": {
@@ -909,13 +1126,6 @@
             3
         ]
     },
-    "sdodgeb": {
-        "game_name": "Super Dodge Ball",
-        "aspect_ratio": [
-            4,
-            3
-        ]
-    },
     "svc": {
         "game_name": "SNK vs. Capcom - SVC Chaos",
         "aspect_ratio": [
@@ -951,6 +1161,13 @@
             3
         ]
     },
+    "truxton2": {
+        "game_name": "Truxton II / Tatsujin-Oh",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
     "turfmast": {
         "game_name": "Neo Turf Masters",
         "aspect_ratio": [
@@ -979,8 +1196,8 @@
             3
         ]
     },
-    "viostorm": {
-        "game_name": "Violent Storm",
+    "unsquad": {
+        "game_name": "Area 88 / UN Squadron",
         "aspect_ratio": [
             4,
             3
@@ -988,6 +1205,34 @@
     },
     "vampjr1": {
         "game_name": "Vampire - the night warriors",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "varth": {
+        "game_name": "Varth - Operatio Thunderstorm",
+        "aspect_ratio": [
+            3,
+            4
+        ]
+    },
+    "vhunt2": {
+        "game_name": "Vampire Hunter 2 - darkstalkers revenge",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "vhuntjr2": {
+        "game_name": "Vampire Hunter - darkstalkers' revenge",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "viostorm": {
+        "game_name": "Violent Storm",
         "aspect_ratio": [
             4,
             3
@@ -1009,20 +1254,6 @@
     },
     "vsavj": {
         "game_name": "Vampire Savior - the lord of vampire",
-        "aspect_ratio": [
-            4,
-            3
-        ]
-    },
-    "vhuntjr2": {
-        "game_name": "Vampire Hunter - darkstalkers' revenge",
-        "aspect_ratio": [
-            4,
-            3
-        ]
-    },
-    "vhunt2": {
-        "game_name": "Vampire Hunter 2 - darkstalkers revenge",
         "aspect_ratio": [
             4,
             3

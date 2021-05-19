@@ -1,4 +1,3 @@
-from cerberus import Validator
 import json
 import pkg_resources
 
@@ -12,6 +11,10 @@ class TestSupprtedGames:
                     'game_name': {
                         'type': 'string',
                         'required': True,
+                    },
+                    'aspect_ratio': {
+                        'type': 'list',
+                        'required': True
                     }
                 }
             }
@@ -20,8 +23,12 @@ class TestSupprtedGames:
         with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
             supported_games = json.load(f)
 
-        v = Validator(allow_unknown=True)
-        assert v.validate(supported_games, schema)
+        for gameid in supported_games:
+            if 'game_name' not in supported_games[gameid]:
+                assert False, f"Game name not present for {gameid}"
+
+            if 'aspect_ratio' not in supported_games[gameid]:
+                assert False, f"Aspect ratio not present for {gameid}"
 
     def test_duplicated_games(self):
         with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
