@@ -1,3 +1,11 @@
+"""Thumbnail generation.
+
+This class is return a 'high entropy' thumbnail
+
+The get_thumbnails function will generate thumbnails ever 10 seconds then
+return the path to the thumbnail with the highest entroy
+"""
+
 from fcreplay.config import Config
 from PIL import Image
 import glob
@@ -10,6 +18,7 @@ log = logging.getLogger('fcreplay')
 
 class Thumbnail:
     def __init__(self):
+        """Class initiliser."""
         self.config = Config().config
 
     def _create_thumbnails_fullframe(self, video_file_path):
@@ -33,13 +42,13 @@ class Thumbnail:
         return im.entropy()
 
     def get_thumbnail(self, replay):
-        """[summary]
+        """get_thumbnail.
 
         Args:
             replay ([sqlalchemy_object]): Sqlalchemy object for replay
 
         Returns:
-            [string]: Full path to thumbnail
+            string: Full path to thumbnail
         """
         self._create_thumbnails_fullframe(f"{self.config['fcadefbneo_path']}/avi/{replay.id}.mp4")
         thumbnails = self._get_thumbnails()

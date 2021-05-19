@@ -16,6 +16,7 @@ class TestReplay:
     @patch('fcreplay.replay.Config')
     def test_encode(self, mock_config, mock_database, mock_subprocess):
         r = Replay()
+        r.replay.game = '2020bb'
 
         with tempfile.TemporaryDirectory() as single_file_dir:
             os.mkdir(f"{single_file_dir}/avi")

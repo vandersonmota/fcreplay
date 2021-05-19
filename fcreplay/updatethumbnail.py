@@ -1,3 +1,10 @@
+"""Update a thumbnail with player information
+
+This class will add player information to a thumbnail, such as:
+  * Player name
+  * Player location
+  * Rank
+"""
 from PIL import Image, ImageFont, ImageDraw, ImageOps
 from fcreplay.config import Config
 import logging
@@ -146,11 +153,17 @@ class UpdateThumbnail:
         draw.text((x, 25), vs_text, font=vs_font, fill=fill_color, stroke_width=10, stroke_fill=stroke_color)
         return [im, vs_font_height]
 
-    def _resize_image(self, im):
-        crop_y = 90
-        im = im.crop((160, crop_y, 1120, im.size[1] - crop_y))
-        im = im.resize((1280, 720))
-        return im
+    def _resize_image(self, im: Image.Image):
+        if im.size[0] == 1280:
+            crop_y = 90
+            im = im.crop((160, crop_y, 1120, im.size[1] - crop_y))
+            im = im.resize((1280, 720))
+            return im
+        else:
+            crop_y = 370
+            im = im.crop((0, crop_y, 720, im.size[1] - crop_y))
+            im = im.resize((1280, 720))
+            return im
 
     def update_thumbnail(self, replay, thumbnail):
         log.info(f"Opening thumbnail: {str(thumbnail)}")

@@ -17,7 +17,7 @@ class Tasker:
         self.max_instances = 1
         self.max_fails = 5
 
-    def check_for_replay(self):
+    def check_for_replay(self) -> bool:
         if self.number_of_instances() >= self.max_instances:
             print(f"Maximum number of instances ({self.max_instances}) reached")
             return False
@@ -38,7 +38,7 @@ class Tasker:
         print("No replays")
         return False
 
-    def number_of_instances(self):
+    def number_of_instances(self) -> int:
         d_client = docker.from_env()
         containers = d_client.containers.list()
 
@@ -49,7 +49,7 @@ class Tasker:
 
         return instance_count
 
-    def running_instance(self, instance_hostname):
+    def running_instance(self, instance_hostname) -> bool:
         d_client = docker.from_env()
         for i in d_client.containers.list():
             if instance_hostname in i.attrs['Config']['Hostname']:
