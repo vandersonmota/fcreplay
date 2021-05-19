@@ -594,6 +594,13 @@
             3
         ]
     },
+    "metalb": {
+        "game_name": "Metal Black",
+        "aspect_ration": [
+            4,
+            3
+        ]
+    },
     "metamrphj": {
         "game_name": "Metamorphic Force",
         "aspect_ratio": [
