@@ -596,7 +596,7 @@
     },
     "metalb": {
         "game_name": "Metal Black",
-        "aspect_ration": [
+        "aspect_ratio": [
             4,
             3
         ]
@@ -671,8 +671,29 @@
             3
         ]
     },
+    "mslug2ct": {
+        "game_name": "Metal Slug 2 [Survival Version] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "mslug2dg": {
         "game_name": "Metal Slug 2 - Super Vehicle-001/II (Multifunction Hack)",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslug2fm": {
+        "game_name": "Metal Slug 2 [Mslug2fm Ver.2 Fightcade 2] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslug2r": {
+        "game_name": "Metal Slug 2 [Enemy Remake] [Hack]",
         "aspect_ratio": [
             4,
             3
@@ -692,6 +713,20 @@
             3
         ]
     },
+    "mslug3c": {
+        "game_name": "Metal Slug 3 [Enemy Reset] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslug3eb": {
+        "game_name": "Metal Slug 3 [Green Blue] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "mslug3g": {
         "game_name": "Metal Slug 3 (Multifunction Hack)",
         "aspect_ratio": [
@@ -701,6 +736,13 @@
     },
     "mslug4": {
         "game_name": "Metal Slug 4",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslug4c": {
+        "game_name": "Metal Slug 4 [Enemy Reset] [Hack]",
         "aspect_ratio": [
             4,
             3
@@ -720,8 +762,29 @@
             3
         ]
     },
+    "mslug5c": {
+        "game_name": "Metal Slug 5 [Enemy Reset] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "mslug5g": {
         "game_name": "Metal Slug 5 (Multifunction Hack)",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslug5mg": {
+        "game_name": "Metal Slug 5 [Enemy Demons] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslug5x": {
+        "game_name": "Metal Slug 5X [Enemy Enhance] [Hack]",
         "aspect_ratio": [
             4,
             3
@@ -736,6 +799,34 @@
     },
     "mslugx": {
         "game_name": "Metal Slug X - Super Vehicle-001",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslugxc2": {
+        "game_name": "Metal Slug X [Enemy Remastered] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslugxeb": {
+        "game_name": "Metal Slug X [Green Blue] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslugxlb": {
+        "game_name": "Metal Slug X [Extreme Space Zone] [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "mslugxsrf": {
+        "game_name": "Metal Slug X [AzStar Soda Remix FC2 Version] [Hack]",
         "aspect_ratio": [
             4,
             3
