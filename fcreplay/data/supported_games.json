@@ -1112,6 +1112,20 @@
             3
         ]
     },
+    "sfiii": {
+        "game_name": "Street Fighter III: New Generation",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "sfiii2": {
+        "game_name": "Street Fighter III 2nd Impact: Giant Attack",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "sfiii3nr1": {
         "game_name": "Street Fighter III: 3rd Strike",
         "aspect_ratio": [
