@@ -1308,6 +1308,13 @@
             3
         ]
     },
+    "sf2mix": {
+        "game_name": "Street Fighter II: Mix",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "sfa": {
         "game_name": "Street Fighter Alpha - Warriors' Dreams",
         "aspect_ratio": [
