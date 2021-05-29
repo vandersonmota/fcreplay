@@ -48,6 +48,13 @@
             4
         ]
     },
+    "aliencha": {
+        "game_name": "Alien Challenge",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "altbeast": {
         "game_name": "Altered Beast",
         "aspect_ratio": [
@@ -97,6 +104,27 @@
             3
         ]
     },
+    "asurabld": {
+        "game_name": "Asura Blade - Sword of Dynasty",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "asurabus": {
+        "game_name": "Asura Buster - Eternal Warriors",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "avengrgs": {
+        "game_name": "Avengers In Galactic Storm",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "avsp": {
         "game_name": "Alien vs Predator",
         "aspect_ratio": [
@@ -125,6 +153,13 @@
             4
         ]
     },
+    "bloodwar": {
+        "game_name": "Blood Warrior",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "breakers": {
         "game_name": "Breakers",
         "aspect_ratio": [
@@ -141,6 +176,13 @@
     },
     "bstars2": {
         "game_name": "Baseball Stars 2",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "btlkroad": {
+        "game_name": "Battle K-Road",
         "aspect_ratio": [
             4,
             3
@@ -183,6 +225,13 @@
     },
     "crsword": {
         "game_name": "Crossed Swords",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "cutefght": {
+        "game_name": "Cute Fight",
         "aspect_ratio": [
             4,
             3
@@ -232,6 +281,20 @@
     },
     "dariusgx": {
         "game_name": "Darius Gaiden - Silver Hawk Extra Version",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "dbz": {
+        "game_name": "DragonBall Z",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "dbz2": {
+        "game_name": "DragonBall Z 2 - Super Battle",
         "aspect_ratio": [
             4,
             3
@@ -293,6 +356,13 @@
             3
         ]
     },
+    "drgnmst": {
+        "game_name": "Dragon Master",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "ecofghtr": {
         "game_name": "Eco Fighters",
         "aspect_ratio": [
@@ -321,6 +391,13 @@
             3
         ]
     },
+    "fatfury2": {
+        "game_name": "Fatal Fury 2",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "fbfrenzy": {
         "game_name": "Football Frenzy",
         "aspect_ratio": [
@@ -330,6 +407,20 @@
     },
     "ffight": {
         "game_name": "Final Fight",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "fghthist": {
+        "game_name": "Fighter's History",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "fightfev": {
+        "game_name": "Fight Fever",
         "aspect_ratio": [
             4,
             3
@@ -398,6 +489,20 @@
             3
         ]
     },
+    "gundamex": {
+        "game_name": "Mobile Suit Gundam EX Revue",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "gururin": {
+        "game_name": "Gururin",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "guwange": {
         "game_name": "Guwange",
         "aspect_ratio": [
@@ -433,6 +538,13 @@
             3
         ]
     },
+    "jojo": {
+        "game_name": "Jojo's Venture (USA)",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "jojobanr1": {
         "game_name": "JoJo's Bizarre Adventure: Heritage for the Future",
         "aspect_ratio": [
@@ -440,8 +552,22 @@
             3
         ]
     },
+    "jojon": {
+        "game_name": "Jojo's Venture (Asia, No CD)",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "kabukikl": {
         "game_name": "Kabuki Klash - Far East of Eden",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "kaiserkn": {
+        "game_name": "Kaiser knuckle",
         "aspect_ratio": [
             4,
             3
@@ -459,6 +585,13 @@
         "aspect_ratio": [
             3,
             4
+        ]
+    },
+    "killbld": {
+        "game_name": "The Killing Blade",
+        "aspect_ratio": [
+            4,
+            3
         ]
     },
     "kizuna": {
@@ -580,8 +713,29 @@
             4
         ]
     },
+    "magdrop2": {
+        "game_name": "Magical Drop 2",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "magdrop3": {
         "game_name": "Magical Drop 3",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "marmatcp": {
+        "game_name": "Martial Masters - Community Patch [Hack]",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "martmast": {
+        "game_name": "Martial Masters",
         "aspect_ratio": [
             4,
             3
@@ -839,6 +993,13 @@
             3
         ]
     },
+    "mtlchamp": {
+        "game_name": "Martial Champion",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "mutnat": {
         "game_name": "Mutation Nation",
         "aspect_ratio": [
@@ -902,6 +1063,20 @@
             3
         ]
     },
+    "plegends": {
+        "game_name": "Gouketsuji Gaiden Legends (Power Instinct Legends)",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "powerins": {
+        "game_name": "Power Instinct",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "progear": {
         "game_name": "Progear",
         "aspect_ratio": [
@@ -911,6 +1086,27 @@
     },
     "punisher": {
         "game_name": "The Punisher",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "puzzledp": {
+        "game_name": "Puzzle De Pon!",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "pwrinst2": {
+        "game_name": "Power Instinct 2",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "ragnagrd": {
+        "game_name": "Ragnagard",
         "aspect_ratio": [
             4,
             3
@@ -1035,8 +1231,22 @@
             3
         ]
     },
+    "samsho5": {
+        "game_name": "Samurai Shodown V",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "savagere": {
         "game_name": "Savage Reign",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "sdfight": {
+        "game_name": "SD Fight",
         "aspect_ratio": [
             4,
             3
@@ -1077,6 +1287,13 @@
             3
         ]
     },
+    "sf2": {
+        "game_name": "Street Fighter II - The World Warrior",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "sf2ce": {
         "game_name": "Street Fighter II' - Champion Edition",
         "aspect_ratio": [
@@ -1086,6 +1303,13 @@
     },
     "sf2hf": {
         "game_name": "Street Fighter II': Hyper Fighting",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "sfa": {
+        "game_name": "Street Fighter Alpha - Warriors' Dreams",
         "aspect_ratio": [
             4,
             3
@@ -1111,6 +1335,10 @@
             4,
             3
         ]
+    },
+    "sfa3aism": {
+        "game_name": "Street Fighter Alpha 3 - A-ISM Only [Hack]",
+        "aspect_ratio": []
     },
     "sfiii": {
         "game_name": "Street Fighter III: New Generation",
@@ -1147,6 +1375,13 @@
             3
         ]
     },
+    "shogwarr": {
+        "game_name": "Shogun Warriors",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "sidearms": {
         "game_name": "Side Arms - Hyper Dyne",
         "aspect_ratio": [
@@ -1175,6 +1410,13 @@
             3
         ]
     },
+    "solfigtr": {
+        "game_name": "Solitary Fighter",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "spcinv95": {
         "game_name": "Space Invaders '95: The Attack Of Lunar Loonies",
         "aspect_ratio": [
@@ -1184,6 +1426,13 @@
     },
     "spf2t": {
         "game_name": "Super Puzzle Fighter II Turbo",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "ssf2": {
+        "game_name": "Super Street Fighter II - The New Challengers",
         "aspect_ratio": [
             4,
             3
@@ -1238,6 +1487,13 @@
             3
         ]
     },
+    "survarts": {
+        "game_name": "Survival Arts",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "svc": {
         "game_name": "SNK vs. Capcom - SVC Chaos",
         "aspect_ratio": [
@@ -1259,8 +1515,22 @@
             3
         ]
     },
+    "tattass": {
+        "game_name": "Tattoo Assassins",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "tgm2p": {
         "game_name": "Tetris the Absolute The Grand Master 2 PLUS",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "tkdensho": {
+        "game_name": "Toukidenshou - Angel Eyes",
         "aspect_ratio": [
             4,
             3
@@ -1345,6 +1615,13 @@
     },
     "vhuntjr2": {
         "game_name": "Vampire Hunter - darkstalkers' revenge",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "viofight": {
+        "game_name": "Violence Fight",
         "aspect_ratio": [
             4,
             3
