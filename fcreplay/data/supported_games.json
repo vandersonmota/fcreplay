@@ -153,6 +153,13 @@
             4
         ]
     },
+    "bloodstm": {
+        "game_name": "Blood Storm",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "bloodwar": {
         "game_name": "Blood Warrior",
         "aspect_ratio": [
@@ -568,6 +575,13 @@
     },
     "kaiserkn": {
         "game_name": "Kaiser knuckle",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "karatour": {
+        "game_name": "The Karate Tournament",
         "aspect_ratio": [
             4,
             3
@@ -1368,6 +1382,13 @@
             3
         ]
     },
+    "sfz2al": {
+        "game_name": "Street Fighter Zero 2 Alpha",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "sftm": {
         "game_name": "Street Fighter: The Movie",
         "aspect_ratio": [
@@ -1480,6 +1501,13 @@
             3
         ]
     },
+    "ssoldier": {
+        "game_name": "Superior Soldiers",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "ssridersebc": {
         "game_name": "Sunset Riders (2 Players ver. EBC)",
         "aspect_ratio": [
@@ -1525,6 +1553,21 @@
     "tattass": {
         "game_name": "Tattoo Assassins",
         "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "tetrisp2": {
+        "game_name": "Tetris Plus 2",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
+    "timekill": {
+        "game_name": "Time Killers",
+        "aspect_ratio":
+        [
             4,
             3
         ]
