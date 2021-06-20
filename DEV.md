@@ -1,38 +1,4 @@
 # Development notes
-<!--ts-->
-   * [Development notes](#development-notes)
-      * [Remote debuging](#remote-debuging)
-      * [Database](#database)
-      * [Processing order:](#processing-order)
-      * [Processing tracking](#processing-tracking)
-         * [Job status definitions](#job-status-definitions)
-
-<!-- Added by: gino, at: Sat 26 Dec 2020 09:45:20 AM NZDT -->
-
-<!--te-->
-
-## Remote debuging
-You can enable remote debuging by setting the environment variable `REMOTE_DEBUG=true` then connect to your remote instance on port 5678. To disable remote debuging you need to unset the environment variable.
-
-The following vscode example launch configuration will allow you connect to the remote instance:
-```json
-{
-  "name": "FCReplay HyperV",
-  "type": "python",
-  "request": "attach",
-  "justMyCode": false,
-  "connect": {
-    "host": "192.168.1.88",
-    "port": 5678
-  },
-  "pathMappings": [
-    {
-      "localRoot": "/home/user/git/fcreplay/fcreplay",
-      "remoteRoot": "/home/fcrecorder/fcreplay/venv/lib/python3.8/site-packages/fcreplay-0.9-py3.8.egg/fcreplay"
-    }
-  ]
-}
-```
 
 ## Database
 The database is defined in `models.py`. Tested on postgresql
@@ -40,6 +6,12 @@ Interacting with the database should be done through the database class.
 ```python
 from fcreplaydatabase import Database
 db = Database()
+```
+
+## Running site locally:
+Run with:
+```
+docker-compose run --service-ports fcreplay-site
 ```
 
 ## Processing order:
