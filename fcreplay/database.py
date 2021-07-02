@@ -128,6 +128,16 @@ class Database:
         count = session.execute('select count(id) from replays where failed = true').first()[0]
         return count
 
+    def get_broken_count(self):
+        """Get a count of 'broken' replays
+
+        Returns:
+            int: Number of broken replays
+        """
+        session = self.Session()
+        count = session.execute("select count(id) from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false")
+        return count
+
     def get_pending_count(self):
         session = self.Session()
         count = session.execute("select count(id) from replays where created = false and failed = false").first()[0]
@@ -392,4 +402,9 @@ class Database:
             failed=False,
             created=False
         ).limit(limit).all()
+        return replays
+
+    def get_all_broken_replays(self, limit=10):
+        session = self.Session()
+        replays = session.execute("select * from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false")
         return replays

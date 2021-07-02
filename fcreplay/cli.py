@@ -40,11 +40,15 @@ class Cli(cmd2.Cmd):
     retry_all_failed_replays_parser.add_argument('-y', '--yes', action='store_true',
                                                  help='Force yes')
 
+    retry_all_broken_replays_parser = cmd2.Cmd2ArgumentParser(description='Mark all broken replays to be re-encoded')
+    retry_all_broken_replays_parser.add_argument('-y', '--yes', action='store_true',
+                                                 help='Force yes')
+
     list_replays_parser = cmd2.Cmd2ArgumentParser(description='List replays')
     list_replays_parser.add_argument('type',
                                      type=str,
                                      nargs=1,
-                                     choices=['failed', 'finished', 'pending'],
+                                     choices=['failed', 'finished', 'pending', 'broken'],
                                      help='Type of replays to return')
     list_replays_parser.add_argument('-l', '--limit', default=10, type=int, help='Limit number of results')
 
@@ -52,7 +56,7 @@ class Cli(cmd2.Cmd):
     count_parser.add_argument('type',
                               type=str,
                               nargs=1,
-                              choices=['failed', 'finished', 'pending', 'all'],
+                              choices=['failed', 'finished', 'pending', 'all', 'broken'],
                               help='Type of replays to count')
 
     def yes_or_no(self, question):
@@ -155,6 +159,20 @@ class Cli(cmd2.Cmd):
                 self.db.rerecord_replay(r.id)
                 print(f"Marked failed replay {r.id} to be re-encoded")
 
+    @cmd2.with_argparser(retry_all_broken_replays_parser)
+    def do_retry_all_broken_replays(self, args):
+        if not args.yes:
+            if not self.yes_or_no("This will retry all broken replays, DO NOT RUN THIS WHILE ENCODING!"):
+                return
+
+        broken_replays = self.db.get_all_broken_replays(limit=1000)
+        if broken_replays is None:
+            print("No failed replays to retry")
+        else:
+            for r in broken_replays:
+                self.db.rerecord_replay(r.id)
+                print(f"Marked failed replay {r.id} to be re-encoded")
+
     @cmd2.with_argparser(list_replays_parser)
     def do_ls(self, args):
         replays = None
@@ -165,6 +183,8 @@ class Cli(cmd2.Cmd):
             replays = self.db.get_all_finished_replays(limit=args.limit)
         elif 'pending' in args.type:
             replays = self.db.get_all_queued_replays(limit=args.limit)
+        elif 'broken' in args.type:
+            replays = self.db.get_all_broken_replays(limit=args.limit)
         else:
             return
 
@@ -187,6 +207,8 @@ class Cli(cmd2.Cmd):
             replay_count = self.db.get_pending_count()
         elif 'all' in args.type:
             replay_count = self.db.get_all_count()
+        elif 'broken' in args.type:
+            replay_count = self.db.get_broken_count()
 
         if replay_count is None:
             print("0")
