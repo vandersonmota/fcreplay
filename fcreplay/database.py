@@ -135,7 +135,7 @@ class Database:
             int: Number of broken replays
         """
         session = self.Session()
-        count = session.execute("select count(id) from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false")
+        count = session.execute("select count(id) from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false").first()[0]
         return count
 
     def get_pending_count(self):
