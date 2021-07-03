@@ -406,5 +406,5 @@ class Database:
 
     def get_all_broken_replays(self, limit=10):
         session = self.Session()
-        replays = session.execute("select * from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false")
+        replays = session.execute("select * from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false").all()
         return replays
