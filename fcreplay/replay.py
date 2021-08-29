@@ -321,12 +321,14 @@ class Replay:
 
             first_chapter = True
             for match in self.detected_characters:
+                # Remove leading 0: from replays
+                detect_time = re.sub('0:', '', match[2])
                 if first_chapter:
                     self.description_text += f"\n0:00 {self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]} - " \
                         f"\n{match[0]} vs {match[1]}"
                     first_chapter = False
                 else:
-                    self.description_text += f"\n{match[2]} {self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]} - " \
+                    self.description_text += f"\n{detect_time} {self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]} - " \
                         f"\n{match[0]} vs {match[1]}"
 
         else:
