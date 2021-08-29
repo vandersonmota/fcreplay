@@ -319,9 +319,16 @@ class Replay:
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
                 f"\nFightcade replay id: {self.replay.id}"
 
+            first_chapter = True
             for match in self.detected_characters:
-                self.description_text += f"\n{self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]}  - {match[2]}" \
-                    f"\n{match[0]} vs {match[1]}"
+                if first_chapter:
+                    self.description_text += f"\n0:00 {self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]} - " \
+                        f"\n{match[0]} vs {match[1]}"
+                    first_chapter = False
+                else:
+                    self.description_text += f"\n{match[2]} {self.replay.p1}: {match[0]}, {self.replay.p2}: {match[1]} - " \
+                        f"\n{match[0]} vs {match[1]}"
+
         else:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
                                     f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
