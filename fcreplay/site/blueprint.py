@@ -156,7 +156,7 @@ def advancedSearchResult():
         session['char1'] = result.char1.data
         session['char2'] = result.char2.data
         session['p1_rank'] = result.p1_rank.data
-        session['p2_rank'] = result.p1_rank.data
+        session['p2_rank'] = result.p2_rank.data
         session['order_by'] = result.order_by.data
         session['game'] = result.game.data
 
