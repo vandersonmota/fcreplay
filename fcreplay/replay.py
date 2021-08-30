@@ -322,7 +322,7 @@ class Replay:
             first_chapter = True
             for match in self.detected_characters:
                 # Remove leading 0: from replays
-                detect_time = re.sub('0:', '', match[2])
+                detect_time = re.sub('^0:', '', match[2])
                 if first_chapter:
                     self.description_text += f"\n0:00 {match[0]} vs {match[1]}"
                     first_chapter = False
