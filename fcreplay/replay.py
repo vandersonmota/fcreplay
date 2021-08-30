@@ -408,6 +408,8 @@ class Replay:
         fc_video.upload(f"{self.config['fcadefbneo_path']}/avi/{filename}",
                         metadata=metadata, verbose=True)
 
+        self.db.add_ia_filename(str(self.replay.id), filename)
+
         self.update_status(status.UPLOADED_TO_IA)
         log.info("Finished upload to archive.org")
 

@@ -49,8 +49,19 @@ class Database:
             player_requested=kwargs['player_requested'],
             game=kwargs['game'],
             emulator=kwargs['emulator'],
-            video_processed=kwargs['video_processed']
+            video_processed=kwargs['video_processed'],
+            ia_filename="EMPTY"
         ))
+        session.commit()
+        session.close()
+
+    def add_ia_filename(self, challenge_id, filename):
+        session = self.Session()
+        session.query(Replays).filter_by(
+            id=challenge_id,
+        ).update(
+            {'ia_filename': filename}
+        )
         session.commit()
         session.close()
 
