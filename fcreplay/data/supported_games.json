@@ -1593,6 +1593,13 @@
             3
         ]
     },
+    "trstar": {
+        "game_name": "Top Ranking Stars",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "truxton2": {
         "game_name": "Truxton II / Tatsujin-Oh",
         "aspect_ratio": [
