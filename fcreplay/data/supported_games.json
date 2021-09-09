@@ -1119,6 +1119,13 @@
             3
         ]
     },
+    "pnyaa": {
+        "game_name": "Pochi and Nyaa",
+        "aspect_ratio": [
+            4,
+            3
+        ]
+    },
     "ragnagrd": {
         "game_name": "Ragnagard",
         "aspect_ratio": [
