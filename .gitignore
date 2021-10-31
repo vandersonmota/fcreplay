@@ -26,6 +26,7 @@ config_prod.json
 config_dev.json
 docker_config_prod.json
 docker_config_dev.json
+local_config_dev.json
 description_append.txt
 docker-compose.override.yml
 sql/*
