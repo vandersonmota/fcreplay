@@ -26,7 +26,7 @@ class UploadYouTube:
             description=description,
             tags=tags,
             title_template="",
-            category='gaming',
+            category='Gaming',
             default_language="en",
             default_audio_language="en",
             embeddable=True,

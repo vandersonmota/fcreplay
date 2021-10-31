@@ -97,8 +97,10 @@ RUN cd /opt && \
 
 # Install fcreplay
 COPY fcreplay /root/fcreplay
+COPY requirements.txt /root/fcreplay
 COPY setup.py /root/setup.py
 RUN cd /root && python3 setup.py install
+RUN cd /root/fcreplay && pip3 install -r requirements.txt
 
 # Setup i3 for autostart
 RUN mkdir -p /root/.config/i3
