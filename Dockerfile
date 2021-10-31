@@ -95,13 +95,6 @@ RUN cd /opt && \
 RUN cd /opt && \
   git clone https://github.com/grays/droid-fonts.git
 
-# Download and install youtube-dl
-RUN cd /root && \
-  pip install --upgrade google-api-python-client oauth2client progressbar2 && \
-  git clone https://github.com/tokland/youtube-upload.git && \
-  cd youtube-upload && \
-  python3 setup.py install
-
 # Install fcreplay
 COPY fcreplay /root/fcreplay
 COPY setup.py /root/setup.py
