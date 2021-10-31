@@ -443,15 +443,16 @@ class Replay:
         # Do upload
         log.info("Uploading to youtube")
         try:
-            youtube_id = UploadYouTube(title=title,
-                                       description=self.description_text,
-                                       tags=None,
-                                       video_path=f"{self.config['fcadefbneo_path']}/avi/{filename}",
-                                       playlist=playlist_name,
-                                       thumbnail=self.thumbnail,
-                                       recording_date=recording_date,
-                                       player_requested=self.replay.player_requested
-                                       )
+            upload = UploadYouTube(title=title,
+                                   description=self.description_text,
+                                   tags=None,
+                                   video_path=f"{self.config['fcadefbneo_path']}/avi/{filename}",
+                                   playlist=playlist_name,
+                                   thumbnail=self.thumbnail,
+                                   recording_date=recording_date,
+                                   player_requested=self.replay.player_requested
+                                   )
+            youtube_id = upload.upload()
         except Exception as e:
             log.error(f"Error uploading to youtube: {e}")
             return False
