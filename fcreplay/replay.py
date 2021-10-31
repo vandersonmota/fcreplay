@@ -6,6 +6,7 @@ from fcreplay.status import status
 from fcreplay.thumbnail import Thumbnail
 from fcreplay.updatethumbnail import UpdateThumbnail
 from fcreplay.character_detection import CharacterDetection
+from fcreplay.upload_youtube import UploadYouTube
 
 from internetarchive import get_item
 from retrying import retry
@@ -151,12 +152,12 @@ class Replay:
         # Star a recording store recording status
         log.debug(
             f"""Starting record.main with argumens:
-            fc_challange_id={self.replay.id},
+            fc_challenge_id={self.replay.id},
             fc_time={self.replay.length},
             kill_time={self.config['record_timeout']},
             fcadefbneo_path={self.config['fcadefbneo_path']},
             game_name={self.replay.game}""")
-        record_status = Record().main(fc_challange_id=self.replay.id,
+        record_status = Record().main(fc_challenge_id=self.replay.id,
                                       fc_time=self.replay.length,
                                       kill_time=self.config['record_timeout'],
                                       fcadefbneo_path=self.config['fcadefbneo_path'],
@@ -417,6 +418,7 @@ class Replay:
     def upload_to_yt(self):
         """Upload video to youtube."""
         self.update_status(status.UPLOADING_TO_YOUTUBE)
+
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mp4"
@@ -424,86 +426,47 @@ class Replay:
         date_raw = datetime.datetime.strptime(
             str(self.replay.date_replay), import_format)
 
+        # Trim title length
         if len(title) > 100:
             title = title[:99]
         log.info(f"Title is: {title}")
 
-        # YYYY-MM-DDThh:mm:ss.sZ
-        youtube_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S.0Z')
-
-        # Check if youtube-upload is installed
-        if shutil.which('youtube-upload') is not None:
-            # Check if credentials file exists
-            if not os.path.exists(self.config['youtube_credentials']):
-                log.error("Youtube credentials don't exist exist")
-                return False
-
-            if not os.path.exists(self.config['youtube_secrets']):
-                log.error("Youtube secrets don't exist")
-                return False
-
-            # Find number of uploads today
-            day_log = self.db.get_youtube_day_log()
-
-            # Check max uploads
-            # Get todays date, dd-mm-yyyy
-            today = datetime.date.today()
-
-            # Check the log is for today
-            if day_log.date.date() == today:
-                # Check number of uploads
-                if day_log.count >= int(self.config['youtube_max_daily_uploads']):
-                    log.info("Maximum uploads reached for today")
-                    return False
-            else:
-                # It's a new day, update the counter
-                log.info("New day for youtube uploads")
-                self.db.update_youtube_day_log_count(count=1, date=today)
-
-            # Create description file
-            with open(f"{self.config['fcreplay_dir']}/tmp/description.txt", 'w') as description_file:
-                description_file.write(self.description_text)
-
-            # Do upload
-            log.info("Uploading to youtube")
-            yt_rc = subprocess.run(
-                [
-                    'youtube-upload',
-                    '--credentials-file', self.config['youtube_credentials'],
-                    '--client-secrets', self.config['youtube_secrets'],
-                    '-t', title,
-                    '-c', 'Gaming',
-                    '--description-file', f"{self.config['fcreplay_dir']}/tmp/description.txt",
-                    '--recording-date', youtube_date,
-                    '--default-language', 'en',
-                    '--thumbnail', str(self.thumbnail),
-                    f"{self.config['fcadefbneo_path']}/avi/{filename}",
-                ], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-
-            youtube_id = yt_rc.stdout.decode().rstrip()
-
-            log.info(f"Youtube id: {youtube_id}")
-            log.info(yt_rc.stderr.decode())
-
-            if not self.replay.player_requested:
-                log.info('Updating day_log')
-                log.info("Updating counter")
-                self.db.update_youtube_day_log_count(
-                    count=day_log.count + 1, date=today)
-
-            # Remove description file
-            os.remove(f"{self.config['fcreplay_dir']}/tmp/description.txt")
-            if len(youtube_id) < 4:
-                log.info('Unable to upload to youtube')
-                self.db.set_youtube_uploaded(self.replay.id, False)
-            else:
-                self.db.set_youtube_uploaded(self.replay.id, True)
-                self.db.set_youtube_id(self.replay.id, youtube_id)
-
-            self.update_status(status.UPLOADED_TO_YOUTUBE)
-            log.info('Finished uploading to Youtube')
+        # Trim playlist name length
+        if len(self.supported_games[self.replay.game]['game_name']) > 100:
+            playlist_name = self.supported_games[self.replay.game]['game_name'][:99]
         else:
-            raise ModuleNotFoundError
+            playlist_name = self.supported_games[self.replay.game]['game_name']
+
+        # YYYY-MM-DDThh:mm:ss.sZ
+        recording_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S.0Z')
+
+        # Do upload
+        log.info("Uploading to youtube")
+        try:
+            youtube_id = UploadYouTube(title=title,
+                                       description=self.description_text,
+                                       tags=None,
+                                       video_path=f"{self.config['fcadefbneo_path']}/avi/{filename}",
+                                       playlist=playlist_name,
+                                       thumbnail=self.thumbnail,
+                                       recording_date=recording_date,
+                                       player_requested=self.replay.player_requested
+                                       )
+        except Exception as e:
+            log.error(f"Error uploading to youtube: {e}")
+            return False
+
+        log.info(f"Youtube id: {youtube_id}")
+
+        if type(youtube_id) is bool or len(youtube_id) < 4:
+            log.info('Unable to upload to youtube')
+            self.db.set_youtube_uploaded(self.replay.id, False)
+        else:
+            self.db.set_youtube_uploaded(self.replay.id, True)
+            self.db.set_youtube_id(self.replay.id, youtube_id)
+
+        self.update_status(status.UPLOADED_TO_YOUTUBE)
+        log.info('Finished uploading to Youtube')
 
     @Decorators.handle_fail
     def set_created(self):

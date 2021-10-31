@@ -10,7 +10,14 @@ log = logging.getLogger('fcreplay')
 
 
 class Database:
+    """Database class to manage queries."""
+
     def __init__(self):
+        """Initalise the database class.
+
+        Raises:
+            e: Raises an exception on error
+        """
         config = Config().config
 
         if 'DEBUG' in config['loglevel']:
@@ -19,7 +26,7 @@ class Database:
             logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
             sql_echo = False
 
-        # Create Engine
+        """Create Engine"""
         try:
             log.debug(f"Creating DB Instance with: {config['sql_baseurl']}")
             self.engine = create_engine(config['sql_baseurl'], echo=sql_echo, pool_pre_ping=True)
@@ -30,32 +37,69 @@ class Database:
 
         self.Session = sessionmaker(bind=self.engine)
 
-    def add_replay(self, **kwargs):
+    def add_replay(self, challenge_id,
+                   p1_loc, p2_loc,
+                   p1_rank, p2_rank,
+                   p1, p2,
+                   date_replay, length, created, failed, status, date_added,
+                   player_requested, game, emulator, video_processed,
+                   ia_filename="EMPTY"
+                   ):
+        """Add a new replay to the database to be encoded.
+
+        Args:
+            challenge_id (str): fightcade challenge id
+            p1_loc (str): Location of P1
+            p2_loc (str): Location of P2
+            p1_rank (str): Rank of P1 ('0', '1', '2', '3')
+            p2_rank (str): Rank of P2 ('0', '1', '2', '3')
+            p1 (str): P1 name
+            p2 (str): P2 name
+            date_replay (datetime): Date of replay
+            length (float): Length of replay
+            created (bool): If the replay is already created (usually False)
+            failed (bool): If the replay is failed (usually False)
+            status (str): Current status of the replay (usually ADDED)
+            date_added (datetime): Data the replay was added
+            player_requested (bool): Was the replay player requested
+            game (str): Game name
+            emulator (str): Emulator used
+            video_processed (bool): Has the video been prossed (usually False)
+            ia_filename (str, optional): Archive.org filename. Defaults to "EMPTY".
+        """
         session = self.Session()
-        session.add(Replays(
-            id=kwargs['challenge_id'],
-            p1_loc=kwargs['p1_loc'],
-            p2_loc=kwargs['p2_loc'],
-            p1_rank=kwargs['p1_rank'],
-            p2_rank=kwargs['p2_rank'],
-            p1=kwargs['p1'],
-            p2=kwargs['p2'],
-            date_replay=kwargs['date_replay'],
-            length=kwargs['length'],
-            created=kwargs['created'],
-            failed=kwargs['failed'],
-            status=kwargs['status'],
-            date_added=kwargs['date_added'],
-            player_requested=kwargs['player_requested'],
-            game=kwargs['game'],
-            emulator=kwargs['emulator'],
-            video_processed=kwargs['video_processed'],
-            ia_filename="EMPTY"
-        ))
+        session.add(
+            Replays(
+                id=challenge_id,
+                p1_loc=p1_loc,
+                p2_loc=p2_loc,
+                p1_rank=p1_rank,
+                p2_rank=p2_rank,
+                p1=p1,
+                p2=p2,
+                date_replay=date_replay,
+                length=length,
+                created=created,
+                failed=failed,
+                status=status,
+                date_added=date_added,
+                player_requested=player_requested,
+                game=game,
+                emulator=emulator,
+                video_processed=video_processed,
+                ia_filename="EMPTY"
+            )
+        )
         session.commit()
         session.close()
 
     def add_ia_filename(self, challenge_id, filename):
+        """Add an IA filename to the database.
+
+        Args:
+            challenge_id (str): Challenge id
+            filename (str): Filename
+        """
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id,
@@ -66,6 +110,11 @@ class Database:
         session.close()
 
     def get_single_replay(self, challenge_id):
+        """Get a single replay by id.
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         replay = session.query(Replays).filter_by(
             id=challenge_id
@@ -75,6 +124,11 @@ class Database:
         return(replay)
 
     def update_player_requested(self, challenge_id):
+        """Update whether replay is player requested.
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id,
@@ -85,6 +139,15 @@ class Database:
         session.close()
 
     def add_detected_characters(self, challenge_id, p1_char, p2_char, vid_time, game):
+        """Add detected characters to the replay.
+
+        Args:
+            challenge_id (str): Challenge id of the replay
+            p1_char (str): P1 character
+            p2_char (str): P2 character
+            vid_time (str): Time in the video the character was detected
+            game (str): Game name
+        """
         session = self.Session()
         session.add(Character_detect(
             challenge_id=challenge_id,
@@ -97,6 +160,13 @@ class Database:
         session.close()
 
     def add_job(self, challenge_id, start_time, length):
+        """Add a new encoding job to the database.
+
+        Args:
+            challenge_id (str): Challenge id
+            start_time (datetime): Time replay was added to be encoded
+            length (str): Length of the replay
+        """
         session = self.Session()
         session.add(Job(
             id=challenge_id,
@@ -107,6 +177,11 @@ class Database:
         session.close()
 
     def remove_job(self, challenge_id):
+        """Remove a job from the database.
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         session.query(Job).filter_by(
             id=challenge_id
@@ -115,6 +190,14 @@ class Database:
         session.close()
 
     def get_job(self, challenge_id):
+        """Returns a job by its id
+
+        Args:
+            challenge_id (str): Challenge id
+
+        Returns:
+            sqlalchemy.object: Returns sqlalchemy object of job
+        """
         session = self.Session()
         job = session.query(
             Job
@@ -125,41 +208,80 @@ class Database:
         return job
 
     def get_job_count(self):
+        """Returns the number of jobs in the database.
+
+        Returns:
+            str: Number of jobs
+        """
         session = self.Session()
         count = session.execute('select count(id) from job').first()[0]
+        session.close()
         return count
 
     def get_all_count(self):
+        """Return the total number of replays in the database.
+
+        Returns:
+            str: Number of replays
+        """
         session = self.Session()
         count = session.execute('select count(id) from replays').first()[0]
+        session.close()
         return count
 
     def get_failed_count(self):
+        """Returns the number of failed replays.
+
+        Returns:
+            str: Number of failed replays.
+        """
         session = self.Session()
         count = session.execute('select count(id) from replays where failed = true').first()[0]
+        session.close()
         return count
 
     def get_broken_count(self):
-        """Get a count of 'broken' replays
+        """Return the number of 'broken' replays
 
         Returns:
-            int: Number of broken replays
+            str: Number of broken replays
         """
         session = self.Session()
         count = session.execute("select count(id) from replays where status not like 'ADDED' and status not like 'FINISHED' and failed is false").first()[0]
+        session.close()
         return count
 
     def get_pending_count(self):
+        """Get the number of pending replays.
+
+        Returns:
+            str: Number of pending replays
+        """
         session = self.Session()
         count = session.execute("select count(id) from replays where created = false and failed = false").first()[0]
+        session.close()
         return count
 
     def get_finished_count(self):
+        """Get the number of completed replays.
+
+        Returns:
+            str: Number of completed replays
+        """
         session = self.Session()
         count = session.execute("select count(id) from replays where created = true and failed = false").first()[0]
+        session.close()
         return count
 
     def update_status(self, challenge_id, status):
+        """Update the status of a replay.
+
+        Args:
+            challenge_id (str): Challenge id
+            status (str): Status
+        """
+
+        ## TODO Add method to verify status code
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id,
@@ -170,6 +292,12 @@ class Database:
         session.close()
 
     def add_description(self, challenge_id, description):
+        """Add a description to the database.
+
+        Args:
+            challenge_id (str): Challenge id
+            description (str): Description
+        """
         session = self.Session()
         session.add(Descriptions(
             id=challenge_id,
@@ -179,6 +307,12 @@ class Database:
         session.close()
 
     def update_youtube_day_log_count(self, count, date):
+        """update youtube day log.
+
+        Args:
+            count (int): Number of replays uploaded to youtube
+            date (datetime): Current date
+        """
         session = self.Session()
         session.query(Youtube_day_log).filter_by(
             id='count'
@@ -192,6 +326,11 @@ class Database:
         session.close()
 
     def get_youtube_day_log(self):
+        """Get youtube day log
+
+        Returns:
+            sqlalchemy.object: Contains the date and count
+        """
         session = self.Session()
         day_log = session.query(
             Youtube_day_log
@@ -203,6 +342,11 @@ class Database:
         return day_log
 
     def get_oldest_player_replay(self):
+        """Get the oldest player that is waiting to be encoded.
+
+        Returns:
+            sqlalchemy.object: Contains the replay as a sqlalchemy.object
+        """
         session = self.Session()
         replay = session.query(
             Replays
@@ -218,6 +362,11 @@ class Database:
         return replay
 
     def get_random_replay(self):
+        """Get a random replay.
+
+        Returns:
+            sqlalchemy.object: Contains the replay as a sqlalchemy.object
+        """
         session = self.Session()
         replay = session.query(
             Replays
@@ -233,6 +382,11 @@ class Database:
         return replay
 
     def get_oldest_replay(self):
+        """Get the oldest replay waiting to be encoded.
+
+        Returns:
+            sqlalchemy.object: Contains the replay as a sqlalchemy.object
+        """
         session = self.Session()
         replay = session.query(
             Replays
@@ -248,6 +402,11 @@ class Database:
         return replay
 
     def update_failed_replay(self, challenge_id):
+        """Increments the failed replay count for a replay
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         failed_replay = session.query(Replays).filter_by(
             id=challenge_id
@@ -269,6 +428,11 @@ class Database:
         session.close()
 
     def update_created_replay(self, challenge_id):
+        """Marks the replay as created
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id
@@ -281,6 +445,11 @@ class Database:
         session.close()
 
     def get_all_queued_player_replays(self):
+        """Get all queued player plays .
+
+        Returns:
+            sqlalchemt.object: Returns a sqlalchemy.object containing queued replays
+        """
         session = self.Session()
         replays = session.query(
             Replays
@@ -295,6 +464,11 @@ class Database:
         return replays
 
     def get_unprocessed_replays(self):
+        """Get all replays that are unprocessed.
+
+        Returns:
+            sqlalchemy.object: Returns a sqlalchemy.object containing all unprocessed replays
+        """
         session = self.Session()
         replays = session.query(
             Replays
@@ -303,9 +477,15 @@ class Database:
             created=True,
             video_processed=False
         ).all()
+        session.close()
         return replays
 
     def set_replay_processed(self, challenge_id):
+        """Set the replay as processed.
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id
@@ -316,6 +496,12 @@ class Database:
         session.close()
 
     def set_youtube_uploaded(self, challenge_id, yt_bool):
+        """Set whether or not video has been uploaded to youtube.
+
+        Args:
+            challenge_id (str): Challenge id
+            yt_bool (bool): Has the video been uploaded to youtube
+        """
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id
@@ -326,6 +512,12 @@ class Database:
         session.close()
 
     def set_youtube_id(self, challenge_id, yt_id):
+        """Set the youtube_id of a challenge.
+
+        Args:
+            challenge_id (str): Challenge id
+            yt_id (str): Youtube id of the replay
+        """
         session = self.Session()
         session.query(Replays).filter_by(
             id=challenge_id
@@ -336,7 +528,10 @@ class Database:
         session.close()
 
     def rerecord_replay(self, challenge_id):
-        """Sets replay to be rerecorded
+        """Rerecords a replay of a given challenge .
+
+        Args:
+            challenge_id (str): Challenge id
         """
         session = self.Session()
         # Set replay to original status
@@ -367,6 +562,11 @@ class Database:
         session.close()
 
     def delete_replay(self, challenge_id):
+        """Delete a replay.
+
+        Args:
+            challenge_id (str): Challenge id
+        """
         session = self.Session()
         # Remove replay if it exists
         session.query(Replays).filter_by(
@@ -391,35 +591,72 @@ class Database:
             challenge_id=challenge_id
         ).delete()
         session.commit()
+        session.close()
 
     def get_all_failed_replays(self, limit=10):
+        """Get all failed replays.
+
+        Args:
+            limit (int, optional): Number of replays to return. Defaults to 10.
+
+        Returns:
+            sqlalchemy.object: sqlalchemy.object containing failed replays
+        """
         session = self.Session()
         failed_replays = session.query(Replays).filter_by(
             failed=True,
         ).limit(limit).all()
+        session.close()
         return failed_replays
 
     def get_all_finished_replays(self, limit=10):
+        """Get all the finished replays.
+
+        Args:
+            limit (int, optional): Number of replays to return. Defaults to 10.
+
+        Returns:
+            sqlalchemy.object: sqlalchemy.object containing finished replays
+        """
         session = self.Session()
         replays = session.query(Replays).filter_by(
             failed=False,
             created=True
         ).limit(limit).all()
+        session.close()
         return replays
 
     def get_all_queued_replays(self, limit=10):
+        """Get all queued replays.
+
+        Args:
+            limit (int, optional): Number of replays to return. Defaults to 10.
+
+        Returns:
+            sqlalchemy.object: sqlalchemy.object containing queued replays.
+        """
         session = self.Session()
         replays = session.query(Replays).filter_by(
             failed=False,
             created=False
         ).limit(limit).all()
+        session.close()
         return replays
 
     def get_all_broken_replays(self, limit=10):
+        """Get broken replays.
+
+        Args:
+            limit (int, optional): Number of replays to return. Defaults to 10.
+
+        Returns:
+            sqlalchemy.object: sqlalchemy.object containing broken replays.
+        """
         session = self.Session()
         replays = session.query(Replays).filter(
             Replays.failed == False,
             Replays.status != 'ADDED',
             Replays.status != 'FINISHED'
         ).limit(limit).all()
+        session.close()
         return replays

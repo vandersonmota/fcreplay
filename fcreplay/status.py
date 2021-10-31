@@ -1,3 +1,7 @@
+""" When updating these status codes, make sure to also update the websiteV
+status codes as well
+"""
+
 from dataclasses import dataclass
 
 
@@ -19,3 +23,9 @@ class status:
     UPLOADED_TO_YOUTUBE: str = "UPLOADED_TO_YOUTUBE"
     REMOVED_GENERATED_FILES: str = "REMOVED_GENERATED_FILES"
     FINISHED: str = "FINISHED"
+    TOO_SHORT: str = "TOO_SHORT"
+    ALREADY_EXISTS: str = "ALREADY_EXISTS"
+    MARKED_PLAYER: str = "MARKED_PLAYER"
+    UNSUPPORTED_GAME: str = "UNSUPPORTED_GAME"
+    INVALID_URL: str = "INVALID_URL"
+    REPLAY_NOT_FOUND: str = "REPLAY_NOT_FOUND"

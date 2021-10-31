@@ -1,6 +1,7 @@
 from datetime import timedelta
 from fcreplay.config import Config
 from fcreplay.database import Database
+from fcreplay.status import status
 from retrying import retry
 import datetime
 import json
@@ -13,7 +14,10 @@ log = logging.getLogger('fcreplay')
 
 
 class Getreplay:
+    """Classmethod to getreplay."""
+
     def __init__(self):
+        """Initialize the Getreplay class."""
         self.config = Config().config
         self.db = Database()
 
@@ -22,6 +26,17 @@ class Getreplay:
 
     @retry(wait_random_min=5000, wait_random_max=10000, stop_max_attempt_number=3)
     def get_data(self, query):
+        """Get data from fightcade api.
+
+        Args:
+            query (dict): Query to pass to fightcade API
+
+        Raises:
+            IOError: Rase error when unable to get data or status code == 500
+
+        Returns:
+            dict: Returns dict containting the request
+        """
         r = requests.post(
             "https://www.fightcade.com/api/",
             json=query
@@ -30,9 +45,17 @@ class Getreplay:
             log.error("500 Code, trying up to 3 times")
             raise IOError("Unable to get data")
         else:
-            return r
+            return r.json()
 
     def add_replay(self, replay, emulator, game, player_replay=True):
+        """Add replay to the database.
+
+        Args:
+            replay ([type]): [description]
+            emulator ([type]): [description]
+            game ([type]): [description]
+            player_replay (bool, optional): [description]. Defaults to True.
+        """
         challenge_id = replay['quarkid']
         p1_loc = replay['players'][0]['country']
         p2_loc = replay['players'][1]['country']
@@ -42,7 +65,7 @@ class Getreplay:
         length = replay['duration']
         created = False
         failed = False
-        status = 'ADDED'
+        local_status = status.ADDED
         date_added = datetime.datetime.utcnow()
         player_requested = player_replay
 
@@ -80,58 +103,61 @@ class Getreplay:
                     length=length,
                     created=created,
                     failed=failed,
-                    status=status,
+                    status=local_status,
                     date_added=date_added,
                     player_requested=player_requested,
                     game=game,
                     emulator=emulator,
                     video_processed=False
                 )
-                return('ADDED')
+                return(status.ADDED)
             else:
                 log.info(f"{challenge_id} is only {length} not adding")
                 if player_replay:
-                    return('TOO_SHORT')
+                    return(status.TOO_SHORT)
         else:
             log.info(f"{challenge_id} already exists")
             if player_replay:
                 # Check if the returned replay is a player replay
                 if data.player_requested:
-                    return('ALREADY_EXISTS')
+                    return(status.ALREADY_EXISTS)
                 else:
                     # Update DB to mark returned replay as player replay
                     self.db.update_player_requested(challenge_id=challenge_id)
-                    return('MARKED_PLAYER')
-            return('ALREADY_EXISTS')
+                    return(status.MARKED_PLAYER)
+            return(status.ALREADY_EXISTS)
 
     def get_game_replays(self, game):
-        """Get game replays
+        """Get a list of games for a game.
 
         Args:
-            game (String): Gameid
+            game (str): Game id to use
         """
         if game not in self.supported_games:
-            return('UNSUPPORTED_GAME')
+            return(status.UNSUPPORTED_GAME)
 
         query = {'req': 'searchquarks', 'gameid': game}
 
         r = self.get_data(query)
 
-        for i in r.json()['results']['results']:
+        for i in r['results']['results']:
             if i['emulator'] == 'fbneo' and i['live'] is False:
-                status = self.add_replay(
+                local_status = self.add_replay(
                     replay=i,
                     emulator=i['emulator'],
                     game=game,
                     player_replay=False
                 )
-                if status != 'ADDED':
-                    log.info(f'Not adding game, Status: {status}')
+                if local_status != status.ADDED:
+                    log.info(f'Not adding game, Status: {local_status}')
 
-        return("ADDED")
+        return(status.ADDED)
 
     def get_top_weekly(self):
-        """Get the top weekly replays
+        """Get the most recent games and add them to the database.
+
+        Returns:
+            str: Returns the status of the request
         """
         today = datetime.datetime.today()
         start_week = today - timedelta(days=today.weekday())
@@ -143,32 +169,36 @@ class Getreplay:
         for i in range(0, pages):
             query['offset'] = i * 15
             r = self.get_data(query)
-            replays += r.json()['results']['results']
+            replays += r['results']['results']
 
         for i in replays:
             if i['gameid'] not in self.supported_games:
                 log.info(f"Game {i['gameid']} not supported for replay {i['quarkid']}")
                 continue
-            status = self.add_replay(
+            local_status = self.add_replay(
                 replay=i,
                 emulator=i['emulator'],
                 game=i['gameid'],
                 player_replay=False
             )
-            if status != 'ADDED':
-                log.info(f"Not adding replay {i['quarkid']}, Status: {status}")
+            if local_status != status.ADDED:
+                log.info(f"Not adding replay {i['quarkid']}, Status: {local_status}")
 
-        return("ADDED")
+        return status.ADDED
 
     def get_ranked_replays(self, game, username=None, pages=None):
-        """Get ranked replays
+        """Get a list of ranked games for a game and add them to the database.
 
         Args:
-            game (String): Gameid
-            username (String, optional): Player profile name. Defaults to None.
+            game (str): Game id
+            username (username, optional): Username. Defaults to None.
+            pages (int, optional): Number of pages to search. Defaults to None.
+
+        Returns:
+            str: Returns the status of the request
         """
         if game not in self.supported_games:
-            return('UNSUPPORTED_GAME')
+            return(status.UNSUPPORTED_GAME)
 
         query = {"req": "searchquarks", "best": True, "gameid": game}
 
@@ -179,36 +209,40 @@ class Getreplay:
         if pages is None:
             query['offset'] = 0
             r = self.get_data(query)
-            replays += r.json()['results']['results']
+            replays += r['results']['results']
         else:
             for page in range(0, pages):
                 query['offset'] = page
                 r = self.get_data(query)
-                replays += r.json()['results']['results']
+                replays += r['results']['results']
 
         for i in replays:
             if i['emulator'] == 'fbneo' and i['live'] is False:
-                status = self.add_replay(
+                local_status = self.add_replay(
                     replay=i,
                     emulator=i['emulator'],
                     game=game,
                     player_replay=False
                 )
-                if status != 'ADDED':
-                    log.info(f'Not adding game, Status: {status}')
+                if local_status != status.ADDED:
+                    log.info(f'Not adding game, Status: {local_status}')
 
-        return("ADDED")
+        return status.ADDED
 
     def get_replay(self, url, player_requested=False):
-        """Get a single replay
+        """Get a replay by url.
 
         Args:
-            url (String): Link to replay
+            url (str): Url to retrieve the replay from
+            player_requested (bool, optional): Is this a player requested replay. Defaults to False.
+
+        Returns:
+            str: Returns the string status of the request
         """
         # Validate url, this could probably be done better
         pattern = re.compile('^https://replay.fightcade.com/fbneo/.*/[0-9]*-[0-9]*$')
         if not pattern.match(url):
-            return('INVALID_URL')
+            return(status.INVALID_URL)
 
         # Parse url
         emulator = url.split('/')[3]
@@ -217,7 +251,7 @@ class Getreplay:
         log.debug(f"Parsed url: emulator: {emulator}, game: {game}, challenge_id: {challenge_id}")
 
         if game not in self.supported_games:
-            return('UNSUPPORTED_GAME')
+            return(status.UNSUPPORTED_GAME)
 
         # Get play replays
         query = {
@@ -227,7 +261,7 @@ class Getreplay:
         r = self.get_data(query)
 
         # Look for replay in results:
-        for i in r.json()['results']['results']:
+        for i in r['results']['results']:
             if challenge_id == i['quarkid']:
                 return self.add_replay(
                     replay=i,
@@ -235,4 +269,4 @@ class Getreplay:
                     game=game,
                     player_replay=player_requested
                 )
-        return False
+        return status.REPLAY_NOT_FOUND

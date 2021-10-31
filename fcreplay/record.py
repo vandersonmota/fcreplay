@@ -80,7 +80,7 @@ class Record:
 
         return running_time
 
-    def main(self, fc_challange_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, game_name=None):
+    def main(self, fc_challenge_id=None, fc_time=None, kill_time=None, fcadefbneo_path=None, game_name=None):
         log.info('Starting pulseaudio')
         subprocess.Popen(
             ['pulseaudio', '-v', '--exit-idle-time=-1'],
@@ -97,10 +97,10 @@ class Record:
 
         # Start ggpofbneo
         log.info("Starting fcadefbneo thread")
-        log.debug(f"Arguments: {fcadefbneo_path}, {fc_challange_id}, {game_name}")
+        log.debug(f"Arguments: {fcadefbneo_path}, {fc_challenge_id}, {game_name}")
 
         ggpo_thread = threading.Thread(target=self.start_fcadefbneo, args=[
-                                       fcadefbneo_path, fc_challange_id, game_name])
+                                       fcadefbneo_path, fc_challenge_id, game_name])
         ggpo_thread.start()
         log.info("Started ggpofbneo")
 

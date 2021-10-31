@@ -270,7 +270,7 @@ class Config:
                 with open("config.json", 'r') as json_data_file:
                     return json.load(json_data_file)
 
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             print("Unable to find config file, please generate one using `fcreplay config generate`")
             sys.exit(1)
 

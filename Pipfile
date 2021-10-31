@@ -6,9 +6,9 @@ verify_ssl = true
 [dev-packages]
 pipenv-setup = "*"
 pytest-env = "*"
-pytest-pudb = "~=0.7"
-flake8 = "~=3.8"
-pytest = "~=6.1"
+pytest-pudb = "*"
+flake8 = "*"
+pytest = "*"
 autopep8 = "*"
 coverage = "*"
 bpython = "*"
@@ -58,6 +58,8 @@ schedule = "*"
 cmd2 = "~=1.5.0"
 greenlet = "<0.5"
 feedgen = "*"
+google-auth-oauthlib = "*"
+youtube-upload = {editable = true, git = "https://github.com/tokland/youtube-upload.git", ref = "master"}
 
 [requires]
 python_version = "3.8"
