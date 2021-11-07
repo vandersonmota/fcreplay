@@ -18,7 +18,6 @@ class Feed:
         self.fg.logo('https://fightcadevids.com/assets/img/fightcade_logo')
         self.fg.subtitle('Fightcade Videos')
         self.fg.language('en')
-        self.fg.updated('2019-01-01T12:00:00Z')
 
         self.atomfeed = self.fg.atom_str(pretty=True)
         self.rssfeed = self.fg.rss_str(pretty=True)
@@ -32,19 +31,26 @@ class Feed:
         # Read lates videos from database
         replays = self.db.get_all_finished_replays(limit=25)
 
-        for r in replays:
-            description = self.db.get_description(r.id).description
+        dates = []
 
+        for r in replays:
+            description = f"{self.supported_games[r.game]['game_name']} - ({r.p1_loc}) {r.p1} vs {r.p2_loc}) {r.p2}"
+ 
             fe = self.fg.add_entry()
-            fe.title(f"{self.supported_games[r.game]} - "\
-                     f"({r.p1_loc}) {r.p1} vs "\
-                     f"({r.p2_loc}) {r.p2}")
+            fe.title(description)
             fe.link(href='https://fightcadevids.com/video/' + r.id, rel='alternate')
             fe.id('https://fightcadevids.com/video/' + r.id)
             fe.description(description)
             fe.content(description)
             fe.pubDate(r.date_added.strftime('%a, %e %b %Y %H:%M:%S UTC'))
             fe.updated(r.date_added.strftime('%a, %e %b %Y %H:%M:%S UTC'))
+
+            dates.append(r.date_added)
+
+        # Get newest date from list
+        newest_date = max(dates)
+
+        self.fg.updated(newest_date.strftime('%a, %e %b %Y %H:%M:%S UTC'))
 
     def render_atom(self):
         self.generate_feed()
