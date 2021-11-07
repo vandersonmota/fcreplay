@@ -34,7 +34,7 @@ class Replays(Base):
     created = Column(Boolean)
     failed = Column(Boolean)
     status = Column(String)
-    date_added = Column(DateTime)
+    date_added = Column(DateTime)  # Date that replay was added to db
     player_requested = Column(Boolean)
     game = Column(String)
     emulator = Column(String)

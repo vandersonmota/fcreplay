@@ -2,6 +2,7 @@ from fcreplay.config import Config
 from fcreplay.site import queries
 from fcreplay.site.database import db
 from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
+from fcreplay.site.feed import Feed
 
 from flask import Blueprint
 from flask import abort, jsonify, render_template, request, session, redirect, send_from_directory, url_for
@@ -282,3 +283,13 @@ def videopage(challenge_id):
     logging.debug(
         f"Video page, replay: {replay}, characters: {characters}, seek: {seek}")
     return render_template('video.j2.html', replay=replay, characters=characters, seek=seek, form=searchForm, games=supported_games)
+
+
+@app.route('/feed/atom')
+def feed_atom():
+    return Feed().render_atom()
+
+
+@app.route('/feed/rss')
+def feed_rss():
+    return Feed().render_rss()

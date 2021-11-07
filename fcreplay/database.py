@@ -444,24 +444,6 @@ class Database:
         session.commit()
         session.close()
 
-    def get_all_queued_player_replays(self):
-        """Get all queued player plays .
-
-        Returns:
-            sqlalchemt.object: Returns a sqlalchemy.object containing queued replays
-        """
-        session = self.Session()
-        replays = session.query(
-            Replays
-        ).filter_by(
-            player_requested=True,
-            failed=False,
-            created=False
-        ).order_by(
-            Replays.date_added.asc()
-        ).all()
-        session.close()
-        return replays
 
     def get_unprocessed_replays(self):
         """Get all replays that are unprocessed.
@@ -609,7 +591,7 @@ class Database:
         session.close()
         return failed_replays
 
-    def get_all_finished_replays(self, limit=10):
+    def get_all_finished_replays(self, limit=10, order_by=Replays.date_added):
         """Get all the finished replays.
 
         Args:
@@ -622,7 +604,7 @@ class Database:
         replays = session.query(Replays).filter_by(
             failed=False,
             created=True
-        ).limit(limit).all()
+        ).order_by(order_by).limit(limit).all()
         session.close()
         return replays
 
@@ -660,3 +642,38 @@ class Database:
         ).limit(limit).all()
         session.close()
         return replays
+
+    def get_all_queued_player_replays(self):
+        """Get all queued player plays .
+
+        Returns:
+            sqlalchemt.object: Returns a sqlalchemy.object containing queued replays
+        """
+        session = self.Session()
+        replays = session.query(
+            Replays
+        ).filter_by(
+            player_requested=True,
+            failed=False,
+            created=False
+        ).order_by(
+            Replays.date_added.asc()
+        ).all()
+        session.close()
+        return replays
+
+    def get_description(self, challenge_id):
+        """Get description of a challenge.
+
+        Args:
+            challenge_id (str): Challenge id
+
+        Returns:
+            sqlalchemy.object: sqlalchemy.object containing description
+        """
+        session = self.Session()
+        description = session.query(Descriptions).filter_by(
+            id=challenge_id
+        ).first()
+        session.close()
+        return description

@@ -14,7 +14,7 @@ class Replays(db.Model):
     created = db.Column(db.Boolean)
     failed = db.Column(db.Boolean)
     status = db.Column(db.String)
-    date_added = db.Column(db.Integer)
+    date_added = db.Column(db.DateTime)
     player_requested = db.Column(db.Boolean)
     game = db.Column(db.String)
     video_processed = db.Column(db.Boolean)
