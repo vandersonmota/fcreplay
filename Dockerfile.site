@@ -1,7 +1,14 @@
-FROM tiangolo/meinheld-gunicorn-flask:python3.8
+#FROM tiangolo/meinheld-gunicorn-flask:python3.10
+FROM python:3.10-buster
 LABEL maintainer="glisignoli"
 
 COPY ./requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
+RUN pip install waitress
 
 COPY ./fcreplay /app/fcreplay
+COPY ./files/waitress.sh /docker-entrypoint.sh
+RUN chmod 0755 /docker-entrypoint.sh
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+RUN touch /app/config.json

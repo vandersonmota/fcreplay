@@ -68,6 +68,7 @@ class Getreplay:
         local_status = status.ADDED
         date_added = datetime.datetime.utcnow()
         player_requested = player_replay
+        fail_count = 0
 
         if 'rank' in replay['players'] or 'rank' in replay['players'][1]:
             if replay['players'][0]['rank'] is None:
@@ -108,7 +109,8 @@ class Getreplay:
                     player_requested=player_requested,
                     game=game,
                     emulator=emulator,
-                    video_processed=False
+                    video_processed=False,
+                    fail_count=fail_count
                 )
                 return(status.ADDED)
             else:

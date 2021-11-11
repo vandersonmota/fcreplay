@@ -1,4 +1,24 @@
 # Development notes
+## Setup
+Use pipenv:
+```
+pipenv install --python
+```
+
+## Tests
+### Unit Tests
+Some unittest are available by running
+```
+pytest
+```
+
+### Functional test
+A functional test is avilalable by running:
+```
+pytest --runslow -s fcreplay/tests/test_functionality.py
+```
+
+This will test all docker containers, but not the site or youtube/archive.org uploads
 
 ## Database
 The database is defined in `models.py`. Tested on postgresql
@@ -11,7 +31,7 @@ db = Database()
 ## Running site locally:
 Run with:
 ```
-docker-compose run --service-ports fcreplay-site
+./dev_site.sh
 ```
 
 ## Processing order:

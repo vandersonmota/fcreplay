@@ -15,6 +15,7 @@ venv
 coverage.xml
 .coverage
 tmp/
+interactive.py
 
 # Config files
 .client_secrets.json
@@ -39,3 +40,6 @@ avi/
 
 # Savestates
 files/savestates/*.fs
+
+# Database
+fcreplay_pgdata

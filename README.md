@@ -34,7 +34,7 @@ This is all done in a headless X11 session
 
 ## Todo
  - Better exception handling.
- - Thumbnails are generated but not used
+ - Thumbnails are generated but not used by archive.org
 
 ## Hardware
 To run this, you need:

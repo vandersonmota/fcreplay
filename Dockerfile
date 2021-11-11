@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM python:3.10-buster
 
 LABEL maintainer="glisignoli"
 
@@ -120,6 +120,9 @@ COPY files/fcadefbneo.default.ini /Fightcade/emulator/fbneo/config/fcadefbneo.de
 COPY files/fcadefbneo.ini /Fightcade/emulator/fbneo/config/fcadefbneo.ini
 
 COPY files/docker-entrypoint.sh /docker-entrypoint.sh
+
+# Create an empty config.json file to overwrite with docker
+RUN touch /root/config.json
 
 CMD ["fcrecord"]
 ENTRYPOINT ["/docker-entrypoint.sh"]

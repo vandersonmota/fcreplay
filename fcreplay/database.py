@@ -43,7 +43,8 @@ class Database:
                    p1, p2,
                    date_replay, length, created, failed, status, date_added,
                    player_requested, game, emulator, video_processed,
-                   ia_filename="EMPTY"
+                   ia_filename="EMPTY",
+                   fail_count=0
                    ):
         """Add a new replay to the database to be encoded.
 
@@ -65,7 +66,9 @@ class Database:
             game (str): Game name
             emulator (str): Emulator used
             video_processed (bool): Has the video been prossed (usually False)
-            ia_filename (str, optional): Archive.org filename. Defaults to "EMPTY".
+            ia_filename (str, optional): Archive.org filename. Defaults to "EMPTY"
+            fail_count (int, optional): Number of times the replay has failed. Defaults to 0
+
         """
         session = self.Session()
         session.add(
@@ -87,7 +90,8 @@ class Database:
                 game=game,
                 emulator=emulator,
                 video_processed=video_processed,
-                ia_filename="EMPTY"
+                ia_filename=ia_filename,
+                fail_count=fail_count
             )
         )
         session.commit()
@@ -190,7 +194,7 @@ class Database:
         session.close()
 
     def get_job(self, challenge_id):
-        """Returns a job by its id
+        """Return a job by its id
 
         Args:
             challenge_id (str): Challenge id
@@ -208,7 +212,7 @@ class Database:
         return job
 
     def get_job_count(self):
-        """Returns the number of jobs in the database.
+        """Return the number of jobs in the database.
 
         Returns:
             str: Number of jobs
@@ -230,7 +234,7 @@ class Database:
         return count
 
     def get_failed_count(self):
-        """Returns the number of failed replays.
+        """Return the number of failed replays.
 
         Returns:
             str: Number of failed replays.
@@ -326,7 +330,7 @@ class Database:
         session.close()
 
     def get_youtube_day_log(self):
-        """Get youtube day log
+        """Get youtube day log.
 
         Returns:
             sqlalchemy.object: Contains the date and count
