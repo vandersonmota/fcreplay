@@ -142,17 +142,17 @@
             <nav class="float-left">
               <ul>
                 <li>
-                  <a href="https://fightcadevids.com/">
+                  <a href="{{ url_for('blueprint.index') }}">
                     FightCade Replays
                   </a>
                 </li>
                 <li>
-                  <a href="https://fightcadevids.com/feed/atom">
+                  <a href="{{ url_for('blueprint.feed_atom') }}">
                     Atom Feed
                   </a>
                 </li>
                 <li>
-                  <a href="https://fightcadevids.com/feed/rss">
+                  <a href="{{ url_for('blueprint.feed_rss') }}">
                     RSS Feed
                   </a>
                 </li>
