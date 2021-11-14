@@ -2,7 +2,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 
-from fcreplay.site.filters import convertLength, linkPath
+from fcreplay.site.filters import convertLength
 from fcreplay.site.blueprint import app as blueprint_app
 from fcreplay.site.database import db
 
@@ -45,7 +45,6 @@ def create_app(app_config):
 
 def app_filters(app):
     app.jinja_env.filters['convertLength'] = convertLength
-    app.jinja_env.filters['linkPath'] = linkPath
 
 
 def cors(app):

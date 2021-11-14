@@ -595,7 +595,7 @@ class Database:
         session.close()
         return failed_replays
 
-    def get_all_finished_replays(self, limit=10, order_by=Replays.date_added.desc()):
+    def get_all_finished_replays(self, limit=10, order_by=Replays.date_added.desc()) -> list[Replays]:
         """Get all the finished replays.
 
         Args:

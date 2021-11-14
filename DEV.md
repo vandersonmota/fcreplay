@@ -12,13 +12,23 @@ Some unittest are available by running
 pytest
 ```
 
+# Loading sample data
+Ok, it's more like 'live data'. But it's handy for testing.
+```
+gunzip < ./files/sample-data.sql.gz | docker-compose exec -T postgres psql -U fcreplay -d fcreplay
+```
+
 ### Functional test
 A functional test is avilalable by running:
 ```
 pytest --runslow -s fcreplay/tests/test_functionality.py
 ```
 
-This will test all docker containers, but not the site or youtube/archive.org uploads
+This will test most if not all features 
+
+This will test all docker containers, except:
+ - youtube/archive.org uploads
+ - fcreplay-cli
 
 ## Database
 The database is defined in `models.py`. Tested on postgresql
@@ -33,6 +43,8 @@ Run with:
 ```
 ./dev_site.sh
 ```
+
+Run with './dev_site.sh --debug' to enable debugpy debugging for vscode
 
 ## Processing order:
 Processing a replay involves many steps. To start with, look at the `main` function of loop.py

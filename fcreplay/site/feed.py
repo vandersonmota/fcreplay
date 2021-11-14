@@ -34,11 +34,16 @@ class Feed:
         dates = []
 
         for r in replays:
+            if r.video_youtube_uploaded:
+                link = f'https://www.youtube.com/watch?v={r.video_youtube_id}'
+            else:
+                link = f'http://archive.org/details/{r.id.replace("@", "-")}'
+
             description = f"{self.supported_games[r.game]['game_name']} - ({r.p1_loc}) {r.p1} vs {r.p2_loc}) {r.p2}"
- 
+
             fe = self.fg.add_entry()
             fe.title(description)
-            fe.link(href='https://fightcadevids.com/video/' + r.id, rel='alternate')
+            fe.link(href=link, rel='alternate')
             fe.id('https://fightcadevids.com/video/' + r.id)
             fe.description(description)
             fe.content(description)

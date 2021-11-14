@@ -1,42 +1,30 @@
 # This is a SLOW long running test to check the functionality of the fcreplay.
 # This requires docker and a bunch of disk space
-import os
 import docker
-import pytest
-import subprocess
-import yaml
-import time
+import gzip
 import json
+import os
+import pytest
+import requests
+import subprocess
+import time
+import yaml
 
+from pylinkvalidator.api import crawl, crawl_with_options
 
 @pytest.mark.slow
 class TestFunctionality:
     def _standup(self) -> bool:
-        """Check if the container is running .
+        """Stop postgres if it's running .
 
         Returns:
-            bool: True if container is running
+            bool: True
         """
         if self._is_container_running('postgres_container'):
             # Kill running postgres container
             print("Stopping postgres")
             subprocess.run(['docker-compose', 'stop', 'postgres'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.run(['docker-compose', 'rm', '-f', 'postgres'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-        # Check the database folder exists
-        try:
-            override = self._get_override('./docker-compose.override.yml')
-            pg_path = override['services']['postgres']['volumes'][0].split(':')[0]
-            print(f"Cheking if {pg_path} exists")
-
-            if os.path.exists(pg_path):
-                print("Path exists, backing up database folder")
-                self._move_database(pg_path, './fcreplay-pg_data.bak')
-            else:
-                print(f"{pg_path} doesn't exist")
-
-        except KeyError:
-            raise Exception('docker-compose.override.yml is missing the postgres volume')
 
         return True
 
@@ -125,7 +113,7 @@ class TestFunctionality:
         return False
 
     def _start_postgres_container(self) -> bool:
-        """AI is creating summary for _start_postgres_container.
+        """Start postgres container.
 
         Returns:
             bool: True if container is running
@@ -142,6 +130,43 @@ class TestFunctionality:
 
             if pg_count > 30:
                 return False
+
+        # Clear the database
+        rc_status = self._drop_fcreplay_database()
+
+        if not rc_status:
+            return False
+
+        # Create the database
+        rc_status = self._create_fcreplay_database()
+
+        if not rc_status:
+            return False
+        return True
+
+    def _drop_fcreplay_database(self) -> bool:
+        """Drop databases from container.
+
+        Returns:
+            bool: True if container is clean
+        """
+        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'dropdb', '--if-exists', '-U', 'fcreplay', 'fcreplay'],stdout=subprocess.PIPE)
+
+        if rc.returncode != 0:
+            raise Exception("Failed to drop database")
+
+        return True
+
+    def _create_fcreplay_database(self) -> bool:
+        """Create databases from container.
+
+        Returns:
+            bool: True if container is clean
+        """
+        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'createdb', '-U', 'fcreplay', 'fcreplay'])
+
+        if rc.returncode != 0:
+            raise Exception("Failed to create database")
 
         return True
 
@@ -486,6 +511,86 @@ class TestFunctionality:
 
         return True
 
+    def _load_sql_data(self) -> bool:
+        """Load sql data for site testing.
+
+        Returns:
+            bool: True if sql data was loaded
+        """
+        # Remove all existing data
+        self._drop_fcreplay_database()
+
+        # Create the database
+        self._create_fcreplay_database()
+
+        # Get sqldata
+        with gzip.open('files/sample-data.sql.gz') as f:
+            sql_data = f.read().decode('utf-8')
+
+        # Load the sql data
+        print("Loading the sql data")
+        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'psql', '-U', 'fcreplay', '-d', 'fcreplay'], stdout=subprocess.PIPE, input=sql_data.encode('utf-8'))
+        print(rc.stdout.decode('utf-8'))
+
+        return True
+
+    def _start_fcreplay_site(self) -> bool:
+        """Start the fcreplay-site container
+
+        Returns:
+            bool: True if the site started
+        """
+        # Start the site
+        rc = subprocess.run(['docker-compose', 'run', '-d', '--service-ports', 'fcreplay-site'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        self.site_instance_id = rc.stdout.decode('utf-8').strip()
+
+        # Wait for the container to start
+        check_count = 0
+        while not self._is_container_running('fcreplay_fcreplay-site', fuzzy=True):
+            check_count += 1
+            time.sleep(1)
+
+            if check_count > 30:
+                return False
+
+        # Perform a http lookup to check if the site is up
+        check_count = 0
+        site_up = False
+
+        while not site_up and check_count < 30:
+            check_count += 1
+            time.sleep(1)
+
+            response = requests.get('http://localhost/')
+            if response.status_code == 200:
+                site_up = True
+
+        return True
+
+    def _check_for_broken_links(self) -> bool:
+        """Check the fcreplay-site for broken links.
+
+        Returns:
+            bool: True if the site is working
+        """
+        crawled_site = crawl_with_options(
+            ['http://localhost/'],
+            {
+                'depth': 2
+            }
+        )
+
+        print(f'Crawled {len(crawled_site.pages)} pages')
+
+        # check crawled_site for errors
+        if len(crawled_site.error_pages) > 0:
+            print('Found broken links')
+            for error in crawled_site.error_pages:
+                print(error)
+            return False
+
+        return True
+
     def _teardown(self) -> bool:
         """Teardown the container .
 
@@ -501,6 +606,11 @@ class TestFunctionality:
 
         # Remove new database
         subprocess.run(['sudo', 'rm', '-rf', pg_path])
+
+        # Check if fcreplay-site is running and remove it
+        site_id = self._get_container_id('fcreplay_fcreplay-site')
+        if len(site_id[0]) > 0:
+            subprocess.run(['docker', 'kill', site_id[0]])
 
         return True
 
@@ -547,10 +657,37 @@ class TestFunctionality:
         assert self._remove_replays(), "Failed to remove replays"
 
         # Run the fcreplay-tasker and wait for it to start a recording instance
+        print("Starting fcreplay-tasker")
         assert self._start_tasker(), "Failed to start fcreplay-tasker"
 
         # Wait for recording to finish
+        print("Waiting for recording to finish")
         assert self._wait_for_recording(), "Failed to wait for recording"
+
+        # Check for broken links
+        print("Checking for broken links")
+
+        # Teardown
+        print("Running teardown")
+        assert self._teardown(), 'Failed to teardown'
+
+    def test_site(self):
+        # Start database
+        print("Running Postgres")
+        assert self._start_postgres_container(), 'Failed to start postgres container'
+
+        # Load some sql data for site testing
+        print("Loading sql data")
+        assert self._load_sql_data(), "Failed to load sql data"
+
+        """Test the fcreplay-site."""
+        # Start the fcreplay-site
+        print("Starting fcreplay-site")
+        assert self._start_fcreplay_site(), "Failed to check fcreplay-site"
+
+        # Check the fcreplay-site
+        print("Checking fcreplay-site")
+        assert self._check_for_broken_links(), "Failed to check fcreplay-site"
 
         # Teardown
         print("Running teardown")

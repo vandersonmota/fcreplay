@@ -98,6 +98,7 @@ def submitResult():
         return render_template('submitResult.j2.html', form=searchForm, result=result, submt_active=True)
 
 
+@app.route('/search/assets/<path:path>')
 @app.route('/assets/<path:path>')
 def send_js(path):
     return send_from_directory('templates/assets', path)
@@ -144,45 +145,25 @@ def advancedSearch():
     return render_template('advancedSearch.j2.html', advancedsearch_active=True, form=searchForm, advancedSearchForm=advancedSearchForm, character_dict=all_characters_dict, players_list=players_list)
 
 
-@app.route('/advancedSearchResult', methods=['POST', 'GET'])
+@app.route('/advancedSearchResult')
 def advancedSearchResult():
-    logging.debug(f"Session: {session}")
-    # I feel like there should be a better way to do this
-    if request.method == 'POST':
-        result = AdvancedSearchForm(request.form)
-
-        session['search'] = result.search.data
-        session['p1_name'] = result.p1_name.data
-        session['p2_name'] = result.p2_name.data
-        session['char1'] = result.char1.data
-        session['char2'] = result.char2.data
-        session['p1_rank'] = result.p1_rank.data
-        session['p2_rank'] = result.p2_rank.data
-        session['order_by'] = result.order_by.data
-        session['game'] = result.game.data
-
-        return redirect(url_for('blueprint.advancedSearchResult'))
-    else:
-        if 'search' not in session:
-            return index()
-        search_query = session['search']
-        p1_name = session['p1_name']
-        p2_name = session['p2_name']
-        char1 = session['char1']
-        char2 = session['char2']
-        p1_rank = session['p1_rank']
-        p2_rank = session['p2_rank']
-        order_by = session['order_by']
-        game = session['game']
+    search = request.args.get('search')
+    p1_name = request.args.get('p1_name', default='', type=str)
+    p2_name = request.args.get('p2_name', default='', type=str)
+    char1 = request.args.get('char1')
+    char2 = request.args.get('char2')
+    p1_rank = request.args.get('p1_rank')
+    p2_rank = request.args.get('p2_rank')
+    order_by = request.args.get('order_by', default='date_added')
+    game = request.args.get('game')
+    page = request.args.get('page', 1, type=int)
 
     searchForm = SearchForm()
-
-    page = request.args.get('page', 1, type=int)
 
     pagination = queries.advanced_search(game_id=game,
                                          p1_rank=p1_rank,
                                          p2_rank=p2_rank,
-                                         search_query=search_query,
+                                         search_query=search,
                                          order_by=order_by,
                                          char1=char1,
                                          char2=char2,
@@ -194,52 +175,32 @@ def advancedSearchResult():
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
 
 
-@app.route('/search', methods=['POST', 'GET'])
+@app.route('/search', )
 def search():
-    logging.debug(f"Session: {session}")
-    # I feel like there should be a better way to do this
-    if request.method == 'POST':
-        result = SearchForm(request.form)
-
-        session['search'] = result.search.data
-        session['order_by'] = result.order_by.data
-        session['game'] = result.game.data
-
-        return redirect(url_for('blueprint.search'))
-    else:
-        if 'search' not in session:
-            return index()
-        search_query = session['search']
-        order_by = session['order_by']
-        game = session['game']
+    search = request.args.get('search')
+    order_by = request.args.get('order_by', default='date_added')
+    game = request.args.get('game')
+    page = request.args.get('page', 1, type=int)
 
     searchForm = SearchForm(request.form,
-                            search=search_query,
+                            search=search,
                             game=game)
-
-    page = request.args.get('page', 1, type=int)
 
     if game == 'Any':
         game = '%'
 
-    pagination = queries.basic_search(game, search_query, order_by).paginate(page, per_page=9)
+    pagination = queries.basic_search(game, search, order_by).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)
 
 
-@app.route('/search/player/<player_name>')
-def search_player_name(player_name):
-    session['player_name'] = player_name
-    return redirect(url_for('blueprint.player_name'))
-
-
-@app.route('/player_name')
-def player_name():
+@app.route('/search/player')
+def search_player():
     searchForm = SearchForm()
-    player_name = session['player_name']
+    player = request.args.get('player')
     page = request.args.get('page', 1, type=int)
-    pagination = queries.player_search(player_name).paginate(page, per_page=9)
+    pagination = queries.player_search(player).paginate(page, per_page=9)
     replays = pagination.items
 
     return render_template('start.j2.html', pagination=pagination, replays=replays, form=searchForm, games=supported_games)

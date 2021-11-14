@@ -18,7 +18,6 @@ class DevConfig(Config):
     ENV = 'dev'
     DEBUG = True
 
-
 class TestConfig(Config):
     config = FcreplayConfig().config
 
