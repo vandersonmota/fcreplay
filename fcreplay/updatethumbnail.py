@@ -6,7 +6,6 @@ This class will add player information to a thumbnail, such as:
   * Rank
 """
 from PIL import Image, ImageFont, ImageDraw, ImageOps
-from fcreplay.config import Config
 import logging
 
 log = logging.getLogger('fcreplay')
@@ -14,7 +13,6 @@ log = logging.getLogger('fcreplay')
 
 class UpdateThumbnail:
     def __init__(self):
-        self.config = Config().config
         self.font_path = "/opt/droid-fonts/droid/DroidSans.ttf"
         self.flag_path = "/opt/flags/png1000px/"
 

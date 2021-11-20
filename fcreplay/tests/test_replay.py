@@ -22,7 +22,7 @@ class TestReplay:
             os.mkdir(f"{single_file_dir}/avi")
             open(f"{single_file_dir}/avi/test_0.avi", "w")
 
-            r.config = {'fcadefbneo_path': single_file_dir}
+            r.config.fcadefbneo_path = single_file_dir
             r.encode()
 
             mock_subprocess.run.assert_called(), 'Single file should call encoder'
@@ -32,7 +32,7 @@ class TestReplay:
             for i in range(0, 3):
                 open(f"{multi_file_dir}/avi/test_{i}.avi", "w")
 
-            r.config = {'fcadefbneo_path': multi_file_dir}
+            r.config.fcadefbneo_path = multi_file_dir
             r.encode()
             mock_subprocess.run.assert_called(), 'Multi file sould call encoder'
 
@@ -41,7 +41,7 @@ class TestReplay:
             for i in range(0, 3):
                 open(f"{multi_file_dir}/avi/_foo_bar_{i}.avi", "w")
 
-            r.config = {'fcadefbneo_path': multi_file_dir}
+            r.config.fcadefbneo_path = multi_file_dir
             r.encode()
             mock_subprocess.run.assert_called(), 'Multifile with underscores should call encoder'
 
@@ -51,9 +51,7 @@ class TestReplay:
     def test_sort(self, mock_config, mock_database, mock_subprocess):
         r = Replay()
 
-        r.config = {
-            'fcadefbneo_path': 'dir'
-        }
+        r.config.fcadefbneo_path = 'dir'
 
         unsorted_list = [
             "foo_bar_1A.avi",

@@ -1,4 +1,3 @@
-from fcreplay.config import Config
 from fcreplay.site import queries
 from fcreplay.site.database import db
 from fcreplay.site.forms import AdvancedSearchForm, SearchForm, SubmitForm
@@ -14,7 +13,6 @@ import pkg_resources
 import pytz
 
 app = Blueprint('blueprint', __name__, static_folder='static')
-config = Config().config
 
 with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
     supported_games = json.load(f)

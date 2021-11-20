@@ -6,24 +6,24 @@ import logging_loki
 import socket
 
 
-def _loki_handler(config):
+def _loki_handler(config: Config):
     loki_handler = logging_loki.LokiQueueHandler(
         Queue(-1),
-        url=config['logging_loki']['url'],
+        url=config.logging_loki['url'],
         tags={
             "application": "fcreplay",
             "instance": socket.gethostname(),
         },
-        auth=(config['logging_loki']['username'], config['logging_loki']['password']),
+        auth=(config.logging_loki['username'], config.logging_loki['password']),
         version="1",
     )
-    loki_handler.setLevel(config['loglevel'])
+    loki_handler.setLevel(config.loglevel)
     return loki_handler
 
 
-def _file_handler(config):
+def _file_handler(config: Config):
     file_handler = logging.FileHandler(
-        filename=config['logfile']
+        filename=config.logfile
     )
     file_formatter = logging.Formatter(
         datefmt='%Y-%m-%d %H:%M:%S',
@@ -34,19 +34,19 @@ def _file_handler(config):
 
 
 def setup_logger():
-    config = Config().config
+    config = Config()
 
     # create logger
     logger = logging.getLogger('fcreplay')
-    logger.setLevel(config['loglevel'])
+    logger.setLevel(config.loglevel)
 
     # create console handler and set level
     stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(config['loglevel'])
+    stream_handler.setLevel(config.loglevel)
     logger.addHandler(stream_handler)
 
     # Setup logging_loki handler
-    if config['logging_loki']['enabled']:
+    if config.logging_loki['enabled']:
         logger.addHandler(_loki_handler(config))
 
     # Setup file handler if we aren't running in a cloud function (which is read only)

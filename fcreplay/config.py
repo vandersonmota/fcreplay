@@ -6,7 +6,90 @@ import sys
 
 
 class Config:
+    """ Configuration class.
+    This class is used to load and validate the configuration file.
+    """
+
     def __init__(self):
+        self.description_append_file: str = str()
+        "Append file"
+
+        self.fcadefbneo_path: str = str()
+        "Path to the fcadedbneo executable"
+
+        self.fcreplay_dir: str = str()
+        "Path to the fcreplay directory"
+
+        self.get_weekly_replay_pages: int = int()
+        "Number of pages to get from the fcadedbneo website"
+
+        self.ia_settings: dict = dict()
+        "Settings for the IA"
+
+        self.kill_all: bool = bool()
+        "Kill all running instances of fcadedbneo"
+
+        self.logging_loki: dict = dict()
+        "Logging settings for loki"
+
+        self.logfile: str = str()
+        "Logfile path"
+
+        self.loglevel: str = str()
+        "Logging level"
+
+        self.min_replay_length: int = int()
+        "Minimum length of a replay"
+
+        self.max_replay_length: int = int()
+        "Maximum length of a replay"
+
+        self.player_replay_first: bool = bool()
+        "If true, player replays will be encoded first"
+
+        self.random_replay: bool = bool()
+        "If true, a random replay will be selected"
+
+        self.record_timeout: int = int()
+        "Timeout for the record command"
+
+        self.remove_old_avi_files: bool = bool()
+        "If true, old avi files will be removed"
+
+        self.secret_key: str = str()
+        "Secret key for the flask app"
+
+        self.sql_baseurl: str = str()
+        "Base url for the sql database"
+
+        self.upload_to_ia: bool = bool()
+        "If true, replays will be uploaded to the IA"
+
+        self.upload_to_yt: bool = bool()
+        "If true, replays will be uploaded to the youtube"
+
+        self.youtube_credentials: str  = str()
+        "Path to the youtube credentials file"
+
+        self.youtube_max_daily_uploads: int = int()
+        "Maximum number of daily youtube uploads"
+
+        self.youtube_secrets: str = str()
+        "Path to the youtube secrets file"
+
+        c = self._validate_config()
+
+        # Load the config into the class variables
+        for k in c:
+            if k not in self.__dict__:
+                print(f"Invalid config key: {k}")
+                sys.exit(1)
+            else:
+                setattr(self, k, c[k])
+
+    def _validate_config(self) -> dict:
+        """ Private function to validate config
+        """
         self.schema = {
             'description_append_file': {
                 'type': 'list',
@@ -30,41 +113,6 @@ class Config:
                 'meta': {
                     'default': '/root',
                     'description': 'Path of where to run fcreplay',
-                }
-            },
-            'gcloud_compute_service_account': {
-                'type': 'string',
-                'meta': {
-                    'default': 'some-service-account123@project.iam.gserviceaccount.com',
-                    'description': 'Google cloud service account email address'
-                }
-            },
-            'gcloud_instance_max': {
-                'type': 'number',
-                'meta': {
-                    'default': 5,
-                    'description': 'Maximum number of cloud recording instances to run',
-                }
-            },
-            'gcloud_project': {
-                'type': 'string',
-                'meta': {
-                    'default': 'some-project-id-123',
-                    'description': 'Google cloud project id'
-                }
-            },
-            'gcloud_region': {
-                'type': 'string',
-                'meta': {
-                    'default': 'some-region',
-                    'description': 'Google cloud region'
-                }
-            },
-            'gcloud_zone': {
-                'type': 'string',
-                'meta': {
-                    'default': 'some-zone',
-                    'description': 'Google cloud zone'
                 }
             },
             'get_weekly_replay_pages': {
@@ -254,13 +302,16 @@ class Config:
                 }
             },
         }
-        self.config = self.get_config()
-        self.validate_config(self.config, self.schema)
+        self._config = self._get_config()
+        self.validate_config(self._config, self.schema)
 
-    def get_config(self):
-        """Returns config based on FCREPLAY_CONFIG environment variable
-        If variable is unset, then look for config.json
-        If file does not exist, generate default config
+        return self._config
+
+    def _get_config(self) -> dict:
+        """Get config from file or from the FCREPLAY_CONFIG environment variable.
+
+        Returns:
+            dict Config dictionary
         """
         try:
             if 'FCREPLAY_CONFIG' in os.environ:

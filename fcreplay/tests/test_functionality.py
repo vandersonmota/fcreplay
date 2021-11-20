@@ -150,7 +150,7 @@ class TestFunctionality:
         Returns:
             bool: True if container is clean
         """
-        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'dropdb', '--if-exists', '-U', 'fcreplay', 'fcreplay'],stdout=subprocess.PIPE)
+        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'dropdb', '--if-exists', '-U', 'fcreplay', 'fcreplay'], stdout=subprocess.PIPE)
 
         if rc.returncode != 0:
             raise Exception("Failed to drop database")
@@ -430,7 +430,6 @@ class TestFunctionality:
         Returns:
             bool: True if the replays were removed
         """
-
         # Find the replay with the shortest length
         shortest_replay_out = self._run_sql("SELECT id, length FROM replays ORDER BY length ASC LIMIT 1;")
         shortest_replay_id = shortest_replay_out.split('\n')[2].split('|')[0].strip()
@@ -535,7 +534,7 @@ class TestFunctionality:
         return True
 
     def _start_fcreplay_site(self) -> bool:
-        """Start the fcreplay-site container
+        """Start the fcreplay-site container.
 
         Returns:
             bool: True if the site started
@@ -672,6 +671,9 @@ class TestFunctionality:
         assert self._teardown(), 'Failed to teardown'
 
     def test_site(self):
+        print("Running Standup")
+        assert self._standup(), 'Failed to standup'
+
         # Start database
         print("Running Postgres")
         assert self._start_postgres_container(), 'Failed to start postgres container'

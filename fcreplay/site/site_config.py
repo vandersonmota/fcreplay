@@ -2,15 +2,15 @@ from fcreplay.config import Config as FcreplayConfig
 
 
 class Config(object):
-    config = FcreplayConfig().config
+    config = FcreplayConfig()
     DEBUG = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = config['sql_baseurl']
-    SECRET_KEY = config['secret_key']
+    SQLALCHEMY_DATABASE_URI = config.sql_baseurl
+    SECRET_KEY = config.secret_key
 
 
 class ProdConfig(Config):
-    config = FcreplayConfig().config
+    config = FcreplayConfig()
     ENV = 'prod'
 
 
@@ -19,7 +19,7 @@ class DevConfig(Config):
     DEBUG = True
 
 class TestConfig(Config):
-    config = FcreplayConfig().config
+    config = FcreplayConfig()
 
     TESTING = True
     DEBUG = True

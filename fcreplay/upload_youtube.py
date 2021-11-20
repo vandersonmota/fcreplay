@@ -12,7 +12,7 @@ log = logging.getLogger('fcreplay')
 
 class UploadYouTube:
     def __init__(self, title, description, tags, video_path, recording_date, playlist=False, thumbnail=False, player_requested=False):
-        self.config = Config().config
+        self.config = Config()
         self.db = Database()
         self.day_log = self.db.get_youtube_day_log()
         self.today = datetime.date.today()
@@ -44,11 +44,11 @@ class UploadYouTube:
 
     def _check_credentials(self):
         # Check if credentials file exists
-        if not os.path.exists(self.config['youtube_credentials']):
+        if not os.path.exists(self.config.youtube_credentials):
             log.error("Youtube credentials don't exist exist")
             return False
 
-        if not os.path.exists(self.config['youtube_secrets']):
+        if not os.path.exists(self.config.youtube_secrets):
             log.error("Youtube secrets don't exist")
             return False
 
@@ -63,7 +63,7 @@ class UploadYouTube:
         # Check the log is for today
         if self.day_log.date.date() == self.today:
             # Check number of uploads
-            if self.day_log.count >= int(self.config['youtube_max_daily_uploads']):
+            if self.day_log.count >= int(self.config.youtube_max_daily_uploads):
                 log.info("Maximum uploads reached for today")
                 return False
         else:

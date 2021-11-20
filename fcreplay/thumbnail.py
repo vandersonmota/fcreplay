@@ -19,7 +19,7 @@ log = logging.getLogger('fcreplay')
 class Thumbnail:
     def __init__(self):
         """Class initiliser."""
-        self.config = Config().config
+        self.config = Config()
 
     def _create_thumbnails_fullframe(self, video_file_path):
         log.info("Generating thumbnails every 10 seconds")
@@ -28,14 +28,14 @@ class Thumbnail:
                 'ffmpeg',
                 '-i', str(video_file_path),
                 '-vf', 'fps=1/10',
-                f"{self.config['fcadefbneo_path']}/avi/thumbnails-%06d.png"
+                f"{self.config.fcadefbneo_path}/avi/thumbnails-%06d.png"
             ],
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE
         )
 
     def _get_thumbnails(self):
-        return glob.glob(f"{self.config['fcadefbneo_path']}/avi/thumbnails-*.png")
+        return glob.glob(f"{self.config.fcadefbneo_path}/avi/thumbnails-*.png")
 
     def _get_image_entropy(self, image):
         im = Image.open(image)
@@ -50,7 +50,7 @@ class Thumbnail:
         Returns:
             string: Full path to thumbnail
         """
-        self._create_thumbnails_fullframe(f"{self.config['fcadefbneo_path']}/avi/{replay.id}.mp4")
+        self._create_thumbnails_fullframe(f"{self.config.fcadefbneo_path}/avi/{replay.id}.mp4")
         thumbnails = self._get_thumbnails()
 
         # Sort files by size. Assuming files that have the largest size have more entpoy

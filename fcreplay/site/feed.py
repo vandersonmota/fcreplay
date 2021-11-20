@@ -1,15 +1,11 @@
 from feedgen.feed import FeedGenerator
 from fcreplay.database import Database
-from fcreplay.config import Config
-
 import json
 import pkg_resources
 
 
 class Feed:
     def __init__(self):
-        self.config = Config().config
-
         self.fg = FeedGenerator()
         self.fg.id('https://fightcadevids.com/feeds')
         self.fg.title('FightcadeVids')

@@ -13,10 +13,10 @@ log = logging.getLogger('fcreplay')
 class OverlayDetection:
     def __init__(self):
         log.debug('Creating character detection instance')
-        self.config = Config().config
+        self.config = Config()
         self.events = [{'start_time': datetime.datetime.now()}]
         self.finished = False
-        self.overlay_pickle_path = f"{self.config['fcadefbneo_path']}/avi/overlay.pickle"
+        self.overlay_pickle_path = f"{self.config.fcadefbneo_path}/avi/overlay.pickle"
 
     def start(self):
         log.info('Starting character detection')
@@ -39,7 +39,7 @@ class OverlayDetection:
             if self.finished:
                 break
 
-            for file_path in glob.glob(f"{self.config['fcadefbneo_path']}/fightcade/*"):
+            for file_path in glob.glob(f"{self.config.fcadefbneo_path}/fightcade/*"):
                 base_name = os.path.basename(file_path)
                 overlay_type = os.path.splitext(base_name)[0]
 

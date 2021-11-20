@@ -1,10 +1,7 @@
 import datetime
 import logging
 
-from fcreplay.config import Config
 from fcreplay.database import Database
-
-config = Config().config
 
 log = logging.getLogger('fcreplay')
 

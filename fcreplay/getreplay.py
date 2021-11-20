@@ -18,7 +18,7 @@ class Getreplay:
 
     def __init__(self):
         """Initialize the Getreplay class."""
-        self.config = Config().config
+        self.config = Config()
         self.db = Database()
 
         with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
@@ -90,7 +90,7 @@ class Getreplay:
         data = self.db.get_single_replay(challenge_id=challenge_id)
         if data is None:
             # Limit the length of videos
-            if length > int(self.config['min_replay_length']) and length < int(self.config['max_replay_length']):
+            if length > int(self.config.min_replay_length) and length < int(self.config.max_replay_length):
                 log.info(f"Adding {challenge_id} to queue")
                 self.db.add_replay(
                     challenge_id=challenge_id,
@@ -167,7 +167,7 @@ class Getreplay:
         query = {'req': 'searchquarks', 'best': True, 'since': start_week_ms}
 
         replays = []
-        pages = self.config['get_weekly_replay_pages']
+        pages = self.config.get_weekly_replay_pages
         for i in range(0, pages):
             query['offset'] = i * 15
             r = self.get_data(query)

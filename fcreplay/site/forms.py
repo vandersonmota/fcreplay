@@ -1,10 +1,7 @@
-from fcreplay.config import Config
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
 import json
 import pkg_resources
-
-config = Config().config
 
 with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
     supported_games = json.load(f)

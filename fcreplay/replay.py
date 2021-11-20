@@ -7,6 +7,7 @@ from fcreplay.thumbnail import Thumbnail
 from fcreplay.updatethumbnail import UpdateThumbnail
 from fcreplay.character_detection import CharacterDetection
 from fcreplay.upload_youtube import UploadYouTube
+from fcreplay.models import Replays
 
 from internetarchive import get_item
 from retrying import retry
@@ -18,11 +19,11 @@ import logging
 import os
 import pkg_resources
 import re
-import shutil
+#import shutil
 import subprocess
-import sys
-import traceback
-import time
+#import sys
+#import traceback
+#import time
 
 log = logging.getLogger('fcreplay')
 
@@ -32,7 +33,7 @@ class Replay:
 
     def __init__(self):
         """Initaliser for Replay class."""
-        self.config = Config().config
+        self.config = Config()
         self.db = Database()
         self.replay = self.get_replay()
         self.description_text = ""
@@ -45,39 +46,38 @@ class Replay:
         with open('/tmp/fcreplay_status', 'w') as f:
             f.write(f"{self.replay.id} STARTED")
 
-    class Decorators(object):
-        @classmethod
-        def handle_fail(cls, func: Callable):
-            """Handle Failure decorator."""
-            def failed(self, *args, **kwargs):
-                try:
-                    return func(self, *args, **kwargs)
-                except Exception:
-                    trace_back = sys.exc_info()[2]
-                    log.error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
-                    log.info(f"Setting {self.replay.id} to failed")
-                    self.db.update_failed_replay(challenge_id=self.replay.id)
-                    self.update_status(status.FAILED)
+    # class Decorators(object):
+    #     @classmethod
+    #     def handle_fail(cls, func: Callable):
+    #         """Handle Failure decorator."""
+    #         def failed(self, *args, **kwargs):
+    #             try:
+    #                 return func(self, *args, **kwargs)
+    #             except Exception:
+    #                 trace_back = sys.exc_info()[2]
+    #                 log.error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
+    #                 log.info(f"Setting {self.replay.id} to failed")
+    #                 self.db.update_failed_replay(challenge_id=self.replay.id)
+    #                 self.update_status(status.FAILED)
 
-                    # Hacky as hell, but ensures everything gets killed
-                    if self.config['kill_all']:
-                        subprocess.run(['pkill', '-9', 'fcadefbneo'])
-                        subprocess.run(['pkill', '-9', 'wine'])
-                        subprocess.run(['pkill', '-9', '-f', 'system32'])
-                        subprocess.run(['/usr/bin/pulseaudio', '-k'])
-                        subprocess.run(['pkill', '-9', 'tail'])
-                        subprocess.run(['killall5'])
-                        subprocess.run(['pkill', '-9', 'sh'])
-                    time.sleep(5)
-                    sys.exit(1)
+    #                 # Hacky as hell, but ensures everything gets killed
+    #                 if self.config.kill_all:
+    #                     subprocess.run(['pkill', '-9', 'fcadefbneo'])
+    #                     subprocess.run(['pkill', '-9', 'wine'])
+    #                     subprocess.run(['pkill', '-9', '-f', 'system32'])
+    #                     subprocess.run(['/usr/bin/pulseaudio', '-k'])
+    #                     subprocess.run(['pkill', '-9', 'tail'])
+    #                     subprocess.run(['killall5'])
+    #                     subprocess.run(['pkill', '-9', 'sh'])
+    #                 time.sleep(5)
+    #                 sys.exit(1)
 
-            return failed
+    #         return failed
 
-    @Decorators.handle_fail
-    def get_replay(self):
+    def get_replay(self) -> Replays:
         """Get a replay from the database."""
         log.info('Getting replay from database')
-        if self.config['player_replay_first']:
+        if self.config.player_replay_first:
             replay = self.db.get_oldest_player_replay()
             if replay is not None:
                 log.info('Found player replay to encode')
@@ -85,7 +85,7 @@ class Replay:
             else:
                 log.info('No more player replays')
 
-        if self.config['random_replay']:
+        if self.config.random_replay:
             log.info('Getting random replay')
             replay = self.db.get_random_replay()
             return replay
@@ -95,7 +95,6 @@ class Replay:
 
         return replay
 
-    @Decorators.handle_fail
     def get_characters(self):
         """Get characters (if they exist) from pickle file."""
         c = CharacterDetection()
@@ -110,7 +109,6 @@ class Replay:
                 game=self.replay.game
             )
 
-    @Decorators.handle_fail
     def add_job(self):
         """Update jobs database table with the current replay."""
         start_time = datetime.datetime.utcnow()
@@ -121,13 +119,11 @@ class Replay:
             length=self.replay.length
         )
 
-    @Decorators.handle_fail
     def remove_job(self):
         """Remove job from database."""
         self.update_status(status.REMOVED_JOB)
         self.db.remove_job(challenge_id=self.replay.id)
 
-    @Decorators.handle_fail
     def update_status(self, status):
         """Update the replay status."""
         log.info(f"Set status to {status}")
@@ -139,7 +135,6 @@ class Replay:
             status=status
         )
 
-    @Decorators.handle_fail
     def record(self):
         """Start recording a replay."""
         log.info(
@@ -154,33 +149,22 @@ class Replay:
             f"""Starting record.main with argumens:
             fc_challenge_id={self.replay.id},
             fc_time={self.replay.length},
-            kill_time={self.config['record_timeout']},
-            fcadefbneo_path={self.config['fcadefbneo_path']},
+            kill_time={self.config.record_timeout},
+            fcadefbneo_path={self.config.fcadefbneo_path},
             game_name={self.replay.game}""")
-        record_status = Record().main(fc_challenge_id=self.replay.id,
-                                      fc_time=self.replay.length,
-                                      kill_time=self.config['record_timeout'],
-                                      fcadefbneo_path=self.config['fcadefbneo_path'],
-                                      game_name=self.replay.game
-                                      )
 
-        # Check recording status
-        if record_status != "Pass":
-            log.error(f"Recording failed on {self.replay.id},"
-                      f"Status: {record_status}, exiting.")
-
-            if record_status == "FailTimeout":
-                raise TimeoutError
-            else:
-                log.error(f"Unknown error: ${record_status}, exiting")
-                raise ValueError
+        Record().main(
+            challenge_id=self.replay.id,
+            replay_length_seconds=self.replay.length,
+            kill_time=self.config.record_timeout,
+            game_id=self.replay.game
+        )
 
         log.info("Capture finished")
         self.update_status(status.RECORDED)
 
         return True
 
-    @Decorators.handle_fail
     def sort_files(self, avi_files_list: list):
         """Sort files.
 
@@ -203,13 +187,12 @@ class Replay:
             sorted_avi_files_list = []
             for i in sorted(avi_dict.items(), key=lambda x: x[1]):
                 sorted_avi_files_list.append(i[0])
-            avi_files = [f"{self.config['fcadefbneo_path']}/avi/" + i for i in sorted_avi_files_list]
+            avi_files = [f"{self.config.fcadefbneo_path}/avi/" + i for i in sorted_avi_files_list]
         else:
-            avi_files = [f"{self.config['fcadefbneo_path']}/avi/" + avi_files_list[0]]
+            avi_files = [f"{self.config.fcadefbneo_path}/avi/" + avi_files_list[0]]
 
         return avi_files
 
-    @Decorators.handle_fail
     def get_resolution(self, aspect_ratio: list, video_resolution: list) -> list:
         """Return the correct resoltion for memcoder.
 
@@ -244,7 +227,6 @@ class Replay:
         desired_resolution = [int(a) for a in desired_resolution]
         return desired_resolution
 
-    @Decorators.handle_fail
     def encode(self):
         """Encode avi files.
 
@@ -253,7 +235,7 @@ class Replay:
         """
         log.info("Encoding lossless file")
 
-        avi_files_list_glob = glob.glob(f"{self.config['fcadefbneo_path']}/avi/*.avi")
+        avi_files_list_glob = glob.glob(f"{self.config.fcadefbneo_path}/avi/*.avi")
         avi_files_list = []
 
         for f in avi_files_list_glob:
@@ -280,7 +262,7 @@ class Replay:
             '-vf', f"flip,scale={r[0]}:{r[1]},dsize={dsize},expand={r[2]}:{r[3]}::::",
             *avi_files,
             '-of', 'lavf',
-            '-o', f"{self.config['fcadefbneo_path']}/avi/{self.replay.id}.mp4"
+            '-o', f"{self.config.fcadefbneo_path}/avi/{self.replay.id}.mp4"
         ]
 
         log.info(f"Running mencoder with: {' '.join(mencoder_options)}")
@@ -296,17 +278,15 @@ class Replay:
             log.error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {mencoder_rc.stdout}, stderr: {mencoder_rc.stderr}")
             raise e
 
-    @Decorators.handle_fail
     def remove_old_avi_files(self):
         """Remove old avi files."""
         log.info('Removing old avi files')
-        old_files = glob.glob(f"{self.config['fcadefbneo_path']}/avi/*.avi")
+        old_files = glob.glob(f"{self.config.fcadefbneo_path}/avi/*.avi")
 
         for f in old_files:
             log.info(f"Removing {f}")
             os.unlink(f)
 
-    @Decorators.handle_fail
     def set_description(self):
         """Set the description of the video.
 
@@ -336,14 +316,14 @@ class Replay:
                                     f"\nFightcade replay id: {self.replay.id}"
 
         # Read the append file:
-        if self.config['description_append_file'][0] is True:
+        if self.config.description_append_file[0] is True:
             # Check if file exists:
-            if not os.path.exists(self.config['description_append_file'][1]):
+            if not os.path.exists(self.config.description_append_file[1]):
                 log.error(
-                    f"Description append file {self.config['description_append_file'][1]} doesn't exist")
+                    f"Description append file {self.config.description_append_file[1]} doesn't exist")
                 return False
             else:
-                with open(self.config['description_append_file'][1], 'r') as description_append:
+                with open(self.config.description_append_file[1], 'r') as description_append:
                     self.description_text += "\n" + description_append.read()
 
         self.update_status(status.DESCRIPTION_CREATED)
@@ -358,7 +338,6 @@ class Replay:
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
         return True
 
-    @Decorators.handle_fail
     def create_thumbnail(self):
         """Create thumbnail from video."""
         log.info("Making thumbnail")
@@ -368,14 +347,12 @@ class Replay:
         self.update_status(status.THUMBNAIL_CREATED)
         log.info("Finished making thumbnail")
 
-    @Decorators.handle_fail
     def update_thumbnail(self):
         """Add text, country and ranks to thumbnail."""
         log.info("Updating thumbnail")
 
         UpdateThumbnail().update_thumbnail(self.replay, self.thumbnail)
 
-    @Decorators.handle_fail
     @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
     def upload_to_ia(self):
         """Upload to internet archive.
@@ -396,17 +373,17 @@ class Replay:
 
         metadata = {
             'title': title,
-            'mediatype': self.config['ia_settings']['mediatype'],
-            'collection': self.config['ia_settings']['collection'],
+            'mediatype': self.config.ia_settings['mediatype'],
+            'collection': self.config.ia_settings['collection'],
             'date': date_short,
             'description': self.description_text,
-            'subject': self.config['ia_settings']['subject'],
-            'creator': self.config['ia_settings']['creator'],
-            'language': self.config['ia_settings']['language'],
-            'licenseurl': self.config['ia_settings']['license_url']}
+            'subject': self.config.ia_settings['subject'],
+            'creator': self.config.ia_settings['creator'],
+            'language': self.config.ia_settings['language'],
+            'licenseurl': self.config.ia_settings['license_url']}
 
         log.info("Starting upload to archive.org")
-        fc_video.upload(f"{self.config['fcadefbneo_path']}/avi/{filename}",
+        fc_video.upload(f"{self.config.fcadefbneo_path}/avi/{filename}",
                         metadata=metadata, verbose=True)
 
         self.db.add_ia_filename(str(self.replay.id), filename)
@@ -414,7 +391,6 @@ class Replay:
         self.update_status(status.UPLOADED_TO_IA)
         log.info("Finished upload to archive.org")
 
-    @Decorators.handle_fail
     def upload_to_yt(self):
         """Upload video to youtube."""
         self.update_status(status.UPLOADING_TO_YOUTUBE)
@@ -446,7 +422,7 @@ class Replay:
             upload = UploadYouTube(title=title,
                                    description=self.description_text,
                                    tags=None,
-                                   video_path=f"{self.config['fcadefbneo_path']}/avi/{filename}",
+                                   video_path=f"{self.config.fcadefbneo_path}/avi/{filename}",
                                    playlist=playlist_name,
                                    thumbnail=self.thumbnail,
                                    recording_date=recording_date,
@@ -469,7 +445,6 @@ class Replay:
         self.update_status(status.UPLOADED_TO_YOUTUBE)
         log.info('Finished uploading to Youtube')
 
-    @Decorators.handle_fail
     def set_created(self):
         """Update the video status to created."""
         self.update_status(status.FINISHED)

@@ -12,14 +12,14 @@ log = logging.getLogger('fcreplay')
 
 class Instance:
     def __init__(self):
-        self.config = Config().config
+        self.config = Config()
 
     def clean(self):
         """Cleans directories before running
         """
         dirs = [
-            f"{self.config['fcreplay_dir']}/tmp/*",
-            f"{self.config['fcadefbneo_path']}/avi/*"
+            f"{self.config.fcreplay_dir}/tmp/*",
+            f"{self.config.fcadefbneo_path}/avi/*"
         ]
 
         for dir in dirs:
@@ -29,9 +29,9 @@ class Instance:
 
     def create_dirs(self):
         # Create directories if they don't exist
-        if not os.path.exists(f"{self.config['fcreplay_dir']}/tmp"):
+        if not os.path.exists(f"{self.config.fcreplay_dir}/tmp"):
             log.info('Created tmp dir')
-            os.mkdir(f"{self.config['fcreplay_dir']}/tmp")
+            os.mkdir(f"{self.config.fcreplay_dir}/tmp")
 
     def main(self):
         """The main loop for processing one or more replays
@@ -45,14 +45,14 @@ class Instance:
             replay.record()
             replay.get_characters()
             replay.encode()
-            if self.config['remove_old_avi_files']:
+            if self.config.remove_old_avi_files:
                 replay.remove_old_avi_files()
             replay.create_thumbnail()
             replay.update_thumbnail()
             replay.set_description()
-            if self.config['upload_to_ia']:
+            if self.config.upload_to_ia:
                 replay.upload_to_ia()
-            if self.config['upload_to_yt']:
+            if self.config.upload_to_yt:
                 replay.upload_to_yt()
             replay.remove_job()
             replay.db.update_created_replay(challenge_id=replay.replay.id)

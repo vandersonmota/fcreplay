@@ -37,7 +37,7 @@ class CharacterDetection:
 
         return False
 
-    def _get_video_time(self, detection_time) -> str:
+    def _get_video_time(self, detection_time: datetime.datetime) -> str:
         """Return the video time return as a string.
 
         Args:
@@ -54,7 +54,7 @@ class CharacterDetection:
         else:
             return formatted_time
 
-    def _time_too_soon(self, new_time):
+    def _time_too_soon(self, new_time: int) -> bool:
         """Check time against previous time, if it's within a 5 seconds, then return true else return false.
 
         Args:

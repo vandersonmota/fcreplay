@@ -30,7 +30,7 @@ class Replays(Base):
     p1 = Column(String)
     p2 = Column(String)
     date_replay = Column(DateTime)
-    length = Column(Integer)
+    length = Column(Integer) # Length in seconds
     created = Column(Boolean)
     failed = Column(Boolean)
     status = Column(String)

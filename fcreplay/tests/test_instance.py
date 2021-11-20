@@ -1,8 +1,11 @@
 import os
 import pathlib
 import pytest
+import sys
 import tempfile
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+
+sys.modules['pyautogui'] = MagicMock()
 from fcreplay.instance import Instance
 
 
@@ -14,16 +17,19 @@ class TestInstance:
     @patch('fcreplay.instance.Config')
     def test_clean(self, mock_config):
         instance = self.setUp()
+
         fcreplay_temp_dir = tempfile.TemporaryDirectory()
         fcadefbneo_temp_dir = tempfile.TemporaryDirectory()
-        instance.config = {'fcreplay_dir': fcreplay_temp_dir.name, 'fcadefbneo_path': fcadefbneo_temp_dir.name}
+
+        instance.config.fcadefbneo_path = fcadefbneo_temp_dir.name
+        instance.config.fcreplay_dir = fcreplay_temp_dir.name
 
         instance.create_dirs()
-        pathlib.Path(instance.config['fcadefbneo_path'] + '/avi').mkdir(parents=True, exist_ok=True)
+        pathlib.Path(instance.config.fcadefbneo_path + '/avi').mkdir(parents=True, exist_ok=True)
 
         create_list = [
-            f"{instance.config['fcreplay_dir']}/tmp",
-            f"{instance.config['fcadefbneo_path']}/avi"
+            f"{instance.config.fcreplay_dir}/tmp",
+            f"{instance.config.fcadefbneo_path}/avi"
         ]
 
         for f in create_list:
@@ -39,7 +45,7 @@ class TestInstance:
     def test_create_dir(self, mock_config):
         instance = self.setUp()
         temp_dir = tempfile.TemporaryDirectory()
-        instance.config = {'fcreplay_dir': temp_dir.name}
+        instance.config.fcreplay_dir = temp_dir.name
 
         instance.create_dirs()
         assert os.path.exists(f"{temp_dir.name}/tmp"), "Should create tmp dir"
@@ -53,7 +59,9 @@ class TestInstance:
             temp_dir = tempfile.TemporaryDirectory()
 
             instance = self.setUp()
-            instance.config = {'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'upload_to_ia': False}
+            instance.config.fcreplay_dir = temp_dir.name
+            instance.config.fcadefbneo_path = temp_dir.name
+            instance.config.upload_to_ia = False
             instance.debug = True
 
             instance.main()
@@ -65,7 +73,8 @@ class TestInstance:
             temp_dir = tempfile.TemporaryDirectory()
 
             instance = Instance()
-            instance.config = {'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config.fcreplay_dir = temp_dir.name
+            instance.config.fcadefbneo_path = temp_dir.name
 
             instance.debug = True
             instance.main()
@@ -76,7 +85,8 @@ class TestInstance:
             temp_dir = tempfile.TemporaryDirectory()
 
             instance = Instance()
-            instance.config = {'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name}
+            instance.config.fcreplay_dir = temp_dir.name
+            instance.config.fcadefbneo_path = temp_dir.name
 
             instance.debug = True
             instance.main()
@@ -89,7 +99,11 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': True, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'remove_old_avi_files': True}
+            instance.config.upload_to_ia = True
+            instance.config.upload_to_yt = False
+            instance.config.fcreplay_dir = temp_dir.name
+            instance.config.fcadefbneo_path = temp_dir.name
+            instance.config.remove_old_avi_files = True
             instance.debug = True
 
             instance.main()
@@ -103,7 +117,11 @@ class TestInstance:
         with pytest.raises(SystemExit) as e:
             temp_dir = tempfile.TemporaryDirectory()
             instance = Instance()
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': True, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'remove_old_avi_files': True}
+            instance.config.upload_to_ia = False
+            instance.config.upload_to_yt = True
+            instance.config.fcreplay_dir = temp_dir.name
+            instance.config.fcadefbneo_path = temp_dir.name
+            instance.config.remove_old_avi_files = True
             instance.debug = True
 
             instance.main()
@@ -119,8 +137,11 @@ class TestInstance:
             mock_replay.replay.return_value = True
 
             instance = Instance()
-
-            instance.config = {'upload_to_ia': False, 'upload_to_yt': False, 'fcreplay_dir': temp_dir.name, 'fcadefbneo_path': temp_dir.name, 'remove_old_avi_files': True}
+            instance.config.upload_to_ia = False
+            instance.config.upload_to_yt = False
+            instance.config.fcreplay_dir = temp_dir.name
+            instance.config.fcadefbneo_path = temp_dir.name
+            instance.config.remove_old_avi_files = True
             instance.debug = True
 
             instance.main()

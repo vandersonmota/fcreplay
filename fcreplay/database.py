@@ -18,9 +18,9 @@ class Database:
         Raises:
             e: Raises an exception on error
         """
-        config = Config().config
+        config = Config()
 
-        if 'DEBUG' in config['loglevel']:
+        if 'DEBUG' in config.loglevel:
             sql_echo = True
         else:
             logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
@@ -28,11 +28,11 @@ class Database:
 
         """Create Engine"""
         try:
-            log.debug(f"Creating DB Instance with: {config['sql_baseurl']}")
-            self.engine = create_engine(config['sql_baseurl'], echo=sql_echo, pool_pre_ping=True)
+            log.debug(f"Creating DB Instance with: {config.sql_baseurl}")
+            self.engine = create_engine(config.sql_baseurl, echo=sql_echo, pool_pre_ping=True)
             Base.metadata.create_all(self.engine)
         except Exception as e:
-            log.error(f"Unable to connect to {config['sql_baseurl']}: {e}")
+            log.error(f"Unable to connect to {config.sql_baseurl}: {e}")
             raise e
 
         self.Session = sessionmaker(bind=self.engine)
