@@ -19,8 +19,8 @@ class UploadYouTube:
         self.player_requested = player_requested
 
         self.options = SimpleNamespace(
-            client_secrets=self.config["youtube_secrets"],
-            credentials=self.config["youtube_credentials"],
+            client_secrets=self.config.youtube_secrets,
+            credentials=self.config.youtube_credentials,
             auth_browser=False,
             title=title,
             description=description,
