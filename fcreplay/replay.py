@@ -295,6 +295,10 @@ class Replay:
         """
         log.info("Creating description")
 
+        tags = ['fightcade']
+
+        tags.append(self.replay.game)
+
         if len(self.detected_characters) > 0:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
@@ -302,6 +306,10 @@ class Replay:
 
             first_chapter = True
             for match in self.detected_characters:
+                # Add characters to tags
+                tags.append(match[0])
+                tags.append(match[1])
+
                 # Remove leading 0: from replays
                 detect_time = re.sub('^0:', '', match[2])
                 if first_chapter:
@@ -314,6 +322,9 @@ class Replay:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs " \
                                     f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}" \
                                     f"\nFightcade replay id: {self.replay.id}"
+
+        # Add tags to the description text
+        self.description_text += "\n#" + '\n#'.join(tags)
 
         # Read the append file:
         if self.config.description_append_file[0] is True:

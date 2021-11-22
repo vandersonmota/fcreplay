@@ -50,14 +50,19 @@ class Tasker:
         return instance_count
 
     def running_instance(self, instance_hostname) -> bool:
-        d_client = docker.from_env()
-        for i in d_client.containers.list():
-            if instance_hostname in i.attrs['Config']['Hostname']:
-                return True
+        try:
+            d_client = docker.from_env()
+            for i in d_client.containers.list():
+                if instance_hostname in i.attrs['Config']['Hostname']:
+                    return True
+        except requests.exceptions.HTTPError:
+            print(f"Failed to find container {instance_hostname}")
+            return False
 
         return False
 
     def remove_temp_dirs(self):
+        """Remove temp directories for containers no longer running."""
         remove_instances = []
 
         for docker_hostname in self.started_instances:
@@ -70,6 +75,7 @@ class Tasker:
             del self.started_instances[i]
 
     def retry_failed_videos(self):
+        """Retry failed videos."""
         print('Setting failed videos to retry')
         failed_replays = self.db.get_all_failed_replays(limit=1000)
 
