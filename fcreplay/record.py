@@ -98,7 +98,7 @@ class Record:
             try:
                 frame_count = int(frame_count_str)
                 break
-            except TypeError or ValueError as e:
+            except (TypeError, ValueError) as e:
                 # Sometimes, when a recording is finished a newline will be written to the
                 # framecount file. In this case the number of frames recorded will be 'pretty close'
                 # to length of the replay multiplyed by the framerate
@@ -120,7 +120,6 @@ class Record:
             except Exception as e:
                 # This is to capture any other errrors that might occur
                 log.exception(f"Unexpected error: {e}")
-                raise
 
         self._last_good_frame_count = frame_count
         return frame_count
