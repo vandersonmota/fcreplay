@@ -41,22 +41,25 @@ class Instance:
 
         replay = Replay()
         if replay.replay is not None:
-            replay.add_job()
-            replay.record()
-            replay.get_characters()
-            replay.encode()
-            if self.config.remove_old_avi_files:
-                replay.remove_old_avi_files()
-            replay.create_thumbnail()
-            replay.update_thumbnail()
-            replay.set_description()
-            if self.config.upload_to_ia:
-                replay.upload_to_ia()
-            if self.config.upload_to_yt:
-                replay.upload_to_yt()
-            replay.remove_job()
-            replay.db.update_created_replay(challenge_id=replay.replay.id)
-            replay.set_created()
+            try:
+                replay.add_job()
+                replay.record()
+                replay.get_characters()
+                replay.encode()
+                if self.config.remove_old_avi_files:
+                    replay.remove_old_avi_files()
+                replay.create_thumbnail()
+                replay.update_thumbnail()
+                replay.set_description()
+                if self.config.upload_to_ia:
+                    replay.upload_to_ia()
+                if self.config.upload_to_yt:
+                    replay.upload_to_yt()
+                replay.remove_job()
+                replay.db.update_created_replay(challenge_id=replay.replay.id)
+                replay.set_created()
+            except Exception as e:
+                replay.handle_fail(e)
 
         else:
             log.info("No more replays. Waiting for replay submission")

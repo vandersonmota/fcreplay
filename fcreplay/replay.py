@@ -1,4 +1,3 @@
-from typing import Callable
 from fcreplay.config import Config
 from fcreplay.database import Database
 from fcreplay.record import Record
@@ -20,6 +19,8 @@ import os
 import pkg_resources
 import re
 import subprocess
+import time
+import sys
 
 log = logging.getLogger('fcreplay')
 
@@ -42,33 +43,27 @@ class Replay:
         with open('/tmp/fcreplay_status', 'w') as f:
             f.write(f"{self.replay.id} STARTED")
 
-    # class Decorators(object):
-    #     @classmethod
-    #     def handle_fail(cls, func: Callable):
-    #         """Handle Failure decorator."""
-    #         def failed(self, *args, **kwargs):
-    #             try:
-    #                 return func(self, *args, **kwargs)
-    #             except Exception:
-    #                 trace_back = sys.exc_info()[2]
-    #                 log.error(f"Excption: {str(traceback.format_tb(trace_back))},  shutting down")
-    #                 log.info(f"Setting {self.replay.id} to failed")
-    #                 self.db.update_failed_replay(challenge_id=self.replay.id)
-    #                 self.update_status(status.FAILED)
+    def handle_fail(self, e: Exception):
+        """Handle failures."""
+        log.exception(e)
+        log.info(f"Setting {self.replay.id} to failed")
+        self.db.update_failed_replay(challenge_id=self.replay.id)
+        self.update_status(status.FAILED)
 
-    #                 # Hacky as hell, but ensures everything gets killed
-    #                 if self.config.kill_all:
-    #                     subprocess.run(['pkill', '-9', 'fcadefbneo'])
-    #                     subprocess.run(['pkill', '-9', 'wine'])
-    #                     subprocess.run(['pkill', '-9', '-f', 'system32'])
-    #                     subprocess.run(['/usr/bin/pulseaudio', '-k'])
-    #                     subprocess.run(['pkill', '-9', 'tail'])
-    #                     subprocess.run(['killall5'])
-    #                     subprocess.run(['pkill', '-9', 'sh'])
-    #                 time.sleep(5)
-    #                 sys.exit(1)
+        # Hacky as hell, but ensures everything gets killed
+        if self.config.kill_all:
+            subprocess.run(['pkill', '-9', 'fcadefbneo'])
+            subprocess.run(['pkill', '-9', 'wine'])
+            subprocess.run(['pkill', '-9', '-f', 'system32'])
+            subprocess.run(['/usr/bin/pulseaudio', '-k'])
+            subprocess.run(['pkill', '-9', 'tail'])
+            subprocess.run(['killall5'])
+            subprocess.run(['pkill', '-9', 'sh'])
+        time.sleep(5)
+        with open('/tmp/fcreplay_failed', 'w') as f:
+            f.write("FAILED")
 
-    #         return failed
+        sys.exit(1)
 
     def get_replay(self) -> Replays:
         """Get a replay from the database."""
