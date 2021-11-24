@@ -36,6 +36,15 @@
       </iframe>
       {% endif -%}
       <p class="card-description">
+        {% if not replay.video_youtube_uploaded -%}
+        <p>
+          It looks like this replay was uploaded to archive.org. Unfortunately the archive.org player doesn't support playback of encoded replays. You can download and watch the video by clicking the link below.
+        </p>
+        {% endif -%}
+        <p>
+          Archive.org Link:
+          <a href="https://archive.org/details/{{ replay.id.replace('@','-') }}">https://archive.org/details/{{ replay.id.replace('@','-') }}</a>
+        </p>
         <p>
           Length: {{ replay.length|convertLength }}
         </p>
@@ -47,8 +56,6 @@
           </a>
         </p>
         {% endfor %}
-        Archive.org Link:
-        <a href="https://archive.org/details/{{ replay.id.replace('@','-') }}">https://archive.org/details/{{ replay.id.replace('@','-') }}</a>
       </p>
     </div>
   </div>
