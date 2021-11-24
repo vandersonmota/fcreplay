@@ -1,3 +1,4 @@
+import datetime
 import os
 import sys
 import tempfile
@@ -11,6 +12,72 @@ from fcreplay.replay import Replay
 
 
 class TestReplay:
+    @patch('fcreplay.replay.Database')
+    @patch('fcreplay.replay.Config')
+    def test_description_and_tags_no_chars_no_append(self, mock_config, mock_database):
+        """Test description is created with tags."""
+        r = Replay()
+        r.replay.id = '1234567890'
+        r.replay.game = '2020bb'
+        r.replay.date_replay = datetime.datetime.now()
+        r.replay.p1 = 'P1'
+        r.replay.p2 = 'P2'
+        r.replay.p1_loc = 'L1'
+        r.replay.p2_loc = 'L2'
+        r.detected_characters = []
+        r.config.description_append_file = [False]
+
+        expected_tags = [
+            f"#{r.replay.p1}",
+            f"#{r.replay.p2}",
+            f"#{r.replay.game}",
+        ]
+
+        assert r.set_description(), 'Description should be set without characters or appended text'
+        assert all(tag in r.description_text for tag in expected_tags), 'Expected tags should be in generated description'
+        assert r.db.add_description.called, 'Database should be called to add description'
+        assert f"({r.replay.p1_loc}) {r.replay.p1} vs " \
+               f"({r.replay.p2_loc}) {r.replay.p2} - {r.replay.date_replay}" \
+               f"\nFightcade replay id: {r.replay.id}" in r.description_text, 'Expected description should be in generated description'
+
+        r.config.description_append_file = [True, '/does/not/exist']
+        assert not r.set_description(), 'Description should fail when description append is set to true, but not file is configured'
+
+    @patch('fcreplay.replay.Database')
+    @patch('fcreplay.replay.Config')
+    def test_description_and_tags_and_chars_and_append(self, mock_config, mock_database):
+        """Test description is created with tags."""
+        r = Replay()
+        r.replay.id = '1234567890'
+        r.replay.game = '2020bb'
+        r.replay.date_replay = datetime.datetime.now()
+        r.replay.p1 = 'P1'
+        r.replay.p2 = 'P2'
+        r.replay.p1_loc = 'L1'
+        r.replay.p2_loc = 'L2'
+        r.detected_characters = [
+            ['0:05', 'C1', 'C2'],
+            ['1:00', 'C3', 'C2']
+        ]
+
+        expected_tags = [
+            f"#{r.replay.p1}",
+            f"#{r.replay.p2}",
+            f"#{r.replay.game}",
+            f"#{r.detected_characters[0][1]}",
+            f"#{r.detected_characters[0][2]}",
+            f"#{r.detected_characters[1][1]}",
+        ]
+
+        with tempfile.NamedTemporaryFile() as f:
+            r.config.description_append_file = [True, f.name]
+
+            append_contents = 'SomeAppendedText'
+            f.write(append_contents.encode())
+
+            assert r.set_description(), 'Description should be set without characters or appended text'
+            assert all(tag in r.description_text for tag in expected_tags), 'Expected tags should be in generated description'
+
     @patch('fcreplay.replay.subprocess')
     @patch('fcreplay.replay.Database')
     @patch('fcreplay.replay.Config')

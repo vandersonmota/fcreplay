@@ -19,11 +19,7 @@ import logging
 import os
 import pkg_resources
 import re
-#import shutil
 import subprocess
-#import sys
-#import traceback
-#import time
 
 log = logging.getLogger('fcreplay')
 
@@ -307,8 +303,8 @@ class Replay:
             first_chapter = True
             for match in self.detected_characters:
                 # Add characters to tags
-                tags.append(match[0])
                 tags.append(match[1])
+                tags.append(match[2])
 
                 # Remove leading 0: from replays
                 detect_time = re.sub('^0:', '', match[2])
@@ -324,7 +320,10 @@ class Replay:
                                     f"\nFightcade replay id: {self.replay.id}"
 
         # Add tags to the description text
-        self.description_text += "\n#" + '\n#'.join(tags)
+        tags.append(self.replay.p1)
+        tags.append(self.replay.p2)
+
+        self.description_text += "\n#" + '\n#'.join(set(tags)).replace(' ', '')
 
         # Read the append file:
         if self.config.description_append_file[0] is True:
@@ -407,7 +406,7 @@ class Replay:
         self.update_status(status.UPLOADING_TO_YOUTUBE)
 
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
-                f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
+                f"({self.replay.p2_loc}) {self.replay.p2}"
         filename = f"{self.replay.id}.mp4"
         import_format = '%Y-%m-%d %H:%M:%S'
         date_raw = datetime.datetime.strptime(
