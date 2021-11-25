@@ -286,9 +286,7 @@ class Replay:
         """
         log.info("Creating description")
 
-        tags = ['fightcade']
-
-        tags.append(self.replay.game)
+        tags = []
 
         if len(self.detected_characters) > 0:
             self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
@@ -318,7 +316,7 @@ class Replay:
         tags.append(self.replay.p1)
         tags.append(self.replay.p2)
 
-        self.description_text += "\n#" + '\n#'.join(set(tags)).replace(' ', '')
+        self.description_text += f"\n#fightcade\n#{self.replay.game}\n#" + '\n#'.join(set(tags)).replace(' ', '')
 
         # Read the append file:
         if self.config.description_append_file[0] is True:
