@@ -14,10 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image for fcreplay
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-      
-    - uses: actions/checkout@v2
     - name: Build the Docker image for fcreplay/image:latest
       run: docker build . --file Dockerfile --tag fcreplay/image::$(date +%s)
       
