@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image for fcreplay
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      
+    - uses: actions/checkout@v2
+    - name: Build the Docker image for fcreplay/image:latest
+      run: docker build . --file Dockerfile --tag fcreplay/image::$(date +%s)
+      
+    - uses: actions/checkout@v2
+    - name: Build the Docker image for fcreplay/site:latest
+      run: docker build . --file Dockerfile.site --tag fcreplay/site:$(date +%s)
