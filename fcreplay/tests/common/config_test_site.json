@@ -27,6 +27,7 @@
   "player_replay_first": true,
   "random_replay": false,
   "record_timeout": 120,
+  "resolution": [1920, 1080],
   "remove_old_avi_files": true,
   "secret_key": "SOME_TEST_SECERT_KEY",
   "sql_baseurl": "",

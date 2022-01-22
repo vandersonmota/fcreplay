@@ -53,6 +53,9 @@ class Config:
         self.record_timeout: int = int()
         "Timeout for the record command"
 
+        self.resolution: list = list()
+        "Resolution for the replay"
+
         self.remove_old_avi_files: bool = bool()
         "If true, old avi files will be removed"
 
@@ -68,7 +71,7 @@ class Config:
         self.upload_to_yt: bool = bool()
         "If true, replays will be uploaded to the youtube"
 
-        self.youtube_credentials: str  = str()
+        self.youtube_credentials: str = str()
         "Path to the youtube credentials file"
 
         self.youtube_max_daily_uploads: int = int()
@@ -238,6 +241,14 @@ class Config:
                 'meta': {
                     'default': 120,
                     'description': 'Time in seconds before marking a replay as failed if start not detected'
+                }
+            },
+            'resolution': {
+                'type': 'list',
+                'required': True,
+                'meta': {
+                    'default': [1920, 1080],
+                    'description': 'Resolution for the replay'
                 }
             },
             'remove_old_avi_files': {

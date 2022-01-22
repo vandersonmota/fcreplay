@@ -14,6 +14,17 @@ from fcreplay.replay import Replay
 class TestReplay:
     @patch('fcreplay.replay.Database')
     @patch('fcreplay.replay.Config')
+    def test_get_resolution(self, mock_config, mock_database):
+        r = Replay()
+        desired_resolution = r.get_resolution(
+            aspect_ratio=[4, 3],
+            video_resolution=[1920, 1080]
+        )
+
+        assert isinstance(desired_resolution, list), "Returned value is not a list"
+
+    @patch('fcreplay.replay.Database')
+    @patch('fcreplay.replay.Config')
     def test_description_and_tags_no_chars_no_append(self, mock_config, mock_database):
         """Test description is created with tags."""
         r = Replay()
@@ -84,6 +95,7 @@ class TestReplay:
     def test_encode(self, mock_config, mock_database, mock_subprocess):
         r = Replay()
         r.replay.game = '2020bb'
+        r.config.resolution = [1920, 1080]
 
         with tempfile.TemporaryDirectory() as single_file_dir:
             os.mkdir(f"{single_file_dir}/avi")

@@ -33,6 +33,7 @@
     "random_replay": true,
     "record_timeout": 120,
     "remove_old_avi_files": true,
+    "resolution": [1920, 1080],
     "sql_baseurl": "postgres://user:pass@address:port",
     "secret_key": "some_random_data",
     "upload_to_ia": false,

@@ -238,7 +238,7 @@ class Replay:
         avi_files = self.sort_files(avi_files_list)
 
         # Get the correct screen resolution settings
-        resolution = [1280, 720]
+        resolution = self.config.resolution
         aspect_ratio = self.supported_games[self.replay.game]['aspect_ratio']
         dsize = '/'.join(str(x) for x in aspect_ratio)
 
@@ -250,7 +250,7 @@ class Replay:
         mencoder_options = [
             '/opt/mplayer/bin/mencoder', '-oac', 'mp3lame', '-lameopts', 'vbr=3',
             '-ovc', 'x264', '-x264encopts', 'preset=slow:threads=auto',
-            '-vf', f"flip,scale={r[0]}:{r[1]},dsize={dsize},expand={r[2]}:{r[3]}::::",
+            '-vf', f"flip,scale={r[0]}:{r[1]},dsize={dsize},expand={r[2]}:{r[3]}::::", '-sws', '4',
             *avi_files,
             '-of', 'lavf',
             '-o', f"{self.config.fcadefbneo_path}/avi/{self.replay.id}.mp4"
