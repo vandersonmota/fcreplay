@@ -180,7 +180,8 @@ class Replay:
                 sorted_avi_files_list.append(i[0])
             avi_files = [f"{self.config.fcadefbneo_path}/avi/" + i for i in sorted_avi_files_list]
         else:
-            avi_files = [f"{self.config.fcadefbneo_path}/avi/" + avi_files_list[0]]
+            avi_files = [
+                f"{self.config.fcadefbneo_path}/avi/" + avi_files_list[0]]
 
         return avi_files
 
@@ -205,7 +206,8 @@ class Replay:
 
             # Super wide games need to be done differently, looking at you darius...
             if desired_resolution[0] > video_resolution[0]:
-                desired_resolution = [video_resolution[0], video_resolution[0] / multiplier]
+                desired_resolution = [video_resolution[0],
+                                      video_resolution[0] / multiplier]
 
         else:
             # Swap the resolutions, make the video verticle
@@ -226,7 +228,8 @@ class Replay:
         """
         log.info("Encoding lossless file")
 
-        avi_files_list_glob = glob.glob(f"{self.config.fcadefbneo_path}/avi/*.avi")
+        avi_files_list_glob = glob.glob(
+            f"{self.config.fcadefbneo_path}/avi/*.avi")
         avi_files_list = []
 
         for f in avi_files_list_glob:
@@ -266,7 +269,8 @@ class Replay:
         try:
             mencoder_rc.check_returncode()
         except subprocess.CalledProcessError as e:
-            log.error(f"Unable to process avi files. Return code: {e.returncode}, stdout: {mencoder_rc.stdout}, stderr: {mencoder_rc.stderr}")
+            log.error(
+                f"Unable to process avi files. Return code: {e.returncode}, stdout: {mencoder_rc.stdout}, stderr: {mencoder_rc.stderr}")
             raise e
 
     def remove_old_avi_files(self):
@@ -278,6 +282,27 @@ class Replay:
             log.info(f"Removing {f}")
             os.unlink(f)
 
+    def get_rank_letter(self, rank: int) -> str:
+        """Return the rank letter.
+
+        Args:
+            rank (int): Rank number
+
+        Returns:
+            str: Rank letter
+        """
+        ranks = {
+            '0': '?',
+            '1': 'E',
+            '2': 'D',
+            '3': 'C',
+            '4': 'B',
+            '5': 'A',
+            '6': 'S',
+        }
+
+        return ranks[str(rank)]
+
     def set_description(self):
         """Set the description of the video.
 
@@ -285,12 +310,15 @@ class Replay:
             boolean: Success or failure
         """
         log.info("Creating description")
-
+        ranks = [
+            self.get_rank_letter(self.replay.p1_rank),
+            self.get_rank_letter(self.replay.p2_rank)
+        ]
         tags = []
 
         if len(self.detected_characters) > 0:
-            self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} vs "\
-                f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay} "\
+            self.description_text = f"({self.replay.p1_loc}) {self.replay.p1} (Rank {ranks[0]}) vs "\
+                f"({self.replay.p2_loc}) {self.replay.p2} {ranks[1]} - {self.replay.date_replay} "\
                 f"\nFightcade replay id: {self.replay.id}"
 
             first_chapter = True
@@ -316,7 +344,8 @@ class Replay:
         tags.append(self.replay.p1)
         tags.append(self.replay.p2)
 
-        self.description_text += f"\n#fightcade\n#{self.replay.game}\n#" + '\n#'.join(set(tags)).replace(' ', '')
+        self.description_text += f"\n#fightcade\n#{self.replay.game}\n#" + '\n#'.join(
+            set(tags)).replace(' ', '')
 
         # Read the append file:
         if self.config.description_append_file[0] is True:
@@ -398,8 +427,13 @@ class Replay:
         """Upload video to youtube."""
         self.update_status(status.UPLOADING_TO_YOUTUBE)
 
-        title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs "\
-                f"({self.replay.p2_loc}) {self.replay.p2}"
+        ranks = [
+            self.get_rank_letter(self.replay.p1_rank),
+            self.get_rank_letter(self.replay.p2_rank)
+        ]
+
+        title = f"{self.supported_games[self.replay.game]['game_name']}: {self.replay.p1} ({self.replay.p1_loc}, Rank {ranks[0]})  vs "\
+                f"{self.replay.p2} ({self.replay.p2_loc}, Rank {ranks[1]})"
         filename = f"{self.replay.id}.mp4"
         import_format = '%Y-%m-%d %H:%M:%S'
         date_raw = datetime.datetime.strptime(

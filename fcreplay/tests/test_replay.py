@@ -35,6 +35,8 @@ class TestReplay:
         r.replay.p2 = 'P2'
         r.replay.p1_loc = 'L1'
         r.replay.p2_loc = 'L2'
+        r.replay.p1_rank = 0
+        r.replay.p2_rank = 5
         r.detected_characters = []
         r.config.description_append_file = [False]
 
@@ -44,7 +46,7 @@ class TestReplay:
             f"#{r.replay.game}",
         ]
 
-        assert r.set_description(), 'Description should be set without characters or appended text'
+        assert r.set_description(), 'Description should be set without game characters or appended text'
         assert all(tag in r.description_text for tag in expected_tags), 'Expected tags should be in generated description'
         assert r.db.add_description.called, 'Database should be called to add description'
         assert f"({r.replay.p1_loc}) {r.replay.p1} vs " \
@@ -66,6 +68,8 @@ class TestReplay:
         r.replay.p2 = 'P2'
         r.replay.p1_loc = 'L1'
         r.replay.p2_loc = 'L2'
+        r.replay.p1_rank = 0
+        r.replay.p2_rank = 5
         r.detected_characters = [
             ['0:05', 'C1', 'C2'],
             ['1:00', 'C3', 'C2']
