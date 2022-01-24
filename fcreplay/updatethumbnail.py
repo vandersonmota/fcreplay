@@ -152,6 +152,14 @@ class UpdateThumbnail:
         return [im, vs_font_height]
 
     def _resize_image(self, im: Image.Image):
+        log.info("Resizing image")
+        log.debug("Original image size: {}".format(im.size))
+
+        # Resize the image to fit withing 1280x720
+        im = im.resize((1280, 720))
+
+        log.debug("New image size: {}".format(im.size))
+
         if im.size[0] == 1280:
             crop_y = 90
             im = im.crop((160, crop_y, 1120, im.size[1] - crop_y))
@@ -164,6 +172,12 @@ class UpdateThumbnail:
             return im
 
     def update_thumbnail(self, replay, thumbnail):
+        """Update thumbnail with test, player names, and rank
+
+        Args:
+            replay (Replay): Replay object
+            thumbnail (str): Path to thumbnail
+        """
         log.info(f"Opening thumbnail: {str(thumbnail)}")
         im = Image.open(str(thumbnail))
 
