@@ -34,6 +34,7 @@ services:
       - ROMS=/path/to/ROMs
       - YOUTUBE_UPLOAD_CREDENTIALS=/path/to/.youtube-upload-credentials.json
       - AVI_TEMP_DIR=/path/to/large/avi_storage_temp
+      - GET_WEEKLY=false
     volumes:
       - /path/to/config.json:/root/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock

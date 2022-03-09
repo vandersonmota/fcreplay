@@ -195,13 +195,15 @@ class Tasker:
             time.sleep(1)
 
     def check_top_weekly(self):
-        g = Getreplay()
-        schedule.every(1).hour.do(g.get_top_weekly)
+        if 'GET_WEEKLY' in os.environ:
+            if os.environ['GET_WEEKLY'].lower() == 'true':
+                g = Getreplay()
+                schedule.every(1).hour.do(g.get_top_weekly)
 
-        g.get_top_weekly()
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
+                g.get_top_weekly()
+                while True:
+                    schedule.run_pending()
+                    time.sleep(1)
 
     def check_video_status(self):
         self.update_video_status()
