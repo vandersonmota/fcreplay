@@ -382,9 +382,12 @@ class Replay:
         bad_words = [x.lower() for x in bad_words]
 
         for word in bad_words:
-            if word in self.description_text.lower():
-                log.error(f"Bad word detected: {word}")
-                return False
+            for player in [self.replay.p1, self.replay.p2]:
+                if word in player.lower():
+                    log.error(f"Bad word: {word} detected in player: {player}")
+                    self.update_status(status.BAD_WORDS_CHECKED)
+                    log.info("Finished checking bad words")
+                    return False
 
         self.update_status(status.BAD_WORDS_CHECKED)
         log.info("Finished checking bad words")
