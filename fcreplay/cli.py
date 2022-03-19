@@ -1,5 +1,6 @@
 from fcreplay.database import Database
 from fcreplay.getreplay import Getreplay
+from fcreplay.config import Config
 import cmd2
 import pprint
 
@@ -15,6 +16,8 @@ class Cli(cmd2.Cmd):
         self.continuation_prompt = '... '
 
         self.db = Database()
+
+        self.config = Config()
 
     add_replay_parser = cmd2.Cmd2ArgumentParser(description='Add a new replay')
     add_replay_parser.add_argument('replay_url', help='Replay url of replay')
@@ -58,6 +61,8 @@ class Cli(cmd2.Cmd):
                               nargs=1,
                               choices=['failed', 'finished', 'pending', 'all', 'broken'],
                               help='Type of replays to count')
+
+    bad_words_parser = cmd2.Cmd2ArgumentParser(description='Check for bad words in existing replays')
 
     def yes_or_no(self, question):
         while "the answer is invalid":
@@ -214,3 +219,16 @@ class Cli(cmd2.Cmd):
             print("0")
         else:
             print(replay_count)
+
+    @cmd2.with_argparser(bad_words_parser)
+    def do_check_bad_words(self):
+        with open(self.config.bad_words_file, 'r') as bad_words_file:
+            bad_words = bad_words_file.read().splitlines()
+        bad_words = [x.lower() for x in bad_words]
+
+        players = self.db.get_all_players(limit=1000000)
+
+        for word in bad_words:
+            for player in players:
+                if word in player.lower():
+                    print(f"Found bad word in play name: Word: {word}, Player: {player}")

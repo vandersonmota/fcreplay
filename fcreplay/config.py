@@ -80,6 +80,9 @@ class Config:
         self.youtube_secrets: str = str()
         "Path to the youtube secrets file"
 
+        self.bad_words_file: str = str()
+        "Path to the bad words file"
+
         c = self._validate_config()
 
         # Load the config into the class variables
@@ -310,6 +313,14 @@ class Config:
                 'meta': {
                     'default': '/root/.youtube-secrets.json',
                     'description': 'Path to youtube-secrets.json file'
+                }
+            },
+            'bad_words_file': {
+                'type': 'string',
+                'required': True,
+                'meta': {
+                    'default': '/home/fcrecorder/fcreplay/bad_words.txt',
+                    'description': 'Path to bad words file',
                 }
             },
         }

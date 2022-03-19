@@ -370,6 +370,26 @@ class Replay:
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
         return True
 
+    def check_bad_words(self):
+        """Check if the description contains bad words.
+
+        Returns:
+            boolean: Success or failure
+        """
+        log.info("Checking bad words")
+        with open(self.config.bad_words_file, 'r') as bad_words_file:
+            bad_words = bad_words_file.read().splitlines()
+        bad_words = [x.lower() for x in bad_words]
+
+        for word in bad_words:
+            if word in self.description_text.lower():
+                log.error(f"Bad word detected: {word}")
+                return False
+
+        self.update_status(status.BAD_WORDS_CHECKED)
+        log.info("Finished checking bad words")
+        return True
+
     def create_thumbnail(self):
         """Create thumbnail from video."""
         log.info("Making thumbnail")

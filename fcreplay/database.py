@@ -629,6 +629,27 @@ class Database:
         session.close()
         return replays
 
+    def get_all_players(self, limit=10) -> list[str]:
+        """Get all players.
+
+        Args:
+            limit (int, optional): Number of players to return. Defaults to 10.
+
+        Returns:
+            list: List of play names
+        """
+        session = self.Session()
+        replays = session.query(Replays).limit(limit).all()
+        session.close()
+
+        players = set()
+
+        for replay in replays:
+            players.add(replay.p1)
+            players.add(replay.p2)
+
+        return list(players)
+
     def get_all_broken_replays(self, limit=10):
         """Get broken replays.
 

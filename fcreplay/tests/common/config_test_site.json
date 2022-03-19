@@ -35,5 +35,6 @@
   "upload_to_yt": false,
   "youtube_credentials": "UNUSED",
   "youtube_max_daily_uploads": 5,
-  "youtube_secrets": "UNUSED"
+  "youtube_secrets": "UNUSED",
+  "bad_words_file": "/home/fcrecorder/fcreplay/bad_words.txt"
 }

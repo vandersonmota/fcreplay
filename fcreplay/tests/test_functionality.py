@@ -121,6 +121,7 @@ class TestFunctionality:
         # We can't just use docker-compose up because fcreplay-site will fail locally due to service ports not being available.
         # Start postgres container
         subprocess.run(['docker-compose', 'up', '-d', 'postgres'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(1)
 
         # Wait for postgres to start
         pg_count = 0
@@ -150,9 +151,10 @@ class TestFunctionality:
         Returns:
             bool: True if container is clean
         """
-        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'dropdb', '--if-exists', '-U', 'fcreplay', 'fcreplay'], stdout=subprocess.PIPE)
+        rc = subprocess.run(['docker-compose', 'exec', '-T', 'postgres', 'dropdb', '--if-exists', '-U', 'fcreplay', 'fcreplay'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if rc.returncode != 0:
+            print(f"Stdout: {str(rc.stdout)}\nStderr: {str(rc.stderr)}")
             raise Exception("Failed to drop database")
 
         return True
@@ -210,7 +212,7 @@ class TestFunctionality:
             bool: True if top weekly videos are correct
         """
         # Wait for fcreplay-tasker-check_top_weekly to start
-        subprocess.run(['docker-compose', 'up', '-d', 'fcreplay-tasker-check_top_weekly'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        rc = subprocess.run(['docker-compose', 'up', '-d', 'fcreplay-tasker-check_top_weekly'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         check_count = 0
         while not self._is_container_running('fcreplay_fcreplay-tasker-check_top_weekly_1'):
@@ -218,6 +220,7 @@ class TestFunctionality:
             time.sleep(1)
 
             if check_count > 30:
+                print("Stdout: " + str(rc.stdout) + "\nStderr: " + str(rc.stderr))
                 raise Exception('fcreplay-tasker-check_top_weekly failed to start')
 
         # Wait for 30 seconds
@@ -608,8 +611,9 @@ class TestFunctionality:
 
         # Check if fcreplay-site is running and remove it
         site_id = self._get_container_id('fcreplay_fcreplay-site')
-        if len(site_id[0]) > 0:
-            subprocess.run(['docker', 'kill', site_id[0]])
+        for id in site_id:
+            subprocess.run(['docker', 'kill', id])
+            subprocess.run(['docker', 'rm', '-f', id])
 
         return True
 
@@ -663,9 +667,6 @@ class TestFunctionality:
         print("Waiting for recording to finish")
         assert self._wait_for_recording(), "Failed to wait for recording"
 
-        # Check for broken links
-        print("Checking for broken links")
-
         # Teardown
         print("Running teardown")
         assert self._teardown(), 'Failed to teardown'
@@ -687,8 +688,8 @@ class TestFunctionality:
         print("Starting fcreplay-site")
         assert self._start_fcreplay_site(), "Failed to check fcreplay-site"
 
-        # Check the fcreplay-site
-        print("Checking fcreplay-site")
+        # Check for broken links
+        print("Checking for broken links")
         assert self._check_for_broken_links(), "Failed to check fcreplay-site"
 
         # Teardown

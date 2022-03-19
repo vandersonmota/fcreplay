@@ -3,9 +3,7 @@ os.environ['FCREPLAY_CONFIG'] = './fcreplay/tests/common/config_test_site.json'
 
 from fcreplay.site.create_app import create_app, db
 from fcreplay.site.site_config import TestConfig
-from flask import url_for
-from io import StringIO
-from lxml import etree
+import xml.etree.ElementTree as ET
 import pytest
 
 class TestSite:
@@ -76,4 +74,11 @@ class TestSite:
         rv = app.get('/sitemap.xml')
 
         assert rv.status_code == 200
-        assert etree.fromstring(rv.data)
+        assert ET.fromstring(rv.data)
+
+        try:
+            bad_xml = "foo"
+            ET.fromstring(bad_xml)
+            assert False, "Bad xml should have thrown an exception"
+        except ET.ParseError:
+            assert True

@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap4
 from flask_cors import CORS
 
 from fcreplay.site.filters import convertLength
@@ -35,7 +35,7 @@ def create_app(app_config):
     app.register_blueprint(blueprint_app)
 
     # Add flask_bootstrap
-    Bootstrap(app)
+    Bootstrap4(app)
 
     # Cors
     cors(app)

@@ -43,3 +43,6 @@ files/savestates/*.fs
 
 # Database
 fcreplay_pgdata
+
+# Bad words
+bad_words.txt

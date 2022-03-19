@@ -54,7 +54,8 @@ class Instance:
                 if self.config.upload_to_ia:
                     replay.upload_to_ia()
                 if self.config.upload_to_yt:
-                    replay.upload_to_yt()
+                    if replay.check_words():
+                        replay.upload_to_yt()
                 replay.remove_job()
                 replay.db.update_created_replay(challenge_id=replay.replay.id)
                 replay.set_created()

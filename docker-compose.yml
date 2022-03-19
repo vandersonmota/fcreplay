@@ -37,6 +37,7 @@ services:
       - GET_WEEKLY=false
     volumes:
       - /path/to/config.json:/root/config.json:ro
+      - /path/to/bad_words_file.txt:/root/bad_words_file.txt:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/large/avi_storage_temp:/avi_storage_temp
     networks:

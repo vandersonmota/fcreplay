@@ -22,5 +22,6 @@ class Status:
             "MARKED_PLAYER": "Replay marked as a player submitted replay",
             "UNSUPPORTED_GAME": "Game is unsupported",
             "INVALID_URL": "URL is invalid",
-            "REPLAY_NOT_FOUND": "Replay was not found in database"
+            "REPLAY_NOT_FOUND": "Replay was not found in database",
+            "BAD_WORDS_CHECKED": "Bad words checked"
         }
