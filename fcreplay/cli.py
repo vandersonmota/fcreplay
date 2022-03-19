@@ -63,6 +63,7 @@ class Cli(cmd2.Cmd):
                               help='Type of replays to count')
 
     bad_words_parser = cmd2.Cmd2ArgumentParser(description='Check for bad words in existing replays')
+    bad_words_parser.add_argument('-l', '--limit', default=10, type=int, help='Limit number of results')
 
     def yes_or_no(self, question):
         while "the answer is invalid":
@@ -221,12 +222,14 @@ class Cli(cmd2.Cmd):
             print(replay_count)
 
     @cmd2.with_argparser(bad_words_parser)
-    def do_check_bad_words(self):
+    def do_check_bad_words(self, args):
         with open(self.config.bad_words_file, 'r') as bad_words_file:
             bad_words = bad_words_file.read().splitlines()
         bad_words = [x.lower() for x in bad_words]
 
-        players = self.db.get_all_players(limit=1000000)
+        limit = args.limit
+
+        players = self.db.get_all_players(limit=limit)
 
         for word in bad_words:
             for player in players:
