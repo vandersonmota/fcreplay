@@ -121,7 +121,8 @@ class Tasker:
                 str(os.environ['IA']): {'bind': '/root/.ia', 'mode': 'ro'},
                 str(os.environ['ROMS']): {'bind': '/Fightcade/emulator/fbneo/ROMs', 'mode': 'ro'},
                 str(os.environ['YOUTUBE_UPLOAD_CREDENTIALS']): {'bind': '/root/.youtube-upload-credentials.json', 'mode': 'ro'},
-                f"{os.environ['AVI_TEMP_DIR']}/{instance_uuid}": {'bind': '/Fightcade/emulator/fbneo/avi', 'mode': 'rw'}
+                f"{os.environ['AVI_TEMP_DIR']}/{instance_uuid}": {'bind': '/Fightcade/emulator/fbneo/avi', 'mode': 'rw'},
+                str(os.environ['BAD_WORDS_FILE']): {'bind': '/root/bad_words.txt', 'mode': 'ro'}
             }
         )
 

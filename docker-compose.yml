@@ -35,6 +35,7 @@ services:
       - YOUTUBE_UPLOAD_CREDENTIALS=/path/to/.youtube-upload-credentials.json
       - AVI_TEMP_DIR=/path/to/large/avi_storage_temp
       - GET_WEEKLY=false
+      - BAD_WORDS_FILE=/path/to/bad_words.txt
     volumes:
       - /path/to/config.json:/root/config.json:ro
       - /path/to/bad_words_file.txt:/root/bad_words_file.txt:ro
