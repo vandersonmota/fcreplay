@@ -1,13 +1,12 @@
-from datetime import timedelta
 from fcreplay.config import Config
 from fcreplay.status import status
 from retrying import retry
-import datetime
 import json
 import logging
 import pkg_resources
 import re
 import requests
+from replaydata import ReplayData
 
 log = logging.getLogger('fcreplay')
 
@@ -46,7 +45,7 @@ class Getreplay:
             return r.json()
 
 
-    def get_replay(self, url, player_requested=False):
+    def get_replay(self, url):
         """Get a replay by url.
 
         Args:
@@ -80,10 +79,4 @@ class Getreplay:
         # Look for replay in results:
         for i in r['results']['results']:
             if challenge_id == i['quarkid']:
-                return self.add_replay(
-                    replay=i,
-                    emulator=emulator,
-                    game=game,
-                    player_replay=player_requested
-                )
-        return status.REPLAY_NOT_FOUND
+                return ReplayData(id=challenge_id, emulator=emulator, game=game)

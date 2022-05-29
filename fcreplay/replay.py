@@ -14,25 +14,10 @@ import subprocess
 import time
 import sys
 from dataclasses import dataclass
+from getreplay import Getreplay
 
 
 log = logging.getLogger('fcreplay')
-
-@dataclass
-class ReplayData:
-    id: str
-    p1_loc: str
-    p2_loc: str
-    p1_rank: str
-    p2_rank: str
-    p1: str
-    p2: str
-    date_replay: datetime.datetime
-    length: int # Length in seconds
-    status: str
-    game: str
-    emulator: str
-
 
 class Replay:
     """Class for FightCade replays."""
@@ -40,7 +25,7 @@ class Replay:
     def __init__(self, url):
         """Initaliser for Replay class."""
         self.config = Config()
-        self.replay = self.get_replay()
+        self.replay = Getreplay().get_replay(url)
         self.description_text = ""
         self.detected_characters = []
 
