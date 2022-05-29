@@ -1,6 +1,0 @@
-DROP TABLE job;
-CREATE TABLE job (
-    id VARCHAR PRIMARY KEY,
-    start_time DATE NOT NULL DEFAULT CURRENT_DATE,
-    instance VARCHAR NOT NULL
-)

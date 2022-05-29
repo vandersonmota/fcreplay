@@ -1,1 +1,0 @@
-SELECT * FROM replays LIMIT 100

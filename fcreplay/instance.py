@@ -42,9 +42,7 @@ class Instance:
         replay = Replay()
         if replay.replay is not None:
             try:
-                replay.add_job()
                 replay.record()
-                replay.get_characters()
                 replay.encode()
                 if self.config.remove_old_avi_files:
                     replay.remove_old_avi_files()

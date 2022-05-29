@@ -1,1 +1,0 @@
-select * from replays where player_requested = true and created = false

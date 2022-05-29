@@ -1,1 +1,0 @@
-select * from replays where failed = true
