@@ -31,7 +31,6 @@ class Replay:
     def __init__(self):
         """Initaliser for Replay class."""
         self.config = Config()
-        self.db = Database()
         self.replay = self.get_replay()
         self.description_text = ""
         self.detected_characters = []
@@ -46,9 +45,6 @@ class Replay:
     def handle_fail(self, e: Exception):
         """Handle failures."""
         log.exception(e)
-        log.info(f"Setting {self.replay.id} to failed")
-        self.db.update_failed_replay(challenge_id=self.replay.id)
-        self.update_status(status.FAILED)
 
         # Hacky as hell, but ensures everything gets killed
         if self.config.kill_all:
@@ -65,75 +61,12 @@ class Replay:
 
         sys.exit(1)
 
-    def get_replay(self) -> Replays:
-        """Get a replay from the database."""
-        log.info('Getting replay from database')
-        if self.config.player_replay_first:
-            replay = self.db.get_oldest_player_replay()
-            if replay is not None:
-                log.info('Found player replay to encode')
-                return replay
-            else:
-                log.info('No more player replays')
-
-        if self.config.random_replay:
-            log.info('Getting random replay')
-            replay = self.db.get_random_replay()
-            return replay
-        else:
-            log.info('Getting oldest replay')
-            replay = self.db.get_oldest_replay()
-
-        return replay
-
-    def get_characters(self):
-        """Get characters (if they exist) from pickle file."""
-        c = CharacterDetection()
-        self.detected_characters = c.get_characters()
-
-        for i in self.detected_characters:
-            self.db.add_detected_characters(
-                challenge_id=self.replay.id,
-                p1_char=i[0],
-                p2_char=i[1],
-                vid_time=i[2],
-                game=self.replay.game
-            )
-
-    def add_job(self):
-        """Update jobs database table with the current replay."""
-        start_time = datetime.datetime.utcnow()
-        self.update_status(status.JOB_ADDED)
-        self.db.add_job(
-            challenge_id=self.replay.id,
-            start_time=start_time,
-            length=self.replay.length
-        )
-
-    def remove_job(self):
-        """Remove job from database."""
-        self.update_status(status.REMOVED_JOB)
-        self.db.remove_job(challenge_id=self.replay.id)
-
-    def update_status(self, status):
-        """Update the replay status."""
-        log.info(f"Set status to {status}")
-        # This file is legacy?
-        with open('/tmp/fcreplay_status', 'w') as f:
-            f.write(f"{self.replay.id} {status}")
-        self.db.update_status(
-            challenge_id=self.replay.id,
-            status=status
-        )
-
     def record(self):
         """Start recording a replay."""
         log.info(
             f"Starting capture with {self.replay.id} and {self.replay.length}")
         time_min = int(self.replay.length / 60)
         log.info(f"Capture will take {time_min} minutes")
-
-        self.update_status(status.RECORDING)
 
         # Star a recording store recording status
         log.debug(
@@ -152,7 +85,6 @@ class Replay:
         )
 
         log.info("Capture finished")
-        self.update_status(status.RECORDED)
 
         return True
 
@@ -303,11 +235,11 @@ class Replay:
 
         return ranks[str(rank)]
 
-    def set_description(self):
-        """Set the description of the video.
+    def get_description(self):
+        """Get the description of the video.
 
         Returns:
-            boolean: Success or failure
+            str: Description texts
         """
         log.info("Creating description")
         ranks = [
@@ -358,17 +290,12 @@ class Replay:
                 with open(self.config.description_append_file[1], 'r') as description_append:
                     self.description_text += "\n" + description_append.read()
 
-        self.update_status(status.DESCRIPTION_CREATED)
         log.info("Finished creating description")
 
-        # Add description to database
-        log.info('Adding description to database')
-        self.db.add_description(
-            challenge_id=self.replay.id, description=self.description_text)
 
         log.debug(
             f"Description Text is: {self.description_text.encode('unicode-escape')}")
-        return True
+        return self.description_text
 
     def check_bad_words(self):
         """Check if the description contains bad words.
@@ -385,11 +312,9 @@ class Replay:
             for player in [self.replay.p1, self.replay.p2]:
                 if word in player.lower():
                     log.error(f"Bad word: {word} detected in player: {player}")
-                    self.update_status(status.BAD_WORDS_CHECKED)
                     log.info("Finished checking bad words")
                     return False
 
-        self.update_status(status.BAD_WORDS_CHECKED)
         log.info("Finished checking bad words")
         return True
 
@@ -399,7 +324,6 @@ class Replay:
 
         self.thumbnail = Thumbnail().get_thumbnail(self.replay)
 
-        self.update_status(status.THUMBNAIL_CREATED)
         log.info("Finished making thumbnail")
 
     def update_thumbnail(self):
@@ -416,7 +340,6 @@ class Replay:
         exist. So we decorate the function with the @retry decorator to try
         again in a little bit. Max of 3 tries
         """
-        self.update_status(status.UPLOADING_TO_IA)
         title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
                 f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
         filename = f"{self.replay.id}.mp4"
@@ -443,69 +366,4 @@ class Replay:
 
         self.db.add_ia_filename(str(self.replay.id), filename)
 
-        self.update_status(status.UPLOADED_TO_IA)
         log.info("Finished upload to archive.org")
-
-    def upload_to_yt(self):
-        """Upload video to youtube."""
-        self.update_status(status.UPLOADING_TO_YOUTUBE)
-
-        ranks = [
-            self.get_rank_letter(self.replay.p1_rank),
-            self.get_rank_letter(self.replay.p2_rank)
-        ]
-
-        title = f"{self.supported_games[self.replay.game]['game_name']}: {self.replay.p1} ({self.replay.p1_loc}, Rank {ranks[0]})  vs "\
-                f"{self.replay.p2} ({self.replay.p2_loc}, Rank {ranks[1]})"
-        filename = f"{self.replay.id}.mp4"
-        import_format = '%Y-%m-%d %H:%M:%S'
-        date_raw = datetime.datetime.strptime(
-            str(self.replay.date_replay), import_format)
-
-        # Trim title length
-        if len(title) > 100:
-            title = title[:99]
-        log.info(f"Title is: {title}")
-
-        # Trim playlist name length
-        if len(self.supported_games[self.replay.game]['game_name']) > 100:
-            playlist_name = self.supported_games[self.replay.game]['game_name'][:99]
-        else:
-            playlist_name = self.supported_games[self.replay.game]['game_name']
-
-        # YYYY-MM-DDThh:mm:ss.sZ
-        recording_date = date_raw.strftime('%Y-%m-%dT%H:%M:%S.0Z')
-
-        # Do upload
-        log.info("Uploading to youtube")
-        try:
-            upload = UploadYouTube(title=title,
-                                   description=self.description_text,
-                                   tags=None,
-                                   video_path=f"{self.config.fcadefbneo_path}/avi/{filename}",
-                                   playlist=playlist_name,
-                                   thumbnail=self.thumbnail,
-                                   recording_date=recording_date,
-                                   player_requested=self.replay.player_requested
-                                   )
-            youtube_id = upload.upload()
-        except Exception as e:
-            log.error(f"Error uploading to youtube: {e}")
-            return False
-
-        log.info(f"Youtube id: {youtube_id}")
-
-        if type(youtube_id) is bool or len(youtube_id) < 4:
-            log.info('Unable to upload to youtube')
-            self.db.set_youtube_uploaded(self.replay.id, False)
-        else:
-            self.db.set_youtube_uploaded(self.replay.id, True)
-            self.db.set_youtube_id(self.replay.id, youtube_id)
-
-        self.update_status(status.UPLOADED_TO_YOUTUBE)
-        log.info('Finished uploading to Youtube')
-
-    def set_created(self):
-        """Update the video status to created."""
-        self.update_status(status.FINISHED)
-        self.db.update_created_replay(challenge_id=self.replay.id)
