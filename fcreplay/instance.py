@@ -48,15 +48,7 @@ class Instance:
                     replay.remove_old_avi_files()
                 replay.create_thumbnail()
                 replay.update_thumbnail()
-                replay.set_description()
-                if self.config.upload_to_ia:
-                    replay.upload_to_ia()
-                if self.config.upload_to_yt:
-                    if replay.check_bad_words():
-                        replay.upload_to_yt()
-                replay.remove_job()
-                replay.db.update_created_replay(challenge_id=replay.replay.id)
-                replay.set_created()
+                replay.get_description()
             except Exception as e:
                 replay.handle_fail(e)
 
