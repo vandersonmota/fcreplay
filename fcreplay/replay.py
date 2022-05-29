@@ -331,39 +331,4 @@ class Replay:
         log.info("Updating thumbnail")
 
         UpdateThumbnail().update_thumbnail(self.replay, self.thumbnail)
-
-    @retry(wait_random_min=30000, wait_random_max=60000, stop_max_attempt_number=3)
-    def upload_to_ia(self):
-        """Upload to internet archive.
-
-        Sometimes it will return a 403, even though the file doesn't already
-        exist. So we decorate the function with the @retry decorator to try
-        again in a little bit. Max of 3 tries
-        """
-        title = f"{self.supported_games[self.replay.game]['game_name']}: ({self.replay.p1_loc}) {self.replay.p1} vs" \
-                f"({self.replay.p2_loc}) {self.replay.p2} - {self.replay.date_replay}"
-        filename = f"{self.replay.id}.mp4"
-        date_short = str(self.replay.date_replay)[10]
-
-        # Make identifier for Archive.org
-        ident = str(self.replay.id).replace("@", "-")
-        fc_video = get_item(ident)
-
-        metadata = {
-            'title': title,
-            'mediatype': self.config.ia_settings['mediatype'],
-            'collection': self.config.ia_settings['collection'],
-            'date': date_short,
-            'description': self.description_text,
-            'subject': self.config.ia_settings['subject'],
-            'creator': self.config.ia_settings['creator'],
-            'language': self.config.ia_settings['language'],
-            'licenseurl': self.config.ia_settings['license_url']}
-
-        log.info("Starting upload to archive.org")
-        fc_video.upload(f"{self.config.fcadefbneo_path}/avi/{filename}",
-                        metadata=metadata, verbose=True)
-
-        self.db.add_ia_filename(str(self.replay.id), filename)
-
-        log.info("Finished upload to archive.org")
+challenge_id = url.split('/')[5]
