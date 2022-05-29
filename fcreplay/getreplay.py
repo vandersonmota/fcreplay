@@ -1,6 +1,5 @@
 from datetime import timedelta
 from fcreplay.config import Config
-from fcreplay.database import Database
 from fcreplay.status import status
 from retrying import retry
 import datetime
@@ -19,7 +18,6 @@ class Getreplay:
     def __init__(self):
         """Initialize the Getreplay class."""
         self.config = Config()
-        self.db = Database()
 
         with open(pkg_resources.resource_filename('fcreplay', 'data/supported_games.json')) as f:
             self.supported_games = json.load(f)
