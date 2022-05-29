@@ -124,5 +124,5 @@ COPY files/docker-entrypoint.sh /docker-entrypoint.sh
 # Create an empty config.json file to overwrite with docker
 RUN touch /root/config.json
 
-CMD ["fcrecord"]
-ENTRYPOINT ["/docker-entrypoint.sh"]
+#CMD ["fcrecord"]
+#ENTRYPOINT ["/docker-entrypoint.sh"]
