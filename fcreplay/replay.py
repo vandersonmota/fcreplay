@@ -1,15 +1,7 @@
 from fcreplay.config import Config
-from fcreplay.database import Database
 from fcreplay.record import Record
-from fcreplay.status import status
 from fcreplay.thumbnail import Thumbnail
 from fcreplay.updatethumbnail import UpdateThumbnail
-from fcreplay.character_detection import CharacterDetection
-from fcreplay.upload_youtube import UploadYouTube
-from fcreplay.models import Replays
-
-from internetarchive import get_item
-from retrying import retry
 
 import datetime
 import glob
@@ -21,14 +13,31 @@ import re
 import subprocess
 import time
 import sys
+from dataclasses import dataclass
+
 
 log = logging.getLogger('fcreplay')
+
+@dataclass
+class ReplayData:
+    id: str
+    p1_loc: str
+    p2_loc: str
+    p1_rank: str
+    p2_rank: str
+    p1: str
+    p2: str
+    date_replay: datetime.datetime
+    length: int # Length in seconds
+    status: str
+    game: str
+    emulator: str
 
 
 class Replay:
     """Class for FightCade replays."""
 
-    def __init__(self):
+    def __init__(self, url):
         """Initaliser for Replay class."""
         self.config = Config()
         self.replay = self.get_replay()
